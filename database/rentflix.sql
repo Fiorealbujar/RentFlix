@@ -10,7 +10,7 @@ CREATE TABLE Peliculas (
     duracion           INT NOT NULL,
     genero             VARCHAR(50) NOT NULL,
     sinopsis           TEXT,
-    clasificacion_edad ENUM('TP', '7', '12', '16', '18') NOT NULL,
+    clasificacion_edad TEXT NOT NULL,
     CONSTRAINT ck_clas_edad CHECK (clasificacion_edad IN ('TP', '7', '12', '16', '18')),
     CONSTRAINT pk_id_pel PRIMARY KEY (id_pelicula)
 );
@@ -54,17 +54,20 @@ CREATE TABLE Clientes (
 CREATE TABLE Copias (
     id_copia        INT AUTO_INCREMENT,
     id_pelicula     INT NOT NULL,
-    formato         ENUM('DVD', 'Blu-ray', '4K Ultra HD') NOT NULL,
-    estado          ENUM('disponible', 'alquilada', 'dañada') NOT NULL DEFAULT 'disponible',
+    formato         TEXT NOT NULL,
+    estado          TEXT NOT NULL DEFAULT 'disponible',
     precio_alquiler DECIMAL(5,2) NOT NULL,
+    CONSTRAINT ck_formato CHECK (formato IN ('DVD', 'Blu-ray', '4K Ultra HD')),
+    CONSTRAINT ck_estado CHECK (estado IN ('disponible', 'alquilada', 'dañada')),
     CONSTRAINT pk_id_cop  PRIMARY KEY (id_copia),
     CONSTRAINT fk_id_pel  FOREIGN KEY (id_pelicula) REFERENCES Peliculas(id_pelicula)
 );
 
 CREATE TABLE Pagos (
     id_transaccion INT AUTO_INCREMENT,
-    metodo_pago    ENUM('efectivo', 'tarjeta', 'transferencia') NOT NULL,
+    metodo_pago    TEXT NOT NULL,
     monto_cobro    DECIMAL(5,2) NOT NULL,
+    CONSTRAINT ck_met_pago CHECK (metodo_pago IN ('efectivo', 'tarjeta', 'transferencia')),
     CONSTRAINT pk_id_trans PRIMARY KEY (id_transaccion)
 );
 
@@ -77,7 +80,7 @@ CREATE TABLE Alquileres (
     fecha_alquiler            DATE NOT NULL,
     fecha_devolucion_prevista DATE NOT NULL,
     fecha_devolucion_real     DATE,
-    estado_alquiler           ENUM('activo', 'devuelto', 'vencido') NOT NULL DEFAULT 'activo',
+    estado_alquiler           TEXT NOT NULL DEFAULT 'activo',
     CONSTRAINT ck_est_alq  CHECK (estado_alquiler IN ('activo', 'devuelto', 'vencido')),
     CONSTRAINT pk_id_alq   PRIMARY KEY (id_alquiler),
     CONSTRAINT fk_id_cli   FOREIGN KEY (id_cliente)      REFERENCES Clientes(id_cliente),
