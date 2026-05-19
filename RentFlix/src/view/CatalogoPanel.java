@@ -1,7 +1,6 @@
 package view;
 
 import controller.NavController;
-import model.Pelicula;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -11,22 +10,21 @@ import java.awt.*;
 
 public class CatalogoPanel extends JPanel {
 
-    private static final Color BG       = new Color(0xF5F5F5);
-    private static final Color PANEL_BG = Color.WHITE;
-    private static final Color BORDER   = new Color(0xE8E8E8);
-    private static final Color ACCENT   = new Color(0x1D9E75);
-    private static final Color TEXT_PRI = new Color(0x1A1A1A);
-    private static final Color TEXT_SEC = new Color(0x999999);
+    private static final Color ACCENT = new Color(0x1D9E75);
 
-    private DefaultTableModel tableModel;
+    private static Color bg()      { Color c = UIManager.getColor("Panel.background");        return c != null ? c : new Color(0xF5F5F5); }
+    private static Color panelBg() { Color c = UIManager.getColor("Table.background");         return c != null ? c : Color.WHITE; }
+    private static Color border()  { Color c = UIManager.getColor("Component.borderColor");    return c != null ? c : new Color(0xE8E8E8); }
+    private static Color textPri() { Color c = UIManager.getColor("Label.foreground");         return c != null ? c : new Color(0x1A1A1A); }
+    private static Color textSec() { Color c = UIManager.getColor("Label.disabledForeground"); return c != null ? c : new Color(0x999999); }
 
     public CatalogoPanel(NavController controller) {
-        setBackground(BG);
+        setBackground(bg());
         setLayout(new BorderLayout());
         setBorder(new EmptyBorder(16, 18, 16, 18));
 
         add(buildToolbar(), BorderLayout.NORTH);
-       // add(buildTabla(),   BorderLayout.CENTER);
+        add(buildTabla(),   BorderLayout.CENTER);
     }
 
     private JPanel buildToolbar() {
@@ -36,68 +34,59 @@ public class CatalogoPanel extends JPanel {
 
         JLabel title = new JLabel("Catálogo de películas");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 15f));
-        title.setForeground(TEXT_PRI);
+        title.setForeground(textPri());
 
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         right.setOpaque(false);
 
-        // Filtro por disponibilidad
         String[] filtros = {"Todas", "Disponibles", "Alquiladas"};
         JComboBox<String> combo = new JComboBox<>(filtros);
         combo.setFont(combo.getFont().deriveFont(12f));
         combo.setPreferredSize(new Dimension(130, 30));
 
-        // Botón añadir
-        JButton btnAdd = buildPrimaryButton("+ Añadir película");
-
         right.add(combo);
-        right.add(btnAdd);
+        right.add(buildPrimaryButton("+ Añadir película"));
 
         bar.add(title, BorderLayout.WEST);
         bar.add(right, BorderLayout.EAST);
         return bar;
     }
 
-   /* private JPanel buildTabla() {
+    private JPanel buildTabla() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(PANEL_BG);
-        panel.setBorder(BorderFactory.createLineBorder(BORDER, 1, true));
+        panel.setBackground(panelBg());
+        panel.setBorder(BorderFactory.createLineBorder(border(), 1, true));
 
         String[] cols = {"ID", "Título", "Género", "Director", "Año", "Precio/día", "Estado"};
-
-        // Datos de ejemplo — reemplazar por consulta a la BD
         Object[][] data = {
-            {"001", "Dune: Parte Dos",  "Sci-Fi",    "Denis Villeneuve", "2024", "2,50 €", "Disponible"},
-            {"002", "Oppenheimer",      "Drama",     "Christopher Nolan","2023", "2,50 €", "Alquilada"},
-            {"003", "Barbie",           "Comedia",   "Greta Gerwig",     "2023", "2,50 €", "Disponible"},
-            {"004", "Avatar 2",         "Acción",    "James Cameron",    "2022", "2,50 €", "Disponible"},
-            {"005", "Gladiator II",     "Acción",    "Ridley Scott",     "2024", "2,50 €", "Disponible"},
-            {"006", "Wonka",            "Familiar",  "Paul King",        "2023", "2,50 €", "Alquilada"},
-            {"007", "Poor Things",      "Drama",     "Yorgos Lanthimos", "2023", "2,50 €", "Disponible"},
+            {"001", "Dune: Parte Dos",  "Sci-Fi",   "Denis Villeneuve",  "2024", "2,50 €", "Disponible"},
+            {"002", "Oppenheimer",      "Drama",    "Christopher Nolan", "2023", "2,50 €", "Alquilada"},
+            {"003", "Barbie",           "Comedia",  "Greta Gerwig",      "2023", "2,50 €", "Disponible"},
+            {"004", "Avatar 2",         "Acción",   "James Cameron",     "2022", "2,50 €", "Disponible"},
+            {"005", "Gladiator II",     "Acción",   "Ridley Scott",      "2024", "2,50 €", "Disponible"},
+            {"006", "Wonka",            "Familiar", "Paul King",         "2023", "2,50 €", "Alquilada"},
+            {"007", "Poor Things",      "Drama",    "Yorgos Lanthimos",  "2023", "2,50 €", "Disponible"},
         };
 
-        tableModel = new DefaultTableModel(data, cols) {
+        DefaultTableModel model = new DefaultTableModel(data, cols) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
 
-        JTable table = new JTable(tableModel);
+        JTable table = new JTable(model);
         table.setFont(table.getFont().deriveFont(12f));
         table.setRowHeight(36);
         table.getTableHeader().setFont(table.getFont().deriveFont(Font.BOLD, 11f));
-        table.getTableHeader().setForeground(TEXT_SEC);
-        table.getTableHeader().setBackground(new Color(0xFAFAFA));
+        table.getTableHeader().setForeground(textSec());
+        table.getTableHeader().setBackground(bg());
         table.setShowHorizontalLines(true);
-        table.setGridColor(new Color(0xF5F5F5));
+        table.setGridColor(border());
         table.setSelectionBackground(new Color(0xE1F5EE));
-        table.setSelectionForeground(TEXT_PRI);
+        table.setSelectionForeground(textPri());
 
-        // Anchos
         int[] widths = {40, 180, 90, 160, 50, 80, 90};
-        for (int i = 0; i < widths.length; i++) {
+        for (int i = 0; i < widths.length; i++)
             table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
-        }
 
-        // Badge de estado
         table.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object val,
@@ -108,11 +97,9 @@ public class CatalogoPanel extends JPanel {
                 lbl.setOpaque(true);
                 lbl.setBorder(new EmptyBorder(3, 8, 3, 8));
                 if ("Disponible".equals(val.toString())) {
-                    lbl.setBackground(new Color(0xE1F5EE));
-                    lbl.setForeground(new Color(0x085041));
+                    lbl.setBackground(new Color(0xE1F5EE)); lbl.setForeground(new Color(0x085041));
                 } else {
-                    lbl.setBackground(new Color(0xFCEBEB));
-                    lbl.setForeground(new Color(0x791F1F));
+                    lbl.setBackground(new Color(0xFCEBEB)); lbl.setForeground(new Color(0x791F1F));
                 }
                 return lbl;
             }
@@ -121,9 +108,8 @@ public class CatalogoPanel extends JPanel {
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBorder(BorderFactory.createEmptyBorder());
         panel.add(scroll, BorderLayout.CENTER);
-
         return panel;
-    }*/
+    }
 
     private JButton buildPrimaryButton(String texto) {
         JButton btn = new JButton(texto) {

@@ -1,5 +1,6 @@
 package main;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import view.MainFrame;
 
@@ -12,12 +13,12 @@ public class Main {
 
         // Recuperar preferencia de tema guardada (por defecto: light)
         Preferences prefs = Preferences.userNodeForPackage(Main.class);
-        String tema = prefs.get("theme", "light");
+        String tema = prefs.get("theme", "dark");
 
         // Aplicar tema antes de crear cualquier ventana
         try {
             if (tema.equals("dark")) {
-                com.formdev.flatlaf.FlatDarkLaf.setup();
+                FlatDarkLaf.setup();
             } else {
                 FlatLightLaf.setup();
             }
