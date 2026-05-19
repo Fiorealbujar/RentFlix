@@ -88,3 +88,4 @@ CREATE TABLE Alquileres (
     CONSTRAINT fk_id_emp   FOREIGN KEY (id_empleado)     REFERENCES Empleados(id_empleado),
     CONSTRAINT fk_id_trans FOREIGN KEY (id_transaccion)  REFERENCES Pagos(id_transaccion)
 );
+
