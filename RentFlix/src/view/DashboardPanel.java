@@ -1,4 +1,4 @@
-package view.panels;
+package view;
 
 import controller.NavController;
 import dao.AlquilerDAO;
