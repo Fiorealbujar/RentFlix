@@ -1,12 +1,17 @@
-package view;
+package view.panels;
 
 import controller.NavController;
+import dao.AlquilerDAO;
+import dao.ClienteDAO;
+import dao.PeliculaDAO;
+import model.Alquiler;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class DashboardPanel extends JPanel {
 
@@ -17,6 +22,11 @@ public class DashboardPanel extends JPanel {
     private static Color border()  { Color c = UIManager.getColor("Component.borderColor");    return c != null ? c : new Color(0xE8E8E8); }
     private static Color textPri() { Color c = UIManager.getColor("Label.foreground");         return c != null ? c : new Color(0x1A1A1A); }
     private static Color textSec() { Color c = UIManager.getColor("Label.disabledForeground"); return c != null ? c : new Color(0x999999); }
+
+    // DAOs
+    private final PeliculaDAO peliculaDAO = new PeliculaDAO();
+    private final ClienteDAO  clienteDAO  = new ClienteDAO();
+    private final AlquilerDAO alquilerDAO = new AlquilerDAO();
 
     public DashboardPanel(NavController controller) {
         setLayout(new BorderLayout());
@@ -41,7 +51,7 @@ public class DashboardPanel extends JPanel {
 
         gbc.gridy = 2; gbc.weighty = 0;
         gbc.fill  = GridBagConstraints.HORIZONTAL;
-        inner.add(buildFormPanel(), gbc);
+        inner.add(buildFormPanel(controller), gbc);
 
         JScrollPane scroll = new JScrollPane(inner);
         scroll.setBorder(BorderFactory.createEmptyBorder());
@@ -50,14 +60,26 @@ public class DashboardPanel extends JPanel {
         add(scroll, BorderLayout.CENTER);
     }
 
+    // ── Estadísticas reales desde la BD ─────────────────────────────────────
+
     private JPanel buildStatsRow() {
+        int totalPeliculas  = peliculaDAO.contarTotal();
+        int totalClientes   = clienteDAO.contarTotal();
+        int activos         = alquilerDAO.contarPorEstado("activo");
+        int vencidos        = alquilerDAO.contarPorEstado("vencido");
+        double ingresos     = alquilerDAO.sumIngresos();
+
         JPanel row = new JPanel(new GridLayout(1, 4, 10, 0));
         row.setOpaque(false);
 
-        row.add(buildStatCard("Películas totales",  "142",   "+ 8 este mes",  new Color(0xE1F5EE), new Color(0x1D9E75)));
-        row.add(buildStatCard("Clientes activos",   "87",    "+ 5 nuevos",    new Color(0xEEEDFE), new Color(0x534AB7)));
-        row.add(buildStatCard("Alquileres activos", "24",    "3 con retraso", new Color(0xFAEEDA), new Color(0xBA7517)));
-        row.add(buildStatCard("Ingresos mayo",      "312 €", "+ 18%",         new Color(0xE1F5EE), new Color(0x1D9E75)));
+        row.add(buildStatCard("Películas totales",  String.valueOf(totalPeliculas),
+                "en catálogo",                      new Color(0xE1F5EE), new Color(0x1D9E75)));
+        row.add(buildStatCard("Clientes activos",   String.valueOf(totalClientes),
+                "registrados",                      new Color(0xEEEDFE), new Color(0x534AB7)));
+        row.add(buildStatCard("Alquileres activos", String.valueOf(activos),
+                vencidos + " vencido(s)",           new Color(0xFAEEDA), new Color(0xBA7517)));
+        row.add(buildStatCard("Ingresos totales",   String.format("%.2f €", ingresos),
+                "cobrados",                         new Color(0xE1F5EE), new Color(0x1D9E75)));
 
         return row;
     }
@@ -105,10 +127,12 @@ public class DashboardPanel extends JPanel {
         dlt.setForeground(iconColor);
 
         texts.add(lbl); texts.add(val); texts.add(dlt);
-        card.add(icon, BorderLayout.EAST);
+        card.add(icon,  BorderLayout.EAST);
         card.add(texts, BorderLayout.CENTER);
         return card;
     }
+
+    // ── Fila central ────────────────────────────────────────────────────────
 
     private JPanel buildMainRow() {
         JPanel row = new JPanel(new BorderLayout(14, 0));
@@ -123,35 +147,42 @@ public class DashboardPanel extends JPanel {
         panel.setBackground(panelBg());
         panel.setBorder(BorderFactory.createLineBorder(border(), 1, true));
 
+        // Cabecera
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(panelBg());
         header.setBorder(new EmptyBorder(12, 14, 10, 14));
-
         JLabel title = new JLabel("Alquileres recientes");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 13f));
         title.setForeground(textPri());
-
         JLabel link = new JLabel("Ver todos →");
         link.setFont(link.getFont().deriveFont(Font.PLAIN, 11f));
         link.setForeground(ACCENT);
         link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
         header.add(title, BorderLayout.WEST);
         header.add(link,  BorderLayout.EAST);
         panel.add(header, BorderLayout.NORTH);
 
-        String[] cols = {"#", "Película", "Cliente", "Devolución", "Estado", "Precio"};
-        Object[][] data = {
-            {"101", "Dune: Parte Dos",  "García, M.",   "20 may", "Activo",   "5,00 €"},
-            {"100", "Oppenheimer",      "López, J.",    "16 may", "Retraso",  "7,50 €"},
-            {"099", "Barbie",           "Martínez, A.", "19 may", "Activo",   "5,00 €"},
-            {"098", "Avatar 2",         "Ruiz, C.",     "14 may", "Devuelto", "5,00 €"},
-            {"097", "Gladiator II",     "Sánchez, P.",  "13 may", "Devuelto", "5,00 €"},
-        };
+        // Datos reales
+        String[] cols = {"#", "Película", "Cliente", "Devolución prev.", "Estado", "Importe"};
+        List<Alquiler> alquileres = alquilerDAO.getAllConDetalle();
 
-        DefaultTableModel model = new DefaultTableModel(data, cols) {
+        DefaultTableModel model = new DefaultTableModel(cols, 0) {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
+
+        for (Alquiler a : alquileres) {
+            String estado = a.getEstado();
+            // Capitalizar primera letra
+            String estadoDisplay = estado.substring(0, 1).toUpperCase() + estado.substring(1);
+            model.addRow(new Object[]{
+                a.getId(),
+                a.getNombrePelicula(),
+                a.getNombreCliente(),
+                a.getFechaDevolucionPrevista(),
+                estadoDisplay,
+                String.format("%.2f €", a.getMontoCobro())
+            });
+        }
 
         JTable table = new JTable(model);
         table.setFont(table.getFont().deriveFont(12f));
@@ -165,10 +196,11 @@ public class DashboardPanel extends JPanel {
         table.setSelectionForeground(textPri());
         table.setIntercellSpacing(new Dimension(0, 0));
 
-        int[] widths = {40, 160, 120, 90, 80, 70};
+        int[] widths = {35, 180, 130, 110, 80, 70};
         for (int i = 0; i < widths.length; i++)
             table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
 
+        // Badge de estado
         table.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object val,
@@ -178,9 +210,9 @@ public class DashboardPanel extends JPanel {
                 lbl.setFont(lbl.getFont().deriveFont(Font.BOLD, 10f));
                 lbl.setOpaque(true);
                 lbl.setBorder(new EmptyBorder(3, 8, 3, 8));
-                switch (val.toString()) {
-                    case "Activo":   lbl.setBackground(new Color(0xE1F5EE)); lbl.setForeground(new Color(0x085041)); break;
-                    case "Retraso":  lbl.setBackground(new Color(0xFAEEDA)); lbl.setForeground(new Color(0x633806)); break;
+                switch (val.toString().toLowerCase()) {
+                    case "activo":   lbl.setBackground(new Color(0xE1F5EE)); lbl.setForeground(new Color(0x085041)); break;
+                    case "vencido":  lbl.setBackground(new Color(0xFAEEDA)); lbl.setForeground(new Color(0x633806)); break;
                     default:         lbl.setBackground(new Color(0xFCEBEB)); lbl.setForeground(new Color(0x791F1F));
                 }
                 return lbl;
@@ -202,7 +234,6 @@ public class DashboardPanel extends JPanel {
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(panelBg());
         header.setBorder(new EmptyBorder(12, 14, 10, 14));
-
         JLabel title = new JLabel("Más alquiladas");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 13f));
         title.setForeground(textPri());
@@ -214,15 +245,23 @@ public class DashboardPanel extends JPanel {
         list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
         list.setBorder(new EmptyBorder(4, 8, 8, 8));
 
-        String[][] peliculas = {
-            {"Dune 2",      "Sci-Fi · 2024",  "#E1F5EE", "#1D9E75"},
-            {"Oppenheimer", "Drama · 2023",   "#FCEBEB", "#E24B4A"},
-            {"Barbie",      "Comedia · 2023", "#EEEDFE", "#534AB7"},
-            {"Avatar 2",    "Acción · 2022",  "#FAEEDA", "#BA7517"},
-        };
+        String[] dotColors = {"#1D9E75", "#E24B4A", "#534AB7", "#BA7517"};
+        String[] bgColors  = {"#E1F5EE", "#FCEBEB", "#EEEDFE", "#FAEEDA"};
 
-        for (String[] p : peliculas) {
-            list.add(buildMiniItem(p[0], p[1], p[2], p[3]));
+        List<String[]> masAlquiladas = peliculaDAO.getMasAlquiladas(4);
+
+        // Si no hay suficientes datos por falta de alquileres, mostrar primeras películas
+        if (masAlquiladas.isEmpty()) {
+            peliculaDAO.getAll().stream().limit(4).forEach(p ->
+                masAlquiladas.add(new String[]{ p.getNombre(), p.getGenero() })
+            );
+        }
+
+        for (int i = 0; i < masAlquiladas.size(); i++) {
+            String[] peli = masAlquiladas.get(i);
+            String dotHex = dotColors[i % dotColors.length];
+            String bgHex  = bgColors[i % bgColors.length];
+            list.add(buildMiniItem(peli[0], peli[1], bgHex, dotHex));
             list.add(Box.createVerticalStrut(2));
         }
 
@@ -255,7 +294,7 @@ public class DashboardPanel extends JPanel {
         texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
         texts.setOpaque(false);
 
-        JLabel tit = new JLabel(titulo);
+        JLabel tit = new JLabel(titulo.length() > 18 ? titulo.substring(0, 16) + "…" : titulo);
         tit.setFont(tit.getFont().deriveFont(Font.BOLD, 12f));
         tit.setForeground(textPri());
 
@@ -283,7 +322,9 @@ public class DashboardPanel extends JPanel {
         return item;
     }
 
-    private JPanel buildFormPanel() {
+    // ── Formulario rápido ────────────────────────────────────────────────────
+
+    private JPanel buildFormPanel(NavController controller) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(panelBg());
         panel.setBorder(BorderFactory.createLineBorder(border(), 1, true));
@@ -291,7 +332,6 @@ public class DashboardPanel extends JPanel {
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
         header.setBackground(panelBg());
         header.setBorder(new EmptyBorder(10, 14, 6, 14));
-
         JLabel title = new JLabel("Registrar nuevo alquiler");
         title.setFont(title.getFont().deriveFont(Font.BOLD, 13f));
         title.setForeground(textPri());
@@ -302,13 +342,17 @@ public class DashboardPanel extends JPanel {
         fields.setBackground(panelBg());
         fields.setBorder(new EmptyBorder(4, 14, 12, 14));
 
-        String[] clientes  = {"García Martínez, María", "López Ruiz, Juan", "Sánchez Pérez, Ana"};
-        String[] peliculas = {"Dune: Parte Dos (2024)", "Oppenheimer (2023)", "Barbie (2023)"};
+        // ComboBox con datos reales
+        JComboBox<String> comboClientes = new JComboBox<>();
+        clienteDAO.getAll().forEach(c -> comboClientes.addItem(c.getApellido() + ", " + c.getNombre()));
 
-        fields.add(buildField("Cliente",          new JComboBox<>(clientes)));
-        fields.add(buildField("Película",         new JComboBox<>(peliculas)));
-        fields.add(buildField("Fecha alquiler",   new JTextField("18/05/2026")));
-        fields.add(buildField("Fecha devolución", new JTextField("21/05/2026")));
+        JComboBox<String> comboPeliculas = new JComboBox<>();
+        peliculaDAO.getAll().forEach(p -> comboPeliculas.addItem(p.getNombre()));
+
+        fields.add(buildField("Cliente",          comboClientes));
+        fields.add(buildField("Película",         comboPeliculas));
+        fields.add(buildField("Fecha alquiler",   new JTextField(java.time.LocalDate.now().toString())));
+        fields.add(buildField("Fecha devolución", new JTextField(java.time.LocalDate.now().plusDays(7).toString())));
 
         panel.add(fields, BorderLayout.CENTER);
 
