@@ -13,7 +13,7 @@ public class Main {
 
         // Recuperar preferencia de tema guardada (por defecto: light)
         Preferences prefs = Preferences.userNodeForPackage(Main.class);
-        String tema = prefs.get("theme", "dark");
+        String tema = prefs.get("theme", "light");
 
         // Aplicar tema antes de crear cualquier ventana
         try {

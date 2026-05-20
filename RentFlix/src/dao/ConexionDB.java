@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class ConexionDB {
 
     // Cambia esta ruta a donde tengas el archivo RentFlix.db en tu equipo
-    private static final String URL = "jdbc:sqlite:RentFlix.db";
+    private static final String URL = "jdbc:sqlite:DB/RentFlix.db";
 
     private static Connection conexion = null;
 

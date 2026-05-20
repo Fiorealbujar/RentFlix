@@ -42,7 +42,7 @@ public class ActorDAO {
     }
 
     public boolean insertar(Actor a) {
-        String sql = "INSERT INTO Actores (nombre_actor) VALUES (?)";
+        String sql = "INSERT INTO Actor (nombre_actor) VALUES (?)";
         try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
             ps.setString(1, a.getNombre());
             return ps.executeUpdate() > 0;
