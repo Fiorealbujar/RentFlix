@@ -95,24 +95,40 @@ public class Sidebar extends JPanel {
 
     private JPanel buildNav() {
         JPanel nav = new JPanel();
-        nav.setBackground(bg());
         nav.setLayout(new BoxLayout(nav, BoxLayout.Y_AXIS));
-        nav.setBorder(new EmptyBorder(10, 8, 4, 8));
+        nav.setBackground(bg());
+        nav.setBorder(new EmptyBorder(10, 0, 10, 0));
 
-        nav.add(buildSectionLabel("Principal"));
-        nav.add(buildNavItem(Seccion.DASHBOARD,  "Inicio",     null));
-        nav.add(buildNavItem(Seccion.CATALOGO,   "Catálogo",   buildBadge("142", BADGE_RED)));
-        nav.add(buildNavItem(Seccion.CLIENTES,   "Clientes",   null));
-        nav.add(buildNavItem(Seccion.ALQUILERES, "Alquileres", buildBadge("3",   BADGE_WARN)));
-        nav.add(Box.createVerticalStrut(6));
-        nav.add(buildSectionLabel("Gestión"));
-        nav.add(buildNavItem(Seccion.INVENTARIO, "Inventario", null));
-        nav.add(buildNavItem(Seccion.INFORMES,   "Informes",   null));
-        nav.add(buildNavItem(Seccion.AJUSTES,    "Ajustes",    null));
+        // 1. Comprobamos el rol del usuario actual
+        security.SesionManager sesion = security.SesionManager.getInstancia();
+        boolean esAdmin = sesion.esAdmin();
 
-        JPanel filler = new JPanel();
-        filler.setBackground(bg());
-        nav.add(filler);
+        // 2. Botones públicos (Los ven todos: Clientes y Administradores)
+        nav.add(buildNavItem(Seccion.DASHBOARD, "Dashboard", null));
+        nav.add(Box.createVerticalStrut(4));
+        
+        nav.add(buildNavItem(Seccion.CATALOGO, "Catálogo", null));
+        nav.add(Box.createVerticalStrut(4));
+
+        // 3. FILTRO DE SEGURIDAD: Solo se añaden al menú si es Administrador
+        if (esAdmin) {
+            nav.add(buildNavItem(Seccion.CLIENTES, "Clientes", null));
+            nav.add(Box.createVerticalStrut(4));
+            
+            nav.add(buildNavItem(Seccion.ALQUILERES, "Alquileres", null));
+            nav.add(Box.createVerticalStrut(4));
+            
+            nav.add(buildNavItem(Seccion.INVENTARIO, "Inventario", null));
+            nav.add(Box.createVerticalStrut(4));
+            
+            nav.add(buildNavItem(Seccion.INFORMES, "Informes", null));
+            nav.add(Box.createVerticalStrut(4));
+        }
+
+        // 4. Otro botón público al final
+        nav.add(buildNavItem(Seccion.AJUSTES, "Ajustes", null));
+        nav.add(Box.createVerticalStrut(4));
+
         return nav;
     }
 
@@ -234,8 +250,26 @@ public class Sidebar extends JPanel {
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 8));
         p.setBackground(bg());
 
+     // --- OBTENER USUARIO ACTUAL DEL SESION MANAGER ---
+        model.Cliente usuarioActual = security.SesionManager.getInstancia().getUsuarioLogueado();
+        
+        // Generar iniciales dinámicas (ej: Juan Pérez -> JP)
+        String iniciales = "U";
+        if (usuarioActual != null) {
+            String n = usuarioActual.getNombre() != null ? usuarioActual.getNombre().trim() : "";
+            String a = usuarioActual.getApellido() != null ? usuarioActual.getApellido().trim() : "";
+            if (!n.isEmpty() && !a.isEmpty()) {
+                iniciales = ("" + n.charAt(0) + a.charAt(0)).toUpperCase();
+            } else if (!n.isEmpty()) {
+                iniciales = ("" + n.charAt(0)).toUpperCase();
+            }
+        }
+        final String textoAvatar = iniciales;
+
+        // Panel del Avatar circular adaptado
         JPanel avatar = new JPanel() {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -244,8 +278,7 @@ public class Sidebar extends JPanel {
                 g2.setColor(new Color(0x3C3489));
                 g2.setFont(g2.getFont().deriveFont(Font.BOLD, 11f));
                 FontMetrics fm = g2.getFontMetrics();
-                String t = "AP";
-                g2.drawString(t, (getWidth() - fm.stringWidth(t)) / 2,
+                g2.drawString(textoAvatar, (getWidth() - fm.stringWidth(textoAvatar)) / 2,
                         (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
             }
         };
@@ -257,17 +290,47 @@ public class Sidebar extends JPanel {
         texts.setLayout(new BoxLayout(texts, BoxLayout.Y_AXIS));
         texts.setBackground(bg());
 
-        JLabel nombre = new JLabel("Admin");
+        // Nombre real del cliente logueado
+        String nombreCompleto = (usuarioActual != null) ? (usuarioActual.getNombre() + " " + usuarioActual.getApellido()) : "Invitado";
+        JLabel nombre = new JLabel(nombreCompleto);
         nombre.setFont(nombre.getFont().deriveFont(Font.BOLD, 12f));
         nombre.setForeground(UIManager.getColor("Label.foreground") != null
                 ? UIManager.getColor("Label.foreground") : new Color(0x333333));
 
-        JLabel rol = new JLabel("Administrador");
+        // Rol dinámico usando tu método .esAdmin()
+        String textoRol = (security.SesionManager.getInstancia().esAdmin()) ? "Administrador" : "Cliente";
+        JLabel rol = new JLabel(textoRol);
         rol.setFont(rol.getFont().deriveFont(Font.PLAIN, 10f));
-        rol.setForeground(textLabel());
 
-        texts.add(nombre); texts.add(rol);
-        p.add(texts);
+        JPanel texts1 = new JPanel();
+        texts1.setLayout(new BoxLayout(texts1, BoxLayout.Y_AXIS));
+        texts1.setBackground(bg());
+
+        // 1. Conectamos con el Gestor de Sesión
+        security.SesionManager sesion = security.SesionManager.getInstancia();
+        
+        // 2. Valores por defecto por si acaso no hay sesión activa
+        String nombreMostrar = "Invitado";
+        String rolMostrar = "Usuario";
+
+        // 3. Si hay un cliente logueado, extraemos sus datos reales
+        if (sesion.getUsuarioLogueado() != null) {
+            nombreMostrar = sesion.getUsuarioLogueado().getNombre();
+            rolMostrar = sesion.esAdmin() ? "Administrador" : "Cliente";
+        }
+
+        // 4. Creamos los JLabels con los textos dinámicos
+        JLabel nombre1 = new JLabel(nombreMostrar); // <-- Aquí cambia
+        nombre1.setFont(nombre1.getFont().deriveFont(Font.BOLD, 12f));
+        nombre1.setForeground(UIManager.getColor("Label.foreground") != null
+                ? UIManager.getColor("Label.foreground") : new Color(0x333333));
+
+        JLabel rol1 = new JLabel(rolMostrar); // <-- Aquí cambia
+        rol1.setFont(rol1.getFont().deriveFont(Font.PLAIN, 10f));
+        rol1.setForeground(textLabel());
+
+        texts1.add(nombre1); texts1.add(rol1);
+        p.add(texts1);
 
         wrapper.add(p, BorderLayout.CENTER);
         return wrapper;

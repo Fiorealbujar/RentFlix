@@ -2,7 +2,8 @@ package main;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
-import view.MainFrame;
+
+import view.LoginFrame;
 
 import javax.swing.*;
 import java.util.prefs.Preferences;
@@ -28,9 +29,11 @@ public class Main {
         }
 
         // Lanzar la ventana principal en el hilo de eventos de Swing
+     // Busca esto dentro del método main de tu archivo main/Main.java:
         SwingUtilities.invokeLater(() -> {
-            MainFrame frame = new MainFrame();
-            frame.setVisible(true);
+            // Cambiamos MainFrame por LoginFrame
+            LoginFrame login = new LoginFrame();
+            login.setVisible(true);
         });
     }
 }

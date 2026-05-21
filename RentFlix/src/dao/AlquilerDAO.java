@@ -18,11 +18,11 @@ public class AlquilerDAO {
             "       c.nombre_cliente || ' ' || c.apellido_cliente AS nombre_cliente, " +
             "       COALESCE(pg.monto_cobro, 0) " +
             "FROM Alquileres a " +
-            "JOIN Copias co    ON co.rowid = a.id_copia " +
-            "JOIN Peliculas p  ON p.rowid  = co.id_pelicula " +
-            "JOIN Clientes c   ON c.rowid  = a.id_cliente " +
+            "LEFT JOIN Copias co    ON co.rowid = a.id_copia " +
+            "LEFT JOIN Peliculas p  ON p.rowid  = co.id_pelicula " +
+            "LEFT JOIN Clientes c   ON c.rowid  = a.id_cliente " +
             "LEFT JOIN Pagos pg ON pg.rowid = a.id_transaccion " +
-            "ORDER BY a.rowid DESC";
+            "ORDER BY a.rowid ASC";
         try (Statement st = ConexionDB.getConexion().createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {

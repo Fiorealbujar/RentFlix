@@ -8,6 +8,31 @@ import java.util.List;
 
 public class ClienteDAO {
 
+	// Añade este método dentro de tu clase ClienteDAO.java
+	public Cliente login(String usuario, String contrasenia) {
+	    String sql = "SELECT rowid, nombre_cliente, apellido_cliente, email_cliente, nombre_usuario, contrasenia_cliente " +
+	                 "FROM Clientes WHERE nombre_usuario = ? AND contrasenia_cliente = ?";
+	    try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
+	        ps.setString(1, usuario);
+	        ps.setString(2, contrasenia);
+	        try (ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                return new Cliente(
+	                    rs.getInt(1),
+	                    rs.getString(2),
+	                    rs.getString(3),
+	                    rs.getString(4),
+	                    rs.getString(5),
+	                    rs.getString(6)
+	                );
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("ClienteDAO.login: " + e.getMessage());
+	    }
+	    return null; // Credenciales incorrectas o error
+	}
+	
     public List<Cliente> getAll() {
         List<Cliente> lista = new ArrayList<>();
         String sql = "SELECT rowid, nombre_cliente, apellido_cliente, email_cliente, nombre_usuario, contrasenia_cliente FROM Clientes";

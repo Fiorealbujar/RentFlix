@@ -142,7 +142,7 @@ public class DashboardPanel extends JPanel {
         return row;
     }
 
-    private JPanel buildTablaAlquileres() {
+    public JPanel buildTablaAlquileres() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(panelBg());
         panel.setBorder(BorderFactory.createLineBorder(border(), 1, true));
