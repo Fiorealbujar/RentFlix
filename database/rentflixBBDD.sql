@@ -1,3 +1,8 @@
+-- =============================================
+-- RENTFLIX - Script de creación de tablas
+-- Base de datos: SQLite
+-- =============================================
+
 CREATE TABLE Peliculas (
     id_pelicula        INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre_pelicula    TEXT NOT NULL,
@@ -23,6 +28,10 @@ CREATE TABLE Pelicula_Actor (
 );
 
 CREATE TABLE Empleados (
+    -- El rol se determina por id_jefe:
+    -- id_jefe = NULL       → Administrador/Jefe (tiene control total del sistema)
+    -- id_jefe IS NOT NULL  → Empleado normal (reporta a un jefe)
+    -- El método esJefe() de la clase Empleado implementa esta lógica en Java
     id_empleado          INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre_empleado      TEXT NOT NULL,
     apellido_empleado    TEXT NOT NULL,
@@ -41,6 +50,8 @@ CREATE TABLE Clientes (
     nombre_usuario      TEXT UNIQUE NOT NULL,
     contrasenia_cliente TEXT NOT NULL,
     estado              TEXT NOT NULL DEFAULT 'activo',
+    -- 'activo'    → cliente puede operar con normalidad
+    -- 'bloqueado' → cliente no puede iniciar sesión
     CONSTRAINT ck_estado_cli CHECK (estado IN ('activo', 'bloqueado'))
 );
 
@@ -72,7 +83,11 @@ CREATE TABLE Alquileres (
     fecha_devolucion_prevista DATE NOT NULL,
     fecha_devolucion_real     DATE,
     estado_alquiler           TEXT NOT NULL DEFAULT 'activo',
-    CONSTRAINT ck_est_alq  CHECK (estado_alquiler IN ('activo', 'devuelto', 'vencido')),
+    -- 'activo'               → alquiler en curso
+    -- 'devuelto'             → devuelto correctamente
+    -- 'vencido'              → plazo superado sin devolver
+    -- 'pendiente_devolucion' → cliente ha solicitado devolución, pendiente de confirmación del empleado
+    CONSTRAINT ck_est_alq  CHECK (estado_alquiler IN ('activo', 'devuelto', 'vencido', 'pendiente_devolucion')),
     CONSTRAINT fk_id_cli   FOREIGN KEY (id_cliente)     REFERENCES Clientes(id_cliente),
     CONSTRAINT fk_id_cop   FOREIGN KEY (id_copia)       REFERENCES Copias(id_copia),
     CONSTRAINT fk_id_emp   FOREIGN KEY (id_empleado)    REFERENCES Empleados(id_empleado),
