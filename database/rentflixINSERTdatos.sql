@@ -3,18 +3,24 @@
 -- =============================================
 
 -- EMPLEADOS
+-- El rol se determina por id_jefe:
+-- id_jefe = NULL       → Administrador/Jefe (tiene control total del sistema)
+-- id_jefe IS NOT NULL  → Empleado normal (reporta a un jefe)
+-- El método esJefe() de la clase Empleado implementa esta lógica en Java
 INSERT INTO Empleados (nombre_empleado, apellido_empleado, email_empleado, usuario_empleado, contrasenia_empleado, id_jefe) VALUES
-('Carlos',  'García',   'carlos@rentflix.com', 'carlos_admin', '1234', NULL),
-('Laura',   'Martínez', 'laura@rentflix.com',  'laura_emp',    '1234', 1),
-('Pedro',   'López',    'pedro@rentflix.com',  'pedro_emp',    '1234', 1);
+('Carlos',  'García',   'carlos@rentflix.com', 'carlos_admin', '1234', NULL),  -- Administrador/Jefe
+('Laura',   'Martínez', 'laura@rentflix.com',  'laura_emp',    '1234', 1),     -- Empleado normal
+('Pedro',   'López',    'pedro@rentflix.com',  'pedro_emp',    '1234', 1);     -- Empleado normal
 
 -- CLIENTES
+-- estado 'activo'    → puede operar con normalidad
+-- estado 'bloqueado' → no puede iniciar sesión (RF15)
 INSERT INTO Clientes (nombre_cliente, apellido_cliente, email_cliente, nombre_usuario, contrasenia_cliente, estado) VALUES
 ('Ana',     'Rueda',     'ana@email.com',     'ana_cli',     '1234', 'activo'),
 ('Gabriel', 'Fernández', 'gabriel@email.com', 'gabriel_cli', '1234', 'activo'),
 ('María',   'Sánchez',   'maria@email.com',   'maria_cli',   '1234', 'activo'),
 ('Jorge',   'Pérez',     'jorge@email.com',   'jorge_cli',   '1234', 'activo'),
-('Sofía',   'Rodríguez', 'sofia@email.com',   'sofia_cli',   '1234', 'bloqueado');
+('Sofía',   'Rodríguez', 'sofia@email.com',   'sofia_cli',   '1234', 'bloqueado');  -- cliente bloqueado para pruebas
 
 -- PELÍCULAS
 INSERT INTO Peliculas (nombre_pelicula, director, duracion, genero, sinopsis, clasificacion_edad) VALUES
@@ -122,14 +128,14 @@ INSERT INTO Pelicula_Actor (id_pelicula, id_actor) VALUES
 (30, 30), (30, 36);
 
 -- COPIAS
--- NOTA: Los ids de las copias se calculan en orden de inserción
--- para garantizar que los Alquileres referencian copias correctas.
--- Películas anteriores a 1990: solo DVD
--- Películas de los años 90:    DVD + Blu-ray
--- Películas del año 2000+:     DVD + Blu-ray + 4K Ultra HD
--- Precios: DVD=2.50€, Blu-ray=5.00€, 4K Ultra HD=7.50€
+-- NOTA: Los ids se calculan en orden de inserción para garantizar
+-- coherencia con los Alquileres que referencian copias 'alquilada'
+-- Precios: DVD=2.50€ | Blu-ray=5.00€ | 4K Ultra HD=7.50€
+-- Películas 1-6  (antes 1990): solo DVD
+-- Películas 7-15 (años 90):    DVD + Blu-ray
+-- Películas 16-30 (2000+):     DVD + Blu-ray + 4K Ultra HD
 
--- Películas 1-6 (antes 1990): solo DVD → ids 1-9
+-- Películas 1-6: solo DVD → ids 1-9
 INSERT INTO Copias (id_pelicula, formato, estado, precio_alquiler) VALUES
 (1, 'DVD', 'disponible', 2.50),  -- id 1
 (1, 'DVD', 'disponible', 2.50),  -- id 2
@@ -141,10 +147,10 @@ INSERT INTO Copias (id_pelicula, formato, estado, precio_alquiler) VALUES
 (5, 'DVD', 'disponible', 2.50),  -- id 8
 (6, 'DVD', 'disponible', 2.50);  -- id 9
 
--- Películas 7-15 (años 90): DVD + Blu-ray → ids 10-30
+-- Películas 7-15: DVD + Blu-ray → ids 10-30
 INSERT INTO Copias (id_pelicula, formato, estado, precio_alquiler) VALUES
 (7,  'DVD',     'disponible', 2.50),  -- id 10
-(7,  'Blu-ray', 'disponible', 5.00),  -- id 11
+(7,  'Blu-ray', 'disponible', 5.00),  -- id 11 → El Silencio Blu-ray (alquiler devuelto de Ana)
 (8,  'DVD',     'disponible', 2.50),  -- id 12
 (8,  'Blu-ray', 'disponible', 5.00),  -- id 13
 (8,  'Blu-ray', 'disponible', 5.00),  -- id 14
@@ -154,7 +160,7 @@ INSERT INTO Copias (id_pelicula, formato, estado, precio_alquiler) VALUES
 (10, 'DVD',     'disponible', 2.50),  -- id 18
 (10, 'Blu-ray', 'disponible', 5.00),  -- id 19
 (11, 'DVD',     'disponible', 2.50),  -- id 20
-(11, 'Blu-ray', 'alquilada',  5.00),  -- id 21 → Titanic Blu-ray (alquiler de Sofía)
+(11, 'Blu-ray', 'alquilada',  5.00),  -- id 21 → Titanic Blu-ray (alquiler pendiente_devolucion de Sofía)
 (11, 'Blu-ray', 'disponible', 5.00),  -- id 22
 (12, 'DVD',     'disponible', 2.50),  -- id 23
 (12, 'Blu-ray', 'disponible', 5.00),  -- id 24
@@ -165,13 +171,13 @@ INSERT INTO Copias (id_pelicula, formato, estado, precio_alquiler) VALUES
 (15, 'DVD',     'disponible', 2.50),  -- id 29
 (15, 'Blu-ray', 'disponible', 5.00);  -- id 30
 
--- Películas 16-30 (2000+): DVD + Blu-ray + 4K → ids 31-75
+-- Películas 16-30: DVD + Blu-ray + 4K → ids 31-75
 INSERT INTO Copias (id_pelicula, formato, estado, precio_alquiler) VALUES
 (16, 'DVD',        'disponible', 2.50),  -- id 31
 (16, 'Blu-ray',    'disponible', 5.00),  -- id 32
 (16, '4K Ultra HD','disponible', 7.50),  -- id 33
 (17, 'DVD',        'disponible', 2.50),  -- id 34
-(17, 'Blu-ray',    'alquilada',  5.00),  -- id 35 → El Señor de los Anillos Blu-ray (alquiler de Gabriel)
+(17, 'Blu-ray',    'alquilada',  5.00),  -- id 35 → El Señor Blu-ray (alquiler activo de Gabriel)
 (17, '4K Ultra HD','disponible', 7.50),  -- id 36
 (18, 'DVD',        'disponible', 2.50),  -- id 37
 (18, 'Blu-ray',    'disponible', 5.00),  -- id 38
@@ -196,7 +202,7 @@ INSERT INTO Copias (id_pelicula, formato, estado, precio_alquiler) VALUES
 (24, '4K Ultra HD','disponible', 7.50),  -- id 57
 (25, 'DVD',        'disponible', 2.50),  -- id 58
 (25, 'Blu-ray',    'disponible', 5.00),  -- id 59
-(25, '4K Ultra HD','alquilada',  7.50),  -- id 60 → Top Gun 4K (alquiler de Jorge)
+(25, '4K Ultra HD','alquilada',  7.50),  -- id 60 → Top Gun 4K (alquiler activo de Jorge)
 (26, 'DVD',        'disponible', 2.50),  -- id 61
 (26, 'Blu-ray',    'disponible', 5.00),  -- id 62
 (26, '4K Ultra HD','disponible', 7.50),  -- id 63
@@ -214,19 +220,30 @@ INSERT INTO Copias (id_pelicula, formato, estado, precio_alquiler) VALUES
 (30, '4K Ultra HD','disponible', 7.50);  -- id 75
 
 -- PAGOS
+-- Montos coinciden exactamente con precio_alquiler de cada copia
+-- id 1 → Ana     | El Silencio Blu-ray  | 5.00€
+-- id 2 → Gabriel | El Señor Blu-ray     | 5.00€
+-- id 3 → María   | Interstellar 4K      | 7.50€
+-- id 4 → Jorge   | Top Gun 4K           | 7.50€
+-- id 5 → Sofía   | Titanic Blu-ray      | 5.00€
 INSERT INTO Pagos (metodo_pago, monto_cobro) VALUES
-('efectivo',      5.00),  -- id 1
-('tarjeta',       7.50),  -- id 2
-('transferencia', 2.50),  -- id 3
-('tarjeta',       5.00),  -- id 4
-('efectivo',      5.00);  -- id 5
+('efectivo',      5.00),
+('tarjeta',       5.00),
+('transferencia', 7.50),
+('tarjeta',       7.50),
+('efectivo',      5.00);
 
 -- ALQUILERES
--- Los id_copia están calculados en base al orden de inserción
--- de las Copias para garantizar coherencia con su estado 'alquilada'
+-- Los id_copia están calculados en base al orden de inserción de Copias
+-- para garantizar coherencia con el estado 'alquilada' de cada copia
+-- Variedad de estados para pruebas de todas las funcionalidades:
+--   devuelto             → flujo completo normal
+--   activo               → alquiler en curso
+--   vencido              → plazo superado sin devolver
+--   pendiente_devolucion → cliente ha solicitado devolución, pendiente de confirmación del empleado
 INSERT INTO Alquileres (id_cliente, id_copia, id_empleado, id_transaccion, fecha_alquiler, fecha_devolucion_prevista, fecha_devolucion_real, estado_alquiler) VALUES
-(1, 11, 2, 1, '2026-05-01', '2026-05-08', '2026-05-07', 'devuelto'),  -- Ana,    El Silencio Blu-ray,  devuelto
-(2, 35, 1, 2, '2026-05-10', '2026-05-17', NULL,         'activo'),    -- Gabriel, El Señor Blu-ray,    activo
-(3, 42, 2, 3, '2026-05-12', '2026-05-19', NULL,         'vencido'),   -- María,   Interstellar 4K,     vencido
-(4, 60, 3, 4, '2026-05-15', '2026-05-22', NULL,         'activo'),    -- Jorge,   Top Gun 4K,          activo
-(5, 21, 1, 5, '2026-05-16', '2026-05-23', NULL,         'activo');    -- Sofía (bloqueada), Titanic Blu-ray, activo previo al bloqueo
+(1, 11, 2, 1, '2026-05-01', '2026-05-08', '2026-05-07', 'devuelto'),            -- Ana,    El Silencio Blu-ray,  devuelto ✅
+(2, 35, 1, 2, '2026-05-10', '2026-05-17', NULL,         'activo'),              -- Gabriel, El Señor Blu-ray,   activo ✅
+(3, 42, 2, 3, '2026-05-12', '2026-05-19', NULL,         'vencido'),             -- María,   Interstellar 4K,    vencido ✅
+(4, 60, 3, 4, '2026-05-15', '2026-05-22', NULL,         'activo'),              -- Jorge,   Top Gun 4K,         activo ✅
+(5, 21, 1, 5, '2026-05-16', '2026-05-23', NULL,         'pendiente_devolucion'); -- Sofía (bloqueada), Titanic Blu-ray, pendiente devolución ✅
