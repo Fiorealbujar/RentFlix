@@ -1,97 +1,80 @@
+// ==========================================
+// CLASE: EmpleadoDAO.java
+// ==========================================
 package dao;
 
 import model.Empleado;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmpleadoDAO {
+public class EmpleadoDAO implements IEmpleadoDAO {
 
-    public List<Empleado> getAll() {
-        List<Empleado> lista = new ArrayList<>();
-        String sql = "SELECT rowid, nombre_empleado, apellido_empleado, email_empleado, " +
-                     "usuario_empleado, contrasenia_empleado, id_jefe FROM Empleados";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(new Empleado(
-                    rs.getInt(1), rs.getString(2), rs.getString(3),
-                    rs.getString(4), rs.getString(5), rs.getString(6),
-                    rs.getInt(7)
-                ));
-            }
-        } catch (SQLException e) {
-            System.err.println("EmpleadoDAO.getAll: " + e.getMessage());
-        }
-        return lista;
+    private Connection con;
+
+    public EmpleadoDAO() {
+        this.con = ConexionDB.getConexion();
     }
 
-    // Buscar empleado por usuario y contraseña (para login)
-    public Empleado login(String usuario, String contrasenia) {
-        String sql = "SELECT rowid, nombre_empleado, apellido_empleado, email_empleado, " +
-                     "usuario_empleado, contrasenia_empleado, id_jefe " +
-                     "FROM Empleados WHERE usuario_empleado = ? AND contrasenia_empleado = ?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, usuario);
+    private Empleado mapear(ResultSet rs) throws SQLException {
+        // getObject permite recibir null para id_jefe (Integer, no int)
+        Integer idJefe = (Integer) rs.getObject("id_jefe");
+        return new Empleado(
+            rs.getInt("id_empleado"),
+            rs.getString("nombre_empleado"),
+            rs.getString("apellido_empleado"),
+            rs.getString("email_empleado"),
+            rs.getString("usuario_empleado"),
+            rs.getString("contrasenia_empleado"),
+            idJefe
+        );
+    }
+
+    @Override
+    public Empleado login(String usuarioEmpleado, String contrasenia) {
+        String sql = "SELECT * FROM Empleados WHERE usuario_empleado = ? " +
+                     "AND contrasenia_empleado = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, usuarioEmpleado);
             ps.setString(2, contrasenia);
             ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return new Empleado(
-                    rs.getInt(1), rs.getString(2), rs.getString(3),
-                    rs.getString(4), rs.getString(5), rs.getString(6),
-                    rs.getInt(7)
-                );
-            }
+            if (rs.next()) return mapear(rs);
         } catch (SQLException e) {
             System.err.println("EmpleadoDAO.login: " + e.getMessage());
         }
         return null;
     }
 
-    public boolean insertar(Empleado e) {
-        String sql = "INSERT INTO Empleados (nombre_empleado, apellido_empleado, email_empleado, " +
-                     "usuario_empleado, contrasenia_empleado, id_jefe) VALUES (?,?,?,?,?,?)";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, e.getNombre());
-            ps.setString(2, e.getApellido());
-            ps.setString(3, e.getEmail());
-            ps.setString(4, e.getUsuario());
-            ps.setString(5, e.getContrasenia());
-            ps.setInt(6, e.getIdJefe());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            System.err.println("EmpleadoDAO.insertar: " + ex.getMessage());
-            return false;
-        }
-    }
-
-    public boolean actualizar(Empleado e) {
-        String sql = "UPDATE Empleados SET nombre_empleado=?, apellido_empleado=?, email_empleado=?, " +
-                     "usuario_empleado=?, contrasenia_empleado=?, id_jefe=? WHERE rowid=?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, e.getNombre());
-            ps.setString(2, e.getApellido());
-            ps.setString(3, e.getEmail());
-            ps.setString(4, e.getUsuario());
-            ps.setString(5, e.getContrasenia());
-            ps.setInt(6, e.getIdJefe());
-            ps.setInt(7, e.getId());
-            return ps.executeUpdate() > 0;
-        } catch (SQLException ex) {
-            System.err.println("EmpleadoDAO.actualizar: " + ex.getMessage());
-            return false;
-        }
-    }
-
-    public boolean eliminar(int id) {
-        String sql = "DELETE FROM Empleados WHERE rowid=?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setInt(1, id);
+    @Override
+    public boolean crear(Empleado empleado) {
+        String sql = "INSERT INTO Empleados (nombre_empleado, apellido_empleado, " +
+                     "email_empleado, usuario_empleado, contrasenia_empleado, id_jefe) " +
+                     "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, empleado.getNombreEmpleado());
+            ps.setString(2, empleado.getApellidoEmpleado());
+            ps.setString(3, empleado.getEmailEmpleado());
+            ps.setString(4, empleado.getUsuarioEmpleado());
+            ps.setString(5, empleado.getContraseniaEmpleado());
+            // setObject maneja el null correctamente para id_jefe
+            ps.setObject(6, empleado.getIdJefe());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("EmpleadoDAO.eliminar: " + e.getMessage());
+            System.err.println("EmpleadoDAO.crear: " + e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public List<Empleado> listarTodos() {
+        List<Empleado> lista = new ArrayList<>();
+        String sql = "SELECT * FROM Empleados";
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) lista.add(mapear(rs));
+        } catch (SQLException e) {
+            System.err.println("EmpleadoDAO.listarTodos: " + e.getMessage());
+        }
+        return lista;
     }
 }

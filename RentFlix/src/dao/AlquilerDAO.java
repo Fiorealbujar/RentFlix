@@ -1,101 +1,140 @@
+// ==========================================
+// CLASE: AlquilerDAO.java
+// ==========================================
 package dao;
 
 import model.Alquiler;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AlquilerDAO {
+public class AlquilerDAO implements IAlquilerDAO {
 
-    // Alquileres con JOIN para mostrar en tabla (película, cliente, pago)
-    public List<Alquiler> getAllConDetalle() {
-        List<Alquiler> lista = new ArrayList<>();
-        String sql =
-            "SELECT a.rowid, a.id_cliente, a.id_copia, a.id_empleado, a.id_transaccion, " +
-            "       a.fecha_alquiler, a.fecha_devolucion_prevista, a.fecha_devolucion_real, a.estado_alquiler, " +
-            "       p.nombre_pelicula, " +
-            "       c.nombre_cliente || ' ' || c.apellido_cliente AS nombre_cliente, " +
-            "       COALESCE(pg.monto_cobro, 0) " +
-            "FROM Alquileres a " +
-            "LEFT JOIN Copias co    ON co.rowid = a.id_copia " +
-            "LEFT JOIN Peliculas p  ON p.rowid  = co.id_pelicula " +
-            "LEFT JOIN Clientes c   ON c.rowid  = a.id_cliente " +
-            "LEFT JOIN Pagos pg ON pg.rowid = a.id_transaccion " +
-            "ORDER BY a.rowid ASC";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                Alquiler a = new Alquiler();
-                a.setId(rs.getInt(1));
-                a.setIdCliente(rs.getInt(2));
-                a.setIdCopia(rs.getInt(3));
-                a.setIdEmpleado(rs.getInt(4));
-                a.setIdTransaccion(rs.getInt(5));
-                a.setFechaAlquiler(rs.getString(6));
-                a.setFechaDevolucionPrevista(rs.getString(7));
-                a.setFechaDevolucionReal(rs.getString(8));
-                a.setEstado(rs.getString(9));
-                a.setNombrePelicula(rs.getString(10));
-                a.setNombreCliente(rs.getString(11));
-                a.setMontoCobro(rs.getDouble(12));
-                lista.add(a);
-            }
-        } catch (SQLException e) {
-            System.err.println("AlquilerDAO.getAllConDetalle: " + e.getMessage());
-        }
-        return lista;
+    private Connection con;
+
+    public AlquilerDAO() {
+        this.con = ConexionDB.getConexion();
     }
 
-    public int contarPorEstado(String estado) {
-        String sql = "SELECT COUNT(*) FROM Alquileres WHERE estado_alquiler = ?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, estado);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) {
-            System.err.println("AlquilerDAO.contarPorEstado: " + e.getMessage());
-        }
-        return 0;
+    // JOIN completo: trae nombre de película y cliente en una sola consulta
+    private static final String SQL_CON_DETALLE =
+        "SELECT a.*, " +
+        "       p.nombre_pelicula, " +
+        "       c.nombre_cliente || ' ' || c.apellido_cliente AS nombre_cliente, " +
+        "       COALESCE(pg.monto_cobro, 0) AS monto_cobro " +
+        "FROM Alquileres a " +
+        "JOIN Copias co    ON co.id_copia    = a.id_copia " +
+        "JOIN Peliculas p  ON p.id_pelicula  = co.id_pelicula " +
+        "JOIN Clientes c   ON c.id_cliente   = a.id_cliente " +
+        "LEFT JOIN Pagos pg ON pg.id_transaccion = a.id_transaccion ";
+
+    private Alquiler mapear(ResultSet rs) throws SQLException {
+        Alquiler a = new Alquiler(
+            rs.getInt("id_alquiler"),
+            rs.getInt("id_cliente"),
+            rs.getInt("id_copia"),
+            (Integer) rs.getObject("id_empleado"),
+            (Integer) rs.getObject("id_transaccion"),
+            rs.getString("fecha_alquiler"),
+            rs.getString("fecha_devolucion_prevista"),
+            rs.getString("fecha_devolucion_real"),
+            rs.getString("estado_alquiler")
+        );
+        // Campos extra del JOIN (pueden ser null si la query no los trae)
+        try {
+            a.setNombrePelicula(rs.getString("nombre_pelicula"));
+            a.setNombreCliente(rs.getString("nombre_cliente"));
+            a.setMontoCobro(rs.getDouble("monto_cobro"));
+        } catch (SQLException ignored) {}
+        return a;
     }
 
-    public double sumIngresos() {
-        String sql = "SELECT COALESCE(SUM(monto_cobro), 0) FROM Pagos";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) return rs.getDouble(1);
-        } catch (SQLException e) {
-            System.err.println("AlquilerDAO.sumIngresos: " + e.getMessage());
-        }
-        return 0;
-    }
-
-    public boolean insertar(Alquiler a) {
-        String sql = "INSERT INTO Alquileres (id_cliente, id_copia, id_empleado, id_transaccion, fecha_alquiler, fecha_devolucion_prevista, fecha_devolucion_real, estado_alquiler) VALUES (?,?,?,?,?,?,?,?)";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setInt(1, a.getIdCliente());
-            ps.setInt(2, a.getIdCopia());
-            ps.setInt(3, a.getIdEmpleado());
-            ps.setInt(4, a.getIdTransaccion());
-            ps.setString(5, a.getFechaAlquiler());
-            ps.setString(6, a.getFechaDevolucionPrevista());
-            ps.setString(7, a.getFechaDevolucionReal());
-            ps.setString(8, a.getEstado());
+    @Override
+    public boolean crear(Alquiler alquiler) {
+        String sql = "INSERT INTO Alquileres (id_cliente, id_copia, id_empleado, " +
+                     "id_transaccion, fecha_alquiler, fecha_devolucion_prevista, " +
+                     "fecha_devolucion_real, estado_alquiler) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1,    alquiler.getIdCliente());
+            ps.setInt(2,    alquiler.getIdCopia());
+            ps.setObject(3, alquiler.getIdEmpleado());
+            ps.setObject(4, alquiler.getIdTransaccion());
+            ps.setString(5, alquiler.getFechaAlquiler());
+            ps.setString(6, alquiler.getFechaDevolucionPrevista());
+            ps.setString(7, alquiler.getFechaDevolucionReal());
+            ps.setString(8, alquiler.getEstadoAlquiler());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("AlquilerDAO.insertar: " + e.getMessage());
+            System.err.println("AlquilerDAO.crear: " + e.getMessage());
             return false;
         }
     }
 
-    public boolean actualizarEstado(int id, String nuevoEstado) {
-        String sql = "UPDATE Alquileres SET estado_alquiler=? WHERE rowid=?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, nuevoEstado);
-            ps.setInt(2, id);
+    @Override
+    public List<Alquiler> listarPorCliente(int idCliente) {
+        List<Alquiler> lista = new ArrayList<>();
+        String sql = SQL_CON_DETALLE + "WHERE a.id_cliente = ? ORDER BY a.fecha_alquiler DESC";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) lista.add(mapear(rs));
+        } catch (SQLException e) {
+            System.err.println("AlquilerDAO.listarPorCliente: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    @Override
+    public List<Alquiler> listarTodos() {
+        List<Alquiler> lista = new ArrayList<>();
+        String sql = SQL_CON_DETALLE + "ORDER BY a.fecha_alquiler DESC";
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) lista.add(mapear(rs));
+        } catch (SQLException e) {
+            System.err.println("AlquilerDAO.listarTodos: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    @Override
+    public List<Alquiler> listarPendientesDevolucion() {
+        List<Alquiler> lista = new ArrayList<>();
+        String sql = SQL_CON_DETALLE + "WHERE a.estado_alquiler = 'pendiente_devolucion'";
+        try (Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) lista.add(mapear(rs));
+        } catch (SQLException e) {
+            System.err.println("AlquilerDAO.listarPendientes: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    @Override
+    public boolean solicitarDevolucion(int idAlquiler) {
+        String sql = "UPDATE Alquileres SET estado_alquiler = 'pendiente_devolucion' " +
+                     "WHERE id_alquiler = ? AND estado_alquiler = 'activo'";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idAlquiler);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("AlquilerDAO.actualizarEstado: " + e.getMessage());
+            System.err.println("AlquilerDAO.solicitarDevolucion: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean aceptarDevolucion(int idAlquiler, String fechaDevolucionReal) {
+        String sql = "UPDATE Alquileres SET estado_alquiler = 'devuelto', " +
+                     "fecha_devolucion_real = ? " +
+                     "WHERE id_alquiler = ? AND estado_alquiler = 'pendiente_devolucion'";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, fechaDevolucionReal);
+            ps.setInt(2,    idAlquiler);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("AlquilerDAO.aceptarDevolucion: " + e.getMessage());
             return false;
         }
     }

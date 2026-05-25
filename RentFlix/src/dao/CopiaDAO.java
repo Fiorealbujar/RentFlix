@@ -1,46 +1,51 @@
+// ==========================================
+// CLASE: CopiaDAO.java
+// ==========================================
 package dao;
 
 import model.Copia;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CopiaDAO {
+public class CopiaDAO implements ICopiaDAO {
 
-    public List<Copia> getAll() {
+    private Connection con;
+
+    public CopiaDAO() {
+        this.con = ConexionDB.getConexion();
+    }
+
+    private Copia mapear(ResultSet rs) throws SQLException {
+        return new Copia(
+            rs.getInt("id_copia"),
+            rs.getInt("id_pelicula"),
+            rs.getString("formato"),
+            rs.getString("estado"),
+            rs.getDouble("precio_alquiler")
+        );
+    }
+
+    @Override
+    public List<Copia> listarDisponiblesPorPelicula(int idPelicula) {
         List<Copia> lista = new ArrayList<>();
-        String sql = "SELECT rowid, id_pelicula, formato, estado, precio_alquiler FROM Copias";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(new Copia(
-                    rs.getInt(1), rs.getInt(2),
-                    rs.getString(3), rs.getString(4), rs.getDouble(5)
-                ));
-            }
+        String sql = "SELECT * FROM Copias WHERE id_pelicula = ? AND estado = 'disponible'";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idPelicula);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) lista.add(mapear(rs));
         } catch (SQLException e) {
-            System.err.println("CopiaDAO.getAll: " + e.getMessage());
+            System.err.println("CopiaDAO.listarDisponibles: " + e.getMessage());
         }
         return lista;
     }
 
-    public int contarDisponibles() {
-        String sql = "SELECT COUNT(*) FROM Copias WHERE estado = 'disponible'";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) {
-            System.err.println("CopiaDAO.contarDisponibles: " + e.getMessage());
-        }
-        return 0;
-    }
-
-    public boolean actualizarEstado(int id, String estado) {
-        String sql = "UPDATE Copias SET estado=? WHERE rowid=?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, estado);
-            ps.setInt(2, id);
+    @Override
+    public boolean actualizarEstado(int idCopia, String nuevoEstado) {
+        String sql = "UPDATE Copias SET estado = ? WHERE id_copia = ?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, nuevoEstado);
+            ps.setInt(2, idCopia);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("CopiaDAO.actualizarEstado: " + e.getMessage());
