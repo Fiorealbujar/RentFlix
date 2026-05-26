@@ -1,6 +1,5 @@
-// ==========================================
-// CLASE: Main.java — VERSIÓN FINAL
-// ==========================================
+// Main.java — DEFINITIVO
+// Cada panel tiene sus propios subpaneles, sin compartir
 package main;
 
 import com.formdev.flatlaf.FlatLightLaf;
@@ -15,52 +14,71 @@ public class Main {
 
         SwingUtilities.invokeLater(() -> {
 
-            // ── 1. Crear todas las vistas ────────────────────────────────────
-            VentanaPrincipal       ventana                = new VentanaPrincipal();
-            PanelCatalogo          panelCatalogo          = new PanelCatalogo();
-            PanelLogin             panelLogin             = new PanelLogin();
-            PanelRegistro          panelRegistro          = new PanelRegistro();
-            PanelMisAlquileres     panelMisAlquileres     = new PanelMisAlquileres();
-            PanelGestionAlquileres panelGestionAlquileres = new PanelGestionAlquileres();
-            PanelAnadirPelicula    panelAnadirPelicula    = new PanelAnadirPelicula();
-            PanelGestionPeliculas  panelGestionPeliculas  = new PanelGestionPeliculas();
-            PanelInformes          panelInformes          = new PanelInformes();
-            PanelGestionEmpleados  panelGestionEmpleados  = new PanelGestionEmpleados();
+            VentanaPrincipal   ventana       = new VentanaPrincipal();
+            PanelLogin         panelLogin    = new PanelLogin();
+            PanelRegistro      panelRegistro = new PanelRegistro();
 
-            PanelCliente  panelCliente  = new PanelCliente(
-                panelCatalogo, panelMisAlquileres
-            );
-            PanelEmpleado panelEmpleado = new PanelEmpleado(
-                panelCatalogo, panelGestionAlquileres, panelAnadirPelicula
-            );
-            PanelAdmin    panelAdmin    = new PanelAdmin(
-                panelCatalogo, panelGestionAlquileres, panelAnadirPelicula,
-                panelGestionPeliculas, panelInformes, panelGestionEmpleados
+            // ── Cliente ──────────────────────────────────────────────────────
+            // El catálogo del cliente es exclusivo suyo
+            PanelCatalogo      catCliente       = new PanelCatalogo(false);
+            PanelMisAlquileres misAlquileres     = new PanelMisAlquileres();
+            PanelCliente       panelCliente      = new PanelCliente(
+                catCliente, misAlquileres
             );
 
-            // ── 2. Crear controlador ─────────────────────────────────────────
+            // ── Empleado ─────────────────────────────────────────────────────
+            // Paneles exclusivos del empleado
+            PanelGestionAlquileres gestionAlqEmp  = new PanelGestionAlquileres();
+            PanelAnadirPelicula    anadirPelEmp    = new PanelAnadirPelicula();
+            PanelGestionPeliculas  gestionPelEmp   = new PanelGestionPeliculas();
+            PanelInformes          informesEmp     = new PanelInformes();
+            PanelEmpleado          panelEmpleado   = new PanelEmpleado(
+                gestionAlqEmp, anadirPelEmp, gestionPelEmp, informesEmp
+            );
+
+            // ── Admin ────────────────────────────────────────────────────────
+            // Paneles exclusivos del admin
+            PanelGestionAlquileres gestionAlqAdm  = new PanelGestionAlquileres();
+            PanelAnadirPelicula    anadirPelAdm    = new PanelAnadirPelicula();
+            PanelGestionPeliculas  gestionPelAdm   = new PanelGestionPeliculas();
+            PanelInformes          informesAdm     = new PanelInformes();
+            PanelGestionEmpleados  gestionEmpleados = new PanelGestionEmpleados();
+            PanelAdmin             panelAdmin       = new PanelAdmin(
+                gestionAlqAdm, anadirPelAdm,
+                gestionPelAdm, informesAdm, gestionEmpleados
+            );
+
+            // ── Controlador ──────────────────────────────────────────────────
             Controlador controlador = new Controlador(
-                ventana, panelCatalogo, panelLogin, panelRegistro,
-                panelCliente, panelMisAlquileres,
-                panelEmpleado, panelGestionAlquileres, panelAnadirPelicula,
-                panelAdmin, panelGestionPeliculas,
-                panelInformes, panelGestionEmpleados
+                ventana,
+                catCliente,
+                panelLogin, panelRegistro,
+                panelCliente, misAlquileres,
+                panelEmpleado,
+                gestionAlqEmp, anadirPelEmp, gestionPelEmp, informesEmp,
+                panelAdmin,
+                gestionAlqAdm, anadirPelAdm, gestionPelAdm,
+                informesAdm, gestionEmpleados
             );
 
-            // ── 3. Inyectar controlador en todas las vistas ──────────────────
+            // ── Inyectar controlador ─────────────────────────────────────────
             ventana.setControlador(controlador);
-            panelCatalogo.setControlador(controlador);
+            catCliente.setControlador(controlador);
             panelLogin.setControlador(controlador);
             panelRegistro.setControlador(controlador);
             panelCliente.setControlador(controlador);
-            panelMisAlquileres.setControlador(controlador);
+            misAlquileres.setControlador(controlador);
             panelEmpleado.setControlador(controlador);
-            panelGestionAlquileres.setControlador(controlador);
-            panelAnadirPelicula.setControlador(controlador);
+            gestionAlqEmp.setControlador(controlador);
+            anadirPelEmp.setControlador(controlador);
+            gestionPelEmp.setControlador(controlador);
+            informesEmp.setControlador(controlador);
             panelAdmin.setControlador(controlador);
-            panelGestionPeliculas.setControlador(controlador);
-            panelInformes.setControlador(controlador);
-            panelGestionEmpleados.setControlador(controlador);
+            gestionAlqAdm.setControlador(controlador);
+            anadirPelAdm.setControlador(controlador);
+            gestionPelAdm.setControlador(controlador);
+            informesAdm.setControlador(controlador);
+            gestionEmpleados.setControlador(controlador);
 
             ventana.hacerVisible();
         });

@@ -1,5 +1,6 @@
 // ==========================================
-// INTERFAZ: IEmpleadoDAO.java
+// INTERFAZ: IEmpleadoDAO.java — ACTUALIZADA
+// Añade eliminar.
 // ==========================================
 package dao;
 
@@ -7,12 +8,8 @@ import model.Empleado;
 import java.util.List;
 
 public interface IEmpleadoDAO {
-    // Login de empleado (devuelve null si falla)
     Empleado login(String usuarioEmpleado, String contrasenia);
-
-    // Solo el admin puede crear empleados
-    boolean crear(Empleado empleado);
-
-    // Listar todos los empleados (para el admin)
+    boolean  crear(Empleado empleado);
+    boolean  eliminar(int idEmpleado);
     List<Empleado> listarTodos();
 }

@@ -1,8 +1,4 @@
-// ==========================================
-// CLASE: PanelCliente.java
-// Panel principal del rol Cliente.
-// Usa JTabbedPane para navegar entre secciones.
-// ==========================================
+// PanelCliente.java
 package view;
 
 import controller.Controlador;
@@ -14,15 +10,12 @@ import java.awt.*;
 
 public class PanelCliente extends JPanel {
 
-    private static final Color COLOR_FONDO      = new Color(0xF5F5F5);
-    private static final Color COLOR_ACENTO     = new Color(0xE50914);
-    private static final Color COLOR_DARK       = new Color(0x1a1a2e);
+    private static final Color COLOR_DARK  = new Color(0x1a1a2e);
+    private static final Color COLOR_FONDO = new Color(0xF5F5F5);
 
-    private JTabbedPane tabbedPane;
     private JLabel      lblBienvenida;
-    private JButton     btnCerrarSesion;
+    private JTabbedPane tabbedPane;
 
-    // Sub-paneles
     private PanelCatalogo      panelCatalogo;
     private PanelMisAlquileres panelMisAlquileres;
 
@@ -30,74 +23,52 @@ public class PanelCliente extends JPanel {
                         PanelMisAlquileres panelMisAlquileres) {
         this.panelCatalogo      = panelCatalogo;
         this.panelMisAlquileres = panelMisAlquileres;
-
         setBackground(COLOR_FONDO);
         setLayout(new BorderLayout());
         initComponents();
     }
 
     private void initComponents() {
-        add(buildHeader(),     BorderLayout.NORTH);
-        add(buildTabs(),       BorderLayout.CENTER);
+        add(buildHeader(), BorderLayout.NORTH);
+        add(buildTabs(),   BorderLayout.CENTER);
     }
 
-    // ── Header del panel cliente ────────────────────────────────────────────
-
+    // Solo bienvenida, sin botón cerrar sesión (lo gestiona la TopBar)
     private JPanel buildHeader() {
-        JPanel header = new JPanel(new BorderLayout());
+        JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
         header.setBackground(COLOR_DARK);
-        header.setBorder(new EmptyBorder(12, 24, 12, 24));
 
-        // Bienvenida personalizada
         lblBienvenida = new JLabel("👋 Hola, Cliente");
         lblBienvenida.setFont(new Font("SansSerif", Font.BOLD, 16));
         lblBienvenida.setForeground(Color.WHITE);
 
-        // Botón cerrar sesión
-        btnCerrarSesion = new JButton("Cerrar sesión");
-        btnCerrarSesion.setActionCommand("CERRAR_SESION");
-        btnCerrarSesion.setFont(new Font("SansSerif", Font.BOLD, 12));
-        btnCerrarSesion.setBackground(new Color(0xE50914));
-        btnCerrarSesion.setForeground(Color.WHITE);
-        btnCerrarSesion.setFocusPainted(false);
-        btnCerrarSesion.setBorder(new EmptyBorder(7, 16, 7, 16));
-        btnCerrarSesion.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        JLabel badge = new JLabel("CLIENTE");
+        badge.setFont(new Font("SansSerif", Font.BOLD, 10));
+        badge.setForeground(COLOR_DARK);
+        badge.setBackground(new Color(0x5DADE2));
+        badge.setOpaque(true);
+        badge.setBorder(new EmptyBorder(3, 8, 3, 8));
 
-        header.add(lblBienvenida,   BorderLayout.WEST);
-        header.add(btnCerrarSesion, BorderLayout.EAST);
+        header.add(lblBienvenida);
+        header.add(badge);
         return header;
     }
-
-    // ── Pestañas ────────────────────────────────────────────────────────────
 
     private JTabbedPane buildTabs() {
         tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 13));
-
-        // Pestaña 1: Catálogo (reutilizamos el panel existente)
-        tabbedPane.addTab("🎬  Catálogo", panelCatalogo);
-
-        // Pestaña 2: Mis alquileres
+        tabbedPane.addTab("🎬  Catálogo",       panelCatalogo);
         tabbedPane.addTab("📋  Mis alquileres", panelMisAlquileres);
-
         return tabbedPane;
     }
 
-    // ── Métodos públicos que usa el Controlador ─────────────────────────────
-
-    // Personaliza el saludo con el nombre del cliente
     public void setBienvenida(Cliente cliente) {
         lblBienvenida.setText("👋 Hola, " + cliente.getNombreCompleto());
     }
 
-    public void setControlador(Controlador controlador) {
-        btnCerrarSesion.addActionListener(controlador);
-    }
-
-    // Navega a la pestaña de mis alquileres
     public void irAMisAlquileres() {
         tabbedPane.setSelectedIndex(1);
     }
 
-    public JButton getBtnCerrarSesion() { return btnCerrarSesion; }
+    public void setControlador(Controlador controlador) {}
 }

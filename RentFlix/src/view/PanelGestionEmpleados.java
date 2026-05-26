@@ -1,6 +1,6 @@
 // ==========================================
-// CLASE: PanelGestionEmpleados.java
-// Crear y listar empleados. Solo para Admin.
+// CLASE: PanelGestionEmpleados.java — CORREGIDA
+// Añade botón "Eliminar empleado".
 // ==========================================
 package view;
 
@@ -19,73 +19,48 @@ public class PanelGestionEmpleados extends JPanel {
     private static final Color COLOR_FONDO  = new Color(0xF5F5F5);
     private static final Color COLOR_DARK   = new Color(0x1a1a2e);
     private static final Color COLOR_ACENTO = new Color(0xE50914);
-    private static final Color COLOR_GOLD   = new Color(0xF0C040);
 
-    // Tabla de empleados
     private DefaultTableModel modeloTabla;
     private JTable            tblEmpleados;
-
-    // Formulario de nuevo empleado
-    private JTextField     txtNombre;
-    private JTextField     txtApellido;
-    private JTextField     txtEmail;
-    private JTextField     txtUsuario;
-    private JPasswordField txtContrasenia;
-    private JButton        btnCrearEmpleado;
-    private JButton        btnLimpiar;
-    private JLabel         lblMensaje;
+    private JButton           btnEliminarEmpleado;
+    private JTextField        txtNombre;
+    private JTextField        txtApellido;
+    private JTextField        txtEmail;
+    private JTextField        txtUsuario;
+    private JPasswordField    txtContrasenia;
+    private JButton           btnCrearEmpleado;
+    private JButton           btnLimpiar;
+    private JLabel            lblMensaje;
 
     public PanelGestionEmpleados() {
         setBackground(COLOR_FONDO);
-        setLayout(new BorderLayout(0, 0));
+        setLayout(new BorderLayout(0, 12));
         setBorder(new EmptyBorder(20, 24, 20, 24));
         initComponents();
     }
 
     private void initComponents() {
-        // Dividir en dos zonas: tabla (arriba) + formulario (abajo)
-        JSplitPane splitPane = new JSplitPane(
-            JSplitPane.VERTICAL_SPLIT,
-            buildZonaTabla(),
-            buildZonaFormulario()
-        );
-        splitPane.setDividerLocation(300);
-        splitPane.setResizeWeight(0.6);
-        splitPane.setBorder(null);
-        splitPane.setDividerSize(8);
-
-        add(buildTitulo(),  BorderLayout.NORTH);
-        add(splitPane,      BorderLayout.CENTER);
+        add(buildTitulo(),     BorderLayout.NORTH);
+        add(buildTabla(),      BorderLayout.CENTER);
+        add(buildFormulario(), BorderLayout.SOUTH);
     }
 
-    // ── Título ──────────────────────────────────────────────────────────────
-
-    private JPanel buildTitulo() {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panel.setOpaque(false);
-        panel.setBorder(new EmptyBorder(0, 0, 12, 0));
-
+    private JLabel buildTitulo() {
         JLabel lbl = new JLabel("👥 Gestión de empleados");
         lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
         lbl.setForeground(COLOR_DARK);
-        panel.add(lbl);
-        return panel;
+        lbl.setBorder(new EmptyBorder(0, 0, 4, 0));
+        return lbl;
     }
 
-    // ── Zona tabla ──────────────────────────────────────────────────────────
+    // ── Tabla + botón eliminar ───────────────────────────────────────────────
 
-    private JPanel buildZonaTabla() {
-        JPanel zona = new JPanel(new BorderLayout());
-        zona.setBackground(COLOR_FONDO);
-
-        JLabel lblSub = new JLabel("Empleados registrados");
-        lblSub.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblSub.setForeground(COLOR_DARK);
-        lblSub.setBorder(new EmptyBorder(0, 0, 8, 0));
+    private JPanel buildTabla() {
+        JPanel panel = new JPanel(new BorderLayout(0, 8));
+        panel.setOpaque(false);
 
         String[] columnas = {
-            "ID", "Nombre", "Apellido",
-            "Email", "Usuario", "Rol"
+            "ID", "Nombre", "Apellido", "Email", "Usuario", "Rol"
         };
 
         modeloTabla = new DefaultTableModel(columnas, 0) {
@@ -96,8 +71,9 @@ public class PanelGestionEmpleados extends JPanel {
         };
 
         tblEmpleados = new JTable(modeloTabla);
-        tblEmpleados.setRowHeight(38);
+        tblEmpleados.setRowHeight(36);
         tblEmpleados.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        tblEmpleados.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tblEmpleados.setShowHorizontalLines(true);
         tblEmpleados.setGridColor(new Color(0xEEEEEE));
         tblEmpleados.setSelectionBackground(new Color(0xFFE0E0));
@@ -110,27 +86,23 @@ public class PanelGestionEmpleados extends JPanel {
         tblEmpleados.getTableHeader().setForeground(Color.WHITE);
 
         int[] anchos = {40, 130, 130, 200, 130, 100};
-        for (int i = 0; i < anchos.length; i++) {
-            tblEmpleados.getColumnModel()
-                        .getColumn(i)
+        for (int i = 0; i < anchos.length; i++)
+            tblEmpleados.getColumnModel().getColumn(i)
                         .setPreferredWidth(anchos[i]);
-        }
 
-        // Renderer para la columna Rol con colores distintos
+        // Renderer colores Rol
         tblEmpleados.getColumnModel().getColumn(5).setCellRenderer(
             new DefaultTableCellRenderer() {
                 @Override
                 public Component getTableCellRendererComponent(
                         JTable table, Object value, boolean isSelected,
                         boolean hasFocus, int row, int column) {
-
                     JLabel lbl = (JLabel) super.getTableCellRendererComponent(
                         table, value, isSelected, hasFocus, row, column
                     );
                     lbl.setHorizontalAlignment(SwingConstants.CENTER);
                     lbl.setFont(new Font("SansSerif", Font.BOLD, 11));
                     lbl.setOpaque(true);
-
                     if (!isSelected) {
                         if ("Administrador".equals(value)) {
                             lbl.setBackground(new Color(0xFFF9E6));
@@ -145,22 +117,37 @@ public class PanelGestionEmpleados extends JPanel {
             }
         );
 
-        JScrollPane scroll = new JScrollPane(tblEmpleados);
-        scroll.setBorder(
-            BorderFactory.createLineBorder(new Color(0xDDDDDD))
+        // Botón eliminar bajo la tabla
+        btnEliminarEmpleado = new JButton("🗑️  Eliminar empleado");
+        btnEliminarEmpleado.setActionCommand("ELIMINAR_EMPLEADO");
+        btnEliminarEmpleado.setFont(new Font("SansSerif", Font.BOLD, 13));
+        btnEliminarEmpleado.setBackground(COLOR_ACENTO);
+        btnEliminarEmpleado.setForeground(Color.WHITE);
+        btnEliminarEmpleado.setFocusPainted(false);
+        btnEliminarEmpleado.setBorder(new EmptyBorder(8, 18, 8, 18));
+        btnEliminarEmpleado.setCursor(
+            Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
         );
+        btnEliminarEmpleado.setEnabled(false);
 
-        zona.add(lblSub,  BorderLayout.NORTH);
-        zona.add(scroll,  BorderLayout.CENTER);
-        return zona;
+        JPanel filaBtnEliminar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        filaBtnEliminar.setOpaque(false);
+        filaBtnEliminar.add(btnEliminarEmpleado);
+
+        JScrollPane scroll = new JScrollPane(tblEmpleados);
+        scroll.setBorder(BorderFactory.createLineBorder(new Color(0xDDDDDD)));
+
+        panel.add(scroll,          BorderLayout.CENTER);
+        panel.add(filaBtnEliminar, BorderLayout.SOUTH);
+        return panel;
     }
 
-    // ── Zona formulario ─────────────────────────────────────────────────────
+    // ── Formulario crear empleado ────────────────────────────────────────────
 
-    private JPanel buildZonaFormulario() {
-        JPanel zona = new JPanel(new BorderLayout());
-        zona.setBackground(Color.WHITE);
-        zona.setBorder(BorderFactory.createCompoundBorder(
+    private JPanel buildFormulario() {
+        JPanel panel = new JPanel(new BorderLayout(0, 10));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(0xDDDDDD)),
             new EmptyBorder(16, 20, 16, 20)
         ));
@@ -168,10 +155,8 @@ public class PanelGestionEmpleados extends JPanel {
         JLabel lblSub = new JLabel("➕ Crear nuevo empleado");
         lblSub.setFont(new Font("SansSerif", Font.BOLD, 14));
         lblSub.setForeground(COLOR_DARK);
-        lblSub.setBorder(new EmptyBorder(0, 0, 12, 0));
 
-        // Campos en grid
-        JPanel campos = new JPanel(new GridLayout(2, 4, 10, 10));
+        JPanel campos = new JPanel(new GridLayout(1, 5, 10, 0));
         campos.setOpaque(false);
 
         txtNombre      = buildCampo("Nombre *");
@@ -189,11 +174,15 @@ public class PanelGestionEmpleados extends JPanel {
         campos.add(txtEmail);
         campos.add(txtUsuario);
         campos.add(txtContrasenia);
-        campos.add(new JLabel()); // espacio vacío
-        campos.add(new JLabel()); // espacio vacío
 
-        // Botones
-        JPanel botones = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        JPanel sur = new JPanel(new BorderLayout(10, 0));
+        sur.setOpaque(false);
+        sur.setBorder(new EmptyBorder(10, 0, 0, 0));
+
+        lblMensaje = new JLabel(" ");
+        lblMensaje.setFont(new Font("SansSerif", Font.PLAIN, 12));
+
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         botones.setOpaque(false);
 
         btnLimpiar = new JButton("🗑  Limpiar");
@@ -219,31 +208,23 @@ public class PanelGestionEmpleados extends JPanel {
         botones.add(btnLimpiar);
         botones.add(btnCrearEmpleado);
 
-        lblMensaje = new JLabel(" ");
-        lblMensaje.setFont(new Font("SansSerif", Font.PLAIN, 12));
-
-        JPanel sur = new JPanel(new BorderLayout());
-        sur.setOpaque(false);
-        sur.setBorder(new EmptyBorder(10, 0, 0, 0));
         sur.add(lblMensaje, BorderLayout.WEST);
         sur.add(botones,    BorderLayout.EAST);
 
-        zona.add(lblSub,  BorderLayout.NORTH);
-        zona.add(campos,  BorderLayout.CENTER);
-        zona.add(sur,     BorderLayout.SOUTH);
-        return zona;
+        panel.add(lblSub,  BorderLayout.NORTH);
+        panel.add(campos,  BorderLayout.CENTER);
+        panel.add(sur,     BorderLayout.SOUTH);
+        return panel;
     }
 
     private JTextField buildCampo(String placeholder) {
-        JTextField campo = new JTextField();
-        campo.putClientProperty(
-            "JTextField.placeholderText", placeholder
-        );
-        campo.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        return campo;
+        JTextField f = new JTextField();
+        f.putClientProperty("JTextField.placeholderText", placeholder);
+        f.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        return f;
     }
 
-    // ── Métodos públicos para el Controlador ────────────────────────────────
+    // ── Métodos para el controlador ─────────────────────────────────────────
 
     public void cargarEmpleados(List<Empleado> empleados) {
         modeloTabla.setRowCount(0);
@@ -257,6 +238,24 @@ public class PanelGestionEmpleados extends JPanel {
                 e.esAdministrador() ? "Administrador" : "Empleado"
             });
         }
+        btnEliminarEmpleado.setEnabled(false);
+    }
+
+    public void actualizarBotonEliminar() {
+        int fila = tblEmpleados.getSelectedRow();
+        if (fila >= 0) {
+            String rol = String.valueOf(modeloTabla.getValueAt(fila, 5));
+            // No se puede eliminar al administrador
+            btnEliminarEmpleado.setEnabled(!"Administrador".equals(rol));
+        } else {
+            btnEliminarEmpleado.setEnabled(false);
+        }
+    }
+
+    public int getIdEmpleadoSeleccionado() {
+        int fila = tblEmpleados.getSelectedRow();
+        if (fila < 0) return -1;
+        return (int) modeloTabla.getValueAt(fila, 0);
     }
 
     public void limpiar() {
@@ -268,8 +267,8 @@ public class PanelGestionEmpleados extends JPanel {
         lblMensaje.setText(" ");
     }
 
-    public void mostrarMensaje(String mensaje, boolean esError) {
-        lblMensaje.setText(mensaje);
+    public void mostrarMensaje(String msg, boolean esError) {
+        lblMensaje.setText(msg);
         lblMensaje.setForeground(
             esError ? COLOR_ACENTO : new Color(0x27AE60)
         );
@@ -286,9 +285,12 @@ public class PanelGestionEmpleados extends JPanel {
     public void setControlador(Controlador controlador) {
         btnCrearEmpleado.addActionListener(controlador);
         btnLimpiar.addActionListener(controlador);
-    }
+        btnEliminarEmpleado.addActionListener(controlador);
 
-    // ── Getters de datos ────────────────────────────────────────────────────
+        tblEmpleados.getSelectionModel().addListSelectionListener(
+            e -> { if (!e.getValueIsAdjusting()) actualizarBotonEliminar(); }
+        );
+    }
 
     public String getNombre()      { return txtNombre.getText().trim(); }
     public String getApellido()    { return txtApellido.getText().trim(); }
