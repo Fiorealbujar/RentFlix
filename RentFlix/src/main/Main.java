@@ -15,8 +15,8 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
 
             VentanaPrincipal   ventana       = new VentanaPrincipal();
-            PanelLogin         panelLogin    = new PanelLogin();
-            PanelRegistro      panelRegistro = new PanelRegistro();
+			PanelLogin panelLogin = new PanelLogin();
+			PanelRegistro      panelRegistro = new PanelRegistro();
 
             // ── Cliente ──────────────────────────────────────────────────────
             // El catálogo del cliente es exclusivo suyo
