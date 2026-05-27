@@ -1,4 +1,4 @@
-// Controlador.java — DEFINITIVO
+// Controlador.java
 package controller;
 
 import dao.*;
@@ -17,7 +17,8 @@ public class Controlador implements ActionListener {
 
     // ── Vistas ────────────────────────────────────────────────────────────────
     private VentanaPrincipal   ventana;
-    private PanelCatalogo      catCliente;       // exclusivo del cliente
+    private PanelCatalogo      catInvitado;
+    private PanelCatalogo      catCliente;
     private PanelLogin         panelLogin;
     private PanelRegistro      panelRegistro;
     private PanelCliente       panelCliente;
@@ -37,6 +38,7 @@ public class Controlador implements ActionListener {
     private PanelGestionPeliculas  gestionPelAdm;
     private PanelInformes          informesAdm;
     private PanelGestionEmpleados  gestionEmpleados;
+    private PanelGestionClientes   gestionClientes;
 
     // ── DAOs ──────────────────────────────────────────────────────────────────
     private IPeliculaDAO peliculaDAO;
@@ -50,13 +52,12 @@ public class Controlador implements ActionListener {
     private Cliente  clienteActivo  = null;
     private Empleado empleadoActivo = null;
 
-    // Cache para form de alquiler de empleado/admin
     private List<Cliente>  listaClientesCache;
     private List<Pelicula> listaPeliculasCache;
-    // Flag para saber qué panel de gestión está activo
     private boolean esAdmin = false;
 
     public Controlador(VentanaPrincipal ventana,
+                       PanelCatalogo catInvitado,
                        PanelCatalogo catCliente,
                        PanelLogin panelLogin,
                        PanelRegistro panelRegistro,
@@ -72,9 +73,11 @@ public class Controlador implements ActionListener {
                        PanelAnadirPelicula anadirPelAdm,
                        PanelGestionPeliculas gestionPelAdm,
                        PanelInformes informesAdm,
-                       PanelGestionEmpleados gestionEmpleados) {
+                       PanelGestionEmpleados gestionEmpleados,
+                       PanelGestionClientes gestionClientes) {
 
         this.ventana          = ventana;
+        this.catInvitado      = catInvitado;
         this.catCliente       = catCliente;
         this.panelLogin       = panelLogin;
         this.panelRegistro    = panelRegistro;
@@ -91,6 +94,7 @@ public class Controlador implements ActionListener {
         this.gestionPelAdm    = gestionPelAdm;
         this.informesAdm      = informesAdm;
         this.gestionEmpleados = gestionEmpleados;
+        this.gestionClientes  = gestionClientes;
 
         peliculaDAO = new PeliculaDAO();
         clienteDAO  = new ClienteDAO();
@@ -116,17 +120,17 @@ public class Controlador implements ActionListener {
                 break;
             case "CANCELAR_LOGIN":
             case "CANCELAR_REGISTRO":
-                ventana.cargarPanel(catCliente);
+                ventana.cargarPanel(catInvitado);
                 break;
             case "CERRAR_SESION":
                 cerrarSesion();
                 break;
 
             case "BUSCAR_PELICULA":
-                buscarPelicula();
+                buscarPelicula(e);
                 break;
             case "FILTRAR_FORMATO_CATALOGO":
-                filtrarFormato();
+                filtrarFormato(e);
                 break;
             case "ALQUILAR_PELICULA":
                 alquilarDesdeClienteCatalogo();
@@ -185,10 +189,17 @@ public class Controlador implements ActionListener {
             case "LIMPIAR_FORM_EMPLEADO":
                 gestionEmpleados.limpiar();
                 break;
+
+            case "EDITAR_CLIENTE":
+                editarCliente();
+                break;
+            case "ELIMINAR_CLIENTE":
+                eliminarCliente();
+                break;
         }
     }
 
-    // ── Helpers para obtener el panel activo según rol ────────────────────────
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private PanelGestionAlquileres getPanelGestionActivo() {
         return esAdmin ? gestionAlqAdm : gestionAlqEmp;
@@ -202,23 +213,21 @@ public class Controlador implements ActionListener {
         return esAdmin ? anadirPelAdm : anadirPelEmp;
     }
 
-    private PanelInformes getPanelInformesActivo() {
-        return esAdmin ? informesAdm : informesEmp;
-    }
-
     // ── Modo invitado ─────────────────────────────────────────────────────────
 
     private void iniciarModoInvitado() {
         clienteActivo  = null;
         empleadoActivo = null;
         esAdmin        = false;
-        recargarCatalogoCliente();
-        catCliente.habilitarAcciones(false);
+        List<Pelicula> peliculas = peliculaDAO.listarTodas();
+        List<Copia>    copias    = copiaDAO.listarTodasDisponibles();
+        catInvitado.cargarCopias(peliculas, copias);
+        catInvitado.habilitarAcciones(false);
         ventana.modoInvitado();
-        ventana.cargarPanel(catCliente);
+        ventana.cargarPanel(catInvitado);
     }
 
-    // ── Catálogo cliente ──────────────────────────────────────────────────────
+    // ── Catálogos ─────────────────────────────────────────────────────────────
 
     private void recargarCatalogoCliente() {
         List<Pelicula> peliculas = peliculaDAO.listarTodas();
@@ -226,8 +235,10 @@ public class Controlador implements ActionListener {
         catCliente.cargarCopias(peliculas, copias);
     }
 
-    private void buscarPelicula() {
-        String termino = catCliente.getTxtBuscar().getText().trim();
+    private void buscarPelicula(ActionEvent e) {
+        PanelCatalogo origen = (e.getSource() == catCliente.getBtnBuscar())
+            ? catCliente : catInvitado;
+        String termino = origen.getTxtBuscar().getText().trim();
         List<Pelicula> peliculas = termino.isEmpty()
             ? peliculaDAO.listarTodas()
             : peliculaDAO.buscarPorTitulo(termino);
@@ -235,16 +246,18 @@ public class Controlador implements ActionListener {
             .filter(c -> peliculas.stream()
                 .anyMatch(p -> p.getId() == c.getIdPelicula()))
             .collect(Collectors.toList());
-        catCliente.cargarCopias(peliculas, copias);
+        origen.cargarCopias(peliculas, copias);
     }
 
-    private void filtrarFormato() {
-        String filtro = catCliente.getFiltroFormato();
+    private void filtrarFormato(ActionEvent e) {
+        PanelCatalogo origen = (e.getSource() == catCliente.getCmbFiltroFormato())
+            ? catCliente : catInvitado;
+        String filtro = origen.getFiltroFormato();
         List<Pelicula> peliculas = peliculaDAO.listarTodas();
         List<Copia> copias = (filtro == null)
             ? copiaDAO.listarTodasDisponibles()
             : copiaDAO.listarDisponiblesPorFormato(filtro);
-        catCliente.cargarCopias(peliculas, copias);
+        origen.cargarCopias(peliculas, copias);
     }
 
     // ── Alquiler cliente ──────────────────────────────────────────────────────
@@ -257,15 +270,17 @@ public class Controlador implements ActionListener {
             return;
         }
 
-        String titulo  = catCliente.getTituloSeleccionado();
-        String formato = catCliente.getFormatoSeleccionado();
-
-        if (titulo == null) {
+        int fila = catCliente.getFilaSeleccionada();
+        if (fila < 0) {
             JOptionPane.showMessageDialog(ventana,
                 "Selecciona una película del catálogo primero.",
                 "Sin selección", JOptionPane.WARNING_MESSAGE);
             return;
         }
+
+        // catCliente es PanelCatalogo(false): col 0=Título, col 5=Formato
+        String titulo  = (String) catCliente.getModelo().getValueAt(fila, 0);
+        String formato = (String) catCliente.getModelo().getValueAt(fila, 5);
 
         List<Pelicula> encontradas = peliculaDAO.buscarPorTitulo(titulo);
         if (encontradas.isEmpty()) return;
@@ -407,7 +422,6 @@ public class Controlador implements ActionListener {
                 "Total: " + String.format("%.2f €", total),
                 "Alquiler exitoso", JOptionPane.INFORMATION_MESSAGE);
 
-            // Recargar según el rol
             if (clienteActivo != null && empleadoActivo == null) {
                 recargarCatalogoCliente();
                 misAlquileres.cargarAlquileres(
@@ -415,8 +429,9 @@ public class Controlador implements ActionListener {
                 );
                 panelCliente.irAMisAlquileres();
             } else if (empleadoActivo != null) {
-                PanelGestionAlquileres panelGestion = getPanelGestionActivo();
-                panelGestion.cargarAlquileres(alquilerDAO.listarTodos());
+                getPanelGestionActivo().cargarAlquileres(
+                    alquilerDAO.listarTodos()
+                );
                 if (esAdmin) cargarInformesAdmin();
                 else         cargarInformesEmpleado();
             }
@@ -430,7 +445,7 @@ public class Controlador implements ActionListener {
     // ── Login y registro ──────────────────────────────────────────────────────
 
     private void procesarLogin() {
-        String usuario    = panelLogin.getUsuario();
+        String usuario     = panelLogin.getUsuario();
         String contrasenia = panelLogin.getContrasenia();
 
         if (usuario.isEmpty() || contrasenia.isEmpty()) {
@@ -490,15 +505,11 @@ public class Controlador implements ActionListener {
     private void cargarPanelCliente() {
         panelCliente.setBienvenida(clienteActivo);
         recargarCatalogoCliente();
-        // Habilitar botón alquilar DESPUÉS de cargar el panel
         catCliente.habilitarAcciones(true);
         misAlquileres.cargarAlquileres(
             alquilerDAO.listarPorCliente(clienteActivo.getIdCliente())
         );
         ventana.cargarPanel(panelCliente);
-        // Forzar repintado para que el botón quede habilitado visiblemente
-        catCliente.revalidate();
-        catCliente.repaint();
     }
 
     private void cargarPanelEmpleado() {
@@ -514,6 +525,7 @@ public class Controlador implements ActionListener {
         gestionAlqAdm.cargarAlquileres(alquilerDAO.listarTodos());
         gestionPelAdm.cargarPeliculas(peliculaDAO.listarTodas());
         gestionEmpleados.cargarEmpleados(empleadoDAO.listarTodos());
+        gestionClientes.cargarClientes(clienteDAO.listarTodos());
         cargarInformesAdmin();
         ventana.cargarPanel(panelAdmin);
     }
@@ -620,11 +632,11 @@ public class Controlador implements ActionListener {
 
         JPanel form = new JPanel(new GridLayout(0, 2, 8, 8));
         form.setBorder(new EmptyBorder(10, 10, 10, 10));
-        form.add(new JLabel("Título:"));          form.add(txtTitulo);
-        form.add(new JLabel("Director:"));        form.add(txtDirector);
-        form.add(new JLabel("Duración (min):"));  form.add(txtDuracion);
-        form.add(new JLabel("Género:"));          form.add(cmbGenero);
-        form.add(new JLabel("Clasificación:"));   form.add(cmbClasif);
+        form.add(new JLabel("Título:"));         form.add(txtTitulo);
+        form.add(new JLabel("Director:"));       form.add(txtDirector);
+        form.add(new JLabel("Duración (min):")); form.add(txtDuracion);
+        form.add(new JLabel("Género:"));         form.add(cmbGenero);
+        form.add(new JLabel("Clasificación:"));  form.add(cmbClasif);
         form.add(new JLabel("Sinopsis:"));
         form.add(new JScrollPane(txtSinopsis));
 
@@ -744,6 +756,87 @@ public class Controlador implements ActionListener {
         }
     }
 
+    // ── Clientes (Admin) ──────────────────────────────────────────────────────
+
+    private void editarCliente() {
+        Cliente c = gestionClientes.getClienteSeleccionado();
+        if (c == null) {
+            JOptionPane.showMessageDialog(ventana,
+                "Selecciona un cliente.", "Sin selección",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JTextField txtNombre   = new JTextField(c.getNombreCliente());
+        JTextField txtApellido = new JTextField(c.getApellidoCliente());
+        JTextField txtEmail    = new JTextField(c.getEmailCliente());
+        JTextField txtUsuario  = new JTextField(c.getNombreUsuario());
+        JComboBox<String> cmbEstado = new JComboBox<>(
+            new String[]{"activo", "inactivo"}
+        );
+        cmbEstado.setSelectedItem(c.getEstado());
+
+        JPanel form = new JPanel(new GridLayout(0, 2, 8, 8));
+        form.setBorder(new EmptyBorder(10, 10, 10, 10));
+        form.add(new JLabel("Nombre:"));   form.add(txtNombre);
+        form.add(new JLabel("Apellido:")); form.add(txtApellido);
+        form.add(new JLabel("Email:"));    form.add(txtEmail);
+        form.add(new JLabel("Usuario:"));  form.add(txtUsuario);
+        form.add(new JLabel("Estado:"));   form.add(cmbEstado);
+
+        int res = JOptionPane.showConfirmDialog(
+            ventana, form,
+            "Editar cliente: " + c.getNombreCompleto(),
+            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (res == JOptionPane.OK_OPTION) {
+            c.setNombreCliente(txtNombre.getText().trim());
+            c.setApellidoCliente(txtApellido.getText().trim());
+            c.setEmailCliente(txtEmail.getText().trim());
+            c.setNombreUsuario(txtUsuario.getText().trim());
+            c.setEstado((String) cmbEstado.getSelectedItem());
+
+            if (clienteDAO.actualizar(c)) {
+                JOptionPane.showMessageDialog(ventana,
+                    "Cliente actualizado. ✅",
+                    "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                gestionClientes.cargarClientes(clienteDAO.listarTodos());
+            } else {
+                JOptionPane.showMessageDialog(ventana,
+                    "Error al actualizar el cliente.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void eliminarCliente() {
+        int id = gestionClientes.getIdClienteSeleccionado();
+        if (id == -1) {
+            JOptionPane.showMessageDialog(ventana,
+                "Selecciona un cliente.", "Sin selección",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int conf = JOptionPane.showConfirmDialog(ventana,
+            "¿Seguro que quieres eliminar este cliente?\n" +
+            "Se eliminarán también sus datos.",
+            "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (conf == JOptionPane.YES_OPTION) {
+            if (clienteDAO.eliminar(id)) {
+                JOptionPane.showMessageDialog(ventana,
+                    "Cliente eliminado. 🗑️", "Éxito",
+                    JOptionPane.INFORMATION_MESSAGE);
+                gestionClientes.cargarClientes(clienteDAO.listarTodos());
+            } else {
+                JOptionPane.showMessageDialog(ventana,
+                    "No se pudo eliminar. Puede tener alquileres asociados.",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
     // ── Informes ──────────────────────────────────────────────────────────────
 
     private void cargarInformes() {
@@ -778,4 +871,4 @@ public class Controlador implements ActionListener {
 
     public Cliente  getClienteActivo()  { return clienteActivo; }
     public Empleado getEmpleadoActivo() { return empleadoActivo; }
-}	
+}

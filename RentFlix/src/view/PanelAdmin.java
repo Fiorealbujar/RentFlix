@@ -1,4 +1,4 @@
-// PanelAdmin.java
+// PanelAdmin.java — ACTUALIZADO
 package view;
 
 import controller.Controlador;
@@ -17,23 +17,26 @@ public class PanelAdmin extends JPanel {
     private JLabel      lblBienvenida;
     private JTabbedPane tabbedPane;
 
-    // Sin catálogo: el form de alquiler está en PanelGestionAlquileres
     private PanelGestionAlquileres panelGestionAlquileres;
     private PanelAnadirPelicula    panelAnadirPelicula;
     private PanelGestionPeliculas  panelGestionPeliculas;
     private PanelInformes          panelInformes;
     private PanelGestionEmpleados  panelGestionEmpleados;
+    private PanelGestionClientes   panelGestionClientes;
 
     public PanelAdmin(PanelGestionAlquileres panelGestionAlquileres,
                       PanelAnadirPelicula    panelAnadirPelicula,
                       PanelGestionPeliculas  panelGestionPeliculas,
                       PanelInformes          panelInformes,
-                      PanelGestionEmpleados  panelGestionEmpleados) {
+                      PanelGestionEmpleados  panelGestionEmpleados,
+                      PanelGestionClientes   panelGestionClientes) {
         this.panelGestionAlquileres = panelGestionAlquileres;
         this.panelAnadirPelicula    = panelAnadirPelicula;
         this.panelGestionPeliculas  = panelGestionPeliculas;
         this.panelInformes          = panelInformes;
         this.panelGestionEmpleados  = panelGestionEmpleados;
+        this.panelGestionClientes   = panelGestionClientes;
+
         setBackground(COLOR_FONDO);
         setLayout(new BorderLayout());
         initComponents();
@@ -44,7 +47,6 @@ public class PanelAdmin extends JPanel {
         add(buildTabs(),   BorderLayout.CENTER);
     }
 
-    // Solo bienvenida y badge dorado, sin botón cerrar sesión
     private JPanel buildHeader() {
         JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
         header.setBackground(COLOR_DARK);
@@ -73,6 +75,7 @@ public class PanelAdmin extends JPanel {
         tabbedPane.addTab("🎞️  Gestión películas", panelGestionPeliculas);
         tabbedPane.addTab("📊  Informes",          panelInformes);
         tabbedPane.addTab("👥  Empleados",         panelGestionEmpleados);
+        tabbedPane.addTab("🧑‍💼  Clientes",          panelGestionClientes);
         return tabbedPane;
     }
 

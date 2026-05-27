@@ -1,5 +1,4 @@
-// Main.java — DEFINITIVO
-// Cada panel tiene sus propios subpaneles, sin compartir
+// Main.java
 package main;
 
 import com.formdev.flatlaf.FlatLightLaf;
@@ -15,42 +14,45 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
 
             VentanaPrincipal   ventana       = new VentanaPrincipal();
-			PanelLogin panelLogin = new PanelLogin();
-			PanelRegistro      panelRegistro = new PanelRegistro();
+            PanelLogin         panelLogin    = new PanelLogin();
+            PanelRegistro      panelRegistro = new PanelRegistro();
+
+            // ── Invitado ─────────────────────────────────────────────────────
+            PanelCatalogo catInvitado = new PanelCatalogo(false);
 
             // ── Cliente ──────────────────────────────────────────────────────
-            // El catálogo del cliente es exclusivo suyo
-            PanelCatalogo      catCliente       = new PanelCatalogo(false);
-            PanelMisAlquileres misAlquileres     = new PanelMisAlquileres();
-            PanelCliente       panelCliente      = new PanelCliente(
+            PanelCatalogo      catCliente    = new PanelCatalogo(false);
+            PanelMisAlquileres misAlquileres = new PanelMisAlquileres();
+            PanelCliente       panelCliente  = new PanelCliente(
                 catCliente, misAlquileres
             );
 
             // ── Empleado ─────────────────────────────────────────────────────
-            // Paneles exclusivos del empleado
-            PanelGestionAlquileres gestionAlqEmp  = new PanelGestionAlquileres();
-            PanelAnadirPelicula    anadirPelEmp    = new PanelAnadirPelicula();
-            PanelGestionPeliculas  gestionPelEmp   = new PanelGestionPeliculas();
-            PanelInformes          informesEmp     = new PanelInformes();
-            PanelEmpleado          panelEmpleado   = new PanelEmpleado(
+            PanelGestionAlquileres gestionAlqEmp = new PanelGestionAlquileres();
+            PanelAnadirPelicula    anadirPelEmp   = new PanelAnadirPelicula();
+            PanelGestionPeliculas  gestionPelEmp  = new PanelGestionPeliculas();
+            PanelInformes          informesEmp    = new PanelInformes();
+            PanelEmpleado          panelEmpleado  = new PanelEmpleado(
                 gestionAlqEmp, anadirPelEmp, gestionPelEmp, informesEmp
             );
 
             // ── Admin ────────────────────────────────────────────────────────
-            // Paneles exclusivos del admin
-            PanelGestionAlquileres gestionAlqAdm  = new PanelGestionAlquileres();
+            PanelGestionAlquileres gestionAlqAdm   = new PanelGestionAlquileres();
             PanelAnadirPelicula    anadirPelAdm    = new PanelAnadirPelicula();
             PanelGestionPeliculas  gestionPelAdm   = new PanelGestionPeliculas();
             PanelInformes          informesAdm     = new PanelInformes();
             PanelGestionEmpleados  gestionEmpleados = new PanelGestionEmpleados();
+            PanelGestionClientes   gestionClientes  = new PanelGestionClientes();
             PanelAdmin             panelAdmin       = new PanelAdmin(
                 gestionAlqAdm, anadirPelAdm,
-                gestionPelAdm, informesAdm, gestionEmpleados
+                gestionPelAdm, informesAdm,
+                gestionEmpleados, gestionClientes
             );
 
             // ── Controlador ──────────────────────────────────────────────────
             Controlador controlador = new Controlador(
                 ventana,
+                catInvitado,
                 catCliente,
                 panelLogin, panelRegistro,
                 panelCliente, misAlquileres,
@@ -58,11 +60,12 @@ public class Main {
                 gestionAlqEmp, anadirPelEmp, gestionPelEmp, informesEmp,
                 panelAdmin,
                 gestionAlqAdm, anadirPelAdm, gestionPelAdm,
-                informesAdm, gestionEmpleados
+                informesAdm, gestionEmpleados, gestionClientes
             );
 
             // ── Inyectar controlador ─────────────────────────────────────────
             ventana.setControlador(controlador);
+            catInvitado.setControlador(controlador);
             catCliente.setControlador(controlador);
             panelLogin.setControlador(controlador);
             panelRegistro.setControlador(controlador);
@@ -79,6 +82,7 @@ public class Main {
             gestionPelAdm.setControlador(controlador);
             informesAdm.setControlador(controlador);
             gestionEmpleados.setControlador(controlador);
+            gestionClientes.setControlador(controlador);
 
             ventana.hacerVisible();
         });

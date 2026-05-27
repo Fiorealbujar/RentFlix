@@ -1,7 +1,4 @@
-// ==========================================
-// CLASE: ClienteDAO.java
-// Implementación de IClienteDAO con SQLite.
-// ==========================================
+// ClienteDAO.java — ACTUALIZADO
 package dao;
 
 import model.Cliente;
@@ -17,7 +14,6 @@ public class ClienteDAO implements IClienteDAO {
         this.con = ConexionDB.getConexion();
     }
 
-    // Mapea un ResultSet a un objeto Cliente
     private Cliente mapear(ResultSet rs) throws SQLException {
         return new Cliente(
             rs.getInt("id_cliente"),
@@ -32,7 +28,8 @@ public class ClienteDAO implements IClienteDAO {
 
     @Override
     public Cliente login(String nombreUsuario, String contrasenia) {
-        String sql = "SELECT * FROM Clientes WHERE nombre_usuario = ? AND contrasenia_cliente = ?";
+        String sql = "SELECT * FROM Clientes " +
+                     "WHERE nombre_usuario=? AND contrasenia_cliente=?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, nombreUsuario);
             ps.setString(2, contrasenia);
@@ -41,7 +38,7 @@ public class ClienteDAO implements IClienteDAO {
         } catch (SQLException e) {
             System.err.println("ClienteDAO.login: " + e.getMessage());
         }
-        return null; // null = credenciales incorrectas
+        return null;
     }
 
     @Override
@@ -64,7 +61,7 @@ public class ClienteDAO implements IClienteDAO {
 
     @Override
     public Cliente obtenerPorId(int idCliente) {
-        String sql = "SELECT * FROM Clientes WHERE id_cliente = ?";
+        String sql = "SELECT * FROM Clientes WHERE id_cliente=?";
         try (PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, idCliente);
             ResultSet rs = ps.executeQuery();
@@ -78,7 +75,7 @@ public class ClienteDAO implements IClienteDAO {
     @Override
     public List<Cliente> listarTodos() {
         List<Cliente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Clientes";
+        String sql = "SELECT * FROM Clientes ORDER BY apellido_cliente ASC";
         try (Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) lista.add(mapear(rs));
@@ -86,5 +83,37 @@ public class ClienteDAO implements IClienteDAO {
             System.err.println("ClienteDAO.listarTodos: " + e.getMessage());
         }
         return lista;
+    }
+
+    @Override
+    public boolean actualizar(Cliente cliente) {
+        String sql = "UPDATE Clientes SET " +
+                     "nombre_cliente=?, apellido_cliente=?, " +
+                     "email_cliente=?, nombre_usuario=?, estado=? " +
+                     "WHERE id_cliente=?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, cliente.getNombreCliente());
+            ps.setString(2, cliente.getApellidoCliente());
+            ps.setString(3, cliente.getEmailCliente());
+            ps.setString(4, cliente.getNombreUsuario());
+            ps.setString(5, cliente.getEstado());
+            ps.setInt(6,    cliente.getIdCliente());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("ClienteDAO.actualizar: " + e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean eliminar(int idCliente) {
+        String sql = "DELETE FROM Clientes WHERE id_cliente=?";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idCliente);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("ClienteDAO.eliminar: " + e.getMessage());
+            return false;
+        }
     }
 }
