@@ -1,6 +1,6 @@
 package view;
 
-import controller.NavController;
+import controller.Controlador;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -21,7 +21,7 @@ public class TopBar extends JPanel {
 
     private JLabel pageTitle;
 
-    public TopBar(NavController controller) {
+    public TopBar(Controlador controller) {
         setBackground(bg());
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createCompoundBorder(
@@ -105,7 +105,7 @@ public class TopBar extends JPanel {
         return btn;
     }
 
-    private JButton buildPrimaryButton(String texto, NavController controller) {
+    private JButton buildPrimaryButton(String texto, Controlador controller) {
         JButton btn = new JButton(texto) {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -124,7 +124,7 @@ public class TopBar extends JPanel {
         btn.setFocusPainted(false);
         btn.setBorder(new EmptyBorder(6, 14, 6, 14));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.addActionListener(e -> controller.navegarA(NavController.Seccion.ALQUILERES));
+        btn.addActionListener(e -> controller.navegarA(Controlador.Seccion.ALQUILERES));
         return btn;
     }
 

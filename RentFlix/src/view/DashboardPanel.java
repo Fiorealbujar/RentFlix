@@ -1,6 +1,6 @@
 package view;
 
-import controller.NavController;
+import controller.Controlador;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -18,7 +18,7 @@ public class DashboardPanel extends JPanel {
     private static Color textPri() { Color c = UIManager.getColor("Label.foreground");         return c != null ? c : new Color(0x1A1A1A); }
     private static Color textSec() { Color c = UIManager.getColor("Label.disabledForeground"); return c != null ? c : new Color(0x999999); }
 
-    public DashboardPanel(NavController controller) {
+    public DashboardPanel(Controlador controller) {
         setLayout(new BorderLayout());
         setBackground(bg());
 

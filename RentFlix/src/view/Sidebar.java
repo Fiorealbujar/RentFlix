@@ -1,7 +1,7 @@
 package view;
 
-import controller.NavController;
-import controller.NavController.Seccion;
+import controller.Controlador;
+import controller.Controlador.Seccion;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -25,11 +25,11 @@ public class Sidebar extends JPanel {
     private static Color textLabel()  { Color c = UIManager.getColor("Label.disabledForeground"); return c != null ? c : new Color(0xAAAAAA); }
     private static Color borderCol()  { Color c = UIManager.getColor("Component.borderColor");    return c != null ? c : new Color(0xDDDDDD); }
 
-    private final NavController controller;
+    private final Controlador controller;
     private final Map<Seccion, JPanel> navItems = new LinkedHashMap<>();
     private Seccion seccionActiva = Seccion.DASHBOARD;
 
-    public Sidebar(NavController controller) {
+    public Sidebar(Controlador controller) {
         this.controller = controller;
         setPreferredSize(new Dimension(190, 0));
         setBackground(bg());

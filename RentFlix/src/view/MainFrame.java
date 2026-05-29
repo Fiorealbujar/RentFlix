@@ -1,6 +1,6 @@
 package view;
 
-import controller.NavController;
+import controller.Controlador;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +8,7 @@ import java.awt.*;
 public class MainFrame extends JFrame {
 
     private final JPanel contentArea;
-    private final NavController navController;
+    private final Controlador navController;
 
     public MainFrame() {
         setTitle("RentFlix — Gestión de videoclub");
@@ -25,7 +25,7 @@ public class MainFrame extends JFrame {
         contentArea.setBackground(new Color(0xF5F5F5));
 
         // Controlador de navegación
-        navController = new NavController(this, contentArea);
+        navController = new Controlador(this, contentArea);
 
         // Topbar
         TopBar topBar = new TopBar(navController);
@@ -44,10 +44,10 @@ public class MainFrame extends JFrame {
         getContentPane().add(shell,  BorderLayout.CENTER);
 
         // Mostrar dashboard al arrancar
-        navController.navegarA(NavController.Seccion.DASHBOARD);
+        navController.navegarA(Controlador.Seccion.DASHBOARD);
     }
 
-    public NavController getNavController() {
+    public Controlador getNavController() {
         return navController;
     }
 }
