@@ -1,31 +1,27 @@
-// ==========================================
-// CLASE: AlquilerDAO.java
-// ==========================================
 package dao;
 
 import model.Alquiler;
+
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class AlquilerDAO implements IAlquilerDAO {
 
-    private Connection con;
+    private ConexionDB acceso;
 
     public AlquilerDAO() {
-        this.con = ConexionDB.getConexion();
+        acceso = new ConexionDB();
     }
 
-    // JOIN completo: trae nombre de película y cliente en una sola consulta
     private static final String SQL_CON_DETALLE =
         "SELECT a.*, " +
         "       p.nombre_pelicula, " +
         "       c.nombre_cliente || ' ' || c.apellido_cliente AS nombre_cliente, " +
         "       COALESCE(pg.monto_cobro, 0) AS monto_cobro " +
         "FROM Alquileres a " +
-        "JOIN Copias co    ON co.id_copia    = a.id_copia " +
-        "JOIN Peliculas p  ON p.id_pelicula  = co.id_pelicula " +
-        "JOIN Clientes c   ON c.id_cliente   = a.id_cliente " +
+        "JOIN Copias co     ON co.id_copia       = a.id_copia " +
+        "JOIN Peliculas p   ON p.id_pelicula     = co.id_pelicula " +
+        "JOIN Clientes c    ON c.id_cliente      = a.id_cliente " +
         "LEFT JOIN Pagos pg ON pg.id_transaccion = a.id_transaccion ";
 
     private Alquiler mapear(ResultSet rs) throws SQLException {
@@ -40,7 +36,6 @@ public class AlquilerDAO implements IAlquilerDAO {
             rs.getString("fecha_devolucion_real"),
             rs.getString("estado_alquiler")
         );
-        // Campos extra del JOIN (pueden ser null si la query no los trae)
         try {
             a.setNombrePelicula(rs.getString("nombre_pelicula"));
             a.setNombreCliente(rs.getString("nombre_cliente"));
@@ -50,12 +45,18 @@ public class AlquilerDAO implements IAlquilerDAO {
     }
 
     @Override
-    public boolean crear(Alquiler alquiler) {
-        String sql = "INSERT INTO Alquileres (id_cliente, id_copia, id_empleado, " +
-                     "id_transaccion, fecha_alquiler, fecha_devolucion_prevista, " +
-                     "fecha_devolucion_real, estado_alquiler) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+    public int crear(Alquiler alquiler) {
+        int res = 0;
+        String query = "INSERT INTO Alquileres (id_cliente, id_copia, id_empleado, " +
+                       "id_transaccion, fecha_alquiler, fecha_devolucion_prevista, " +
+                       "fecha_devolucion_real, estado_alquiler) VALUES (?,?,?,?,?,?,?,?)";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setInt(1,    alquiler.getIdCliente());
             ps.setInt(2,    alquiler.getIdCopia());
             ps.setObject(3, alquiler.getIdEmpleado());
@@ -64,78 +65,145 @@ public class AlquilerDAO implements IAlquilerDAO {
             ps.setString(6, alquiler.getFechaDevolucionPrevista());
             ps.setString(7, alquiler.getFechaDevolucionReal());
             ps.setString(8, alquiler.getEstadoAlquiler());
-            return ps.executeUpdate() > 0;
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("AlquilerDAO.crear: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 
     @Override
-    public List<Alquiler> listarPorCliente(int idCliente) {
-        List<Alquiler> lista = new ArrayList<>();
-        String sql = SQL_CON_DETALLE + "WHERE a.id_cliente = ? ORDER BY a.fecha_alquiler DESC";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+    public ArrayList<Alquiler> listarPorCliente(int idCliente) {
+        ArrayList<Alquiler> lista = new ArrayList<Alquiler>();
+        String query = SQL_CON_DETALLE +
+                       "WHERE a.id_cliente = ? ORDER BY a.fecha_alquiler DESC";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+        ResultSet rslt       = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setInt(1, idCliente);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) lista.add(mapear(rs));
+            rslt = ps.executeQuery();
+            while (rslt.next()) {
+                lista.add(mapear(rslt));
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("AlquilerDAO.listarPorCliente: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (ps   != null) ps.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return lista;
     }
 
     @Override
-    public List<Alquiler> listarTodos() {
-        List<Alquiler> lista = new ArrayList<>();
-        String sql = SQL_CON_DETALLE + "ORDER BY a.fecha_alquiler DESC";
-        try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) lista.add(mapear(rs));
+    public ArrayList<Alquiler> listarTodos() {
+        ArrayList<Alquiler> lista = new ArrayList<Alquiler>();
+        String query = SQL_CON_DETALLE + "ORDER BY a.fecha_alquiler DESC";
+
+        Connection con  = null;
+        Statement stmt  = null;
+        ResultSet rslt  = null;
+
+        try {
+            con  = acceso.getConexion();
+            stmt = con.createStatement();
+            rslt = stmt.executeQuery(query);
+            while (rslt.next()) {
+                lista.add(mapear(rslt));
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("AlquilerDAO.listarTodos: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (stmt != null) stmt.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return lista;
     }
 
     @Override
-    public List<Alquiler> listarPendientesDevolucion() {
-        List<Alquiler> lista = new ArrayList<>();
-        String sql = SQL_CON_DETALLE + "WHERE a.estado_alquiler = 'pendiente_devolucion'";
-        try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) lista.add(mapear(rs));
-        } catch (SQLException e) {
-            System.err.println("AlquilerDAO.listarPendientes: " + e.getMessage());
-        }
-        return lista;
-    }
+    public int solicitarDevolucion(int idAlquiler) {
+        int res = 0;
+        String query = "UPDATE Alquileres SET estado_alquiler = 'pendiente_devolucion' " +
+                       "WHERE id_alquiler = ? AND estado_alquiler = 'activo'";
 
-    @Override
-    public boolean solicitarDevolucion(int idAlquiler) {
-        String sql = "UPDATE Alquileres SET estado_alquiler = 'pendiente_devolucion' " +
-                     "WHERE id_alquiler = ? AND estado_alquiler = 'activo'";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setInt(1, idAlquiler);
-            return ps.executeUpdate() > 0;
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("AlquilerDAO.solicitarDevolucion: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 
     @Override
-    public boolean aceptarDevolucion(int idAlquiler, String fechaDevolucionReal) {
-        String sql = "UPDATE Alquileres SET estado_alquiler = 'devuelto', " +
-                     "fecha_devolucion_real = ? " +
-                     "WHERE id_alquiler = ? AND estado_alquiler = 'pendiente_devolucion'";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+    public int aceptarDevolucion(int idAlquiler, String fechaDevolucionReal) {
+        int res = 0;
+        String query = "UPDATE Alquileres SET estado_alquiler = 'devuelto', " +
+                       "fecha_devolucion_real = ? " +
+                       "WHERE id_alquiler = ? AND estado_alquiler = 'pendiente_devolucion'";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setString(1, fechaDevolucionReal);
             ps.setInt(2,    idAlquiler);
-            return ps.executeUpdate() > 0;
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("AlquilerDAO.aceptarDevolucion: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 }

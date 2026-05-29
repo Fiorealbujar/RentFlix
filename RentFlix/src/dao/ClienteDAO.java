@@ -1,17 +1,16 @@
-// ClienteDAO.java — ACTUALIZADO
 package dao;
 
 import model.Cliente;
+
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ClienteDAO implements IClienteDAO {
 
-    private Connection con;
+    private ConexionDB acceso;
 
     public ClienteDAO() {
-        this.con = ConexionDB.getConexion();
+        acceso = new ConexionDB();
     }
 
     private Cliente mapear(ResultSet rs) throws SQLException {
@@ -28,92 +27,199 @@ public class ClienteDAO implements IClienteDAO {
 
     @Override
     public Cliente login(String nombreUsuario, String contrasenia) {
-        String sql = "SELECT * FROM Clientes " +
-                     "WHERE nombre_usuario=? AND contrasenia_cliente=?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+        Cliente cliente = null;
+        String query = "SELECT * FROM Clientes " +
+                       "WHERE nombre_usuario = ? AND contrasenia_cliente = ?";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+        ResultSet rslt       = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setString(1, nombreUsuario);
             ps.setString(2, contrasenia);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return mapear(rs);
+            rslt = ps.executeQuery();
+            if (rslt.next()) {
+                cliente = mapear(rslt);
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("ClienteDAO.login: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (ps   != null) ps.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+        return cliente;
     }
 
     @Override
-    public boolean registrar(Cliente cliente) {
-        String sql = "INSERT INTO Clientes (nombre_cliente, apellido_cliente, " +
-                     "email_cliente, nombre_usuario, contrasenia_cliente, estado) " +
-                     "VALUES (?, ?, ?, ?, ?, 'activo')";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+    public int registrar(Cliente cliente) {
+        int res = 0;
+        String query = "INSERT INTO Clientes (nombre_cliente, apellido_cliente, " +
+                       "email_cliente, nombre_usuario, contrasenia_cliente, estado) " +
+                       "VALUES (?, ?, ?, ?, ?, 'activo')";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setString(1, cliente.getNombreCliente());
             ps.setString(2, cliente.getApellidoCliente());
             ps.setString(3, cliente.getEmailCliente());
             ps.setString(4, cliente.getNombreUsuario());
             ps.setString(5, cliente.getContraseniaCliente());
-            return ps.executeUpdate() > 0;
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("ClienteDAO.registrar: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 
     @Override
     public Cliente obtenerPorId(int idCliente) {
-        String sql = "SELECT * FROM Clientes WHERE id_cliente=?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+        Cliente cliente = null;
+        String query = "SELECT * FROM Clientes WHERE id_cliente = ?";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+        ResultSet rslt       = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setInt(1, idCliente);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return mapear(rs);
+            rslt = ps.executeQuery();
+            if (rslt.next()) {
+                cliente = mapear(rslt);
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("ClienteDAO.obtenerPorId: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (ps   != null) ps.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        return null;
+        return cliente;
     }
 
     @Override
-    public List<Cliente> listarTodos() {
-        List<Cliente> lista = new ArrayList<>();
-        String sql = "SELECT * FROM Clientes ORDER BY apellido_cliente ASC";
-        try (Statement st = con.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) lista.add(mapear(rs));
+    public ArrayList<Cliente> listarTodos() {
+        ArrayList<Cliente> lista = new ArrayList<Cliente>();
+        String query = "SELECT * FROM Clientes ORDER BY apellido_cliente ASC";
+
+        Connection con  = null;
+        Statement stmt  = null;
+        ResultSet rslt  = null;
+
+        try {
+            con  = acceso.getConexion();
+            stmt = con.createStatement();
+            rslt = stmt.executeQuery(query);
+            while (rslt.next()) {
+                lista.add(mapear(rslt));
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("ClienteDAO.listarTodos: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (stmt != null) stmt.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return lista;
     }
 
     @Override
-    public boolean actualizar(Cliente cliente) {
-        String sql = "UPDATE Clientes SET " +
-                     "nombre_cliente=?, apellido_cliente=?, " +
-                     "email_cliente=?, nombre_usuario=?, estado=? " +
-                     "WHERE id_cliente=?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+    public int actualizar(Cliente cliente) {
+        int res = 0;
+        String query = "UPDATE Clientes SET " +
+                       "nombre_cliente = ?, apellido_cliente = ?, " +
+                       "email_cliente = ?, nombre_usuario = ?, estado = ? " +
+                       "WHERE id_cliente = ?";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setString(1, cliente.getNombreCliente());
             ps.setString(2, cliente.getApellidoCliente());
             ps.setString(3, cliente.getEmailCliente());
             ps.setString(4, cliente.getNombreUsuario());
             ps.setString(5, cliente.getEstado());
             ps.setInt(6,    cliente.getIdCliente());
-            return ps.executeUpdate() > 0;
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("ClienteDAO.actualizar: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 
     @Override
-    public boolean eliminar(int idCliente) {
-        String sql = "DELETE FROM Clientes WHERE id_cliente=?";
-        try (PreparedStatement ps = con.prepareStatement(sql)) {
+    public int eliminar(int idCliente) {
+        int res = 0;
+        String query = "DELETE FROM Clientes WHERE id_cliente = ?";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
             ps.setInt(1, idCliente);
-            return ps.executeUpdate() > 0;
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("ClienteDAO.eliminar: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 }
