@@ -1,41 +1,45 @@
-// ==========================================
-// CLASE: ConexionDB.java
-// Gestiona la conexión a SQLite.
-// Patrón Singleton: una sola conexión para toda la app.
-// ==========================================
 package dao;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class ConexionDB {
 
-    private static final String URL = "jdbc:sqlite:DB/rentflix.db";
-    private static Connection instancia = null;
+    private String driver;
+    private String url;
 
-    // Constructor privado: nadie puede instanciar esta clase desde fuera
-    private ConexionDB() {}
+    public ConexionDB() {
+        Properties prop = new Properties();
+        InputStream is  = null;
 
-    public static Connection getConexion() {
         try {
-            if (instancia == null || instancia.isClosed()) {
-                instancia = DriverManager.getConnection(URL);
+            is = new FileInputStream("DB/ConfiguracionDB.properties");
+            prop.load(is);
+            driver = prop.getProperty("DRIVER");
+            url    = prop.getProperty("URL");
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (is != null) is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            System.err.println("Error al conectar con la BD: " + e.getMessage());
         }
-        return instancia;
     }
 
-    public static void cerrarConexion() {
-        try {
-            if (instancia != null && !instancia.isClosed()) {
-                instancia.close();
-                instancia = null;
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al cerrar la conexión: " + e.getMessage());
-        }
+    public Connection getConexion()
+            throws ClassNotFoundException, SQLException {
+        Class.forName(driver);
+        return DriverManager.getConnection(url);
     }
 }
