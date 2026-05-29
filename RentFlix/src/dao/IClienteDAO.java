@@ -1,14 +1,18 @@
-// IClienteDAO.java — ACTUALIZADO
 package dao;
 
 import model.Cliente;
-import java.util.List;
+import java.util.ArrayList;
 
 public interface IClienteDAO {
-    Cliente login(String nombreUsuario, String contrasenia);
-    boolean registrar(Cliente cliente);
-    Cliente obtenerPorId(int idCliente);
-    List<Cliente> listarTodos();
-    boolean actualizar(Cliente cliente);
-    boolean eliminar(int idCliente);
+	Cliente login(String nombreUsuario, String contrasenia);
+
+	int registrar(Cliente cliente);
+
+	Cliente obtenerPorId(int idCliente);
+
+	ArrayList<Cliente> listarTodos();
+
+	int actualizar(Cliente cliente);
+
+	int eliminar(int idCliente);
 }

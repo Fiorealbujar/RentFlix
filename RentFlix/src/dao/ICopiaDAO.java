@@ -1,16 +1,14 @@
-// ==========================================
-// INTERFAZ: ICopiaDAO.java — ACTUALIZADA
-// Añade listarDisponibles (todas las copias
-// disponibles para el catálogo).
-// ==========================================
 package dao;
 
 import model.Copia;
-import java.util.List;
+import java.util.ArrayList;
 
 public interface ICopiaDAO {
-    List<Copia> listarTodasDisponibles();
-    List<Copia> listarDisponiblesPorPelicula(int idPelicula);
-    List<Copia> listarDisponiblesPorFormato(String formato);
-    boolean     actualizarEstado(int idCopia, String nuevoEstado);
+	ArrayList<Copia> listarTodasDisponibles();
+
+	ArrayList<Copia> listarDisponiblesPorPelicula(int idPelicula);
+
+	ArrayList<Copia> listarDisponiblesPorFormato(String formato);
+
+	int actualizarEstado(int idCopia, String nuevoEstado);
 }

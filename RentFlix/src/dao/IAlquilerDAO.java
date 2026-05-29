@@ -1,27 +1,16 @@
-// ==========================================
-// INTERFAZ: IAlquilerDAO.java
-// ==========================================
 package dao;
 
 import model.Alquiler;
-import java.util.List;
+import java.util.ArrayList;
 
 public interface IAlquilerDAO {
-    // Crear un nuevo alquiler
-    boolean crear(Alquiler alquiler);
+	int crear(Alquiler alquiler);
 
-    // Listar alquileres de un cliente concreto
-    List<Alquiler> listarPorCliente(int idCliente);
+	ArrayList<Alquiler> listarPorCliente(int idCliente);
 
-    // Listar todos los alquileres (empleado/admin)
-    List<Alquiler> listarTodos();
+	ArrayList<Alquiler> listarTodos();
 
-    // Listar alquileres pendientes de devolución
-    List<Alquiler> listarPendientesDevolucion();
+	int solicitarDevolucion(int idAlquiler);
 
-    // Solicitar devolución (cliente) → cambia estado a "pendiente_devolucion"
-    boolean solicitarDevolucion(int idAlquiler);
-
-    // Aceptar devolución (empleado) → cambia estado a "devuelto"
-    boolean aceptarDevolucion(int idAlquiler, String fechaDevolucionReal);
+	int aceptarDevolucion(int idAlquiler, String fechaDevolucionReal);
 }

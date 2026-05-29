@@ -1,24 +1,16 @@
-// ==========================================
-// INTERFAZ: IPeliculaDAO.java
-// ==========================================
 package dao;
 
 import model.Pelicula;
-import java.util.List;
+import java.util.ArrayList;
 
 public interface IPeliculaDAO {
-    // Catálogo completo (para todos los roles + invitado)
-    List<Pelicula> listarTodas();
+	ArrayList<Pelicula> listarTodas();
 
-    // Buscar por título (para la barra de búsqueda)
-    List<Pelicula> buscarPorTitulo(String titulo);
+	ArrayList<Pelicula> buscarPorTitulo(String titulo);
 
-    // Añadir nueva película (empleado/admin)
-    boolean agregar(Pelicula pelicula);
+	int agregar(Pelicula pelicula);
 
-    // Editar película (admin)
-    boolean actualizar(Pelicula pelicula);
+	int actualizar(Pelicula pelicula);
 
-    // Eliminar película (admin)
-    boolean eliminar(int idPelicula);
+	int eliminar(int idPelicula);
 }
