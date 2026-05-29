@@ -1,115 +1,192 @@
+// PeliculaDAO.java
 package dao;
 
 import model.Pelicula;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
-public class PeliculaDAO {
+public class PeliculaDAO implements IPeliculaDAO {
 
-    // Devuelve todas las películas
-    public List<Pelicula> getAll() {
-        List<Pelicula> lista = new ArrayList<>();
-        String sql = "SELECT rowid, nombre_pelicula, director, duracion, genero, sinopsis, clasificacion_edad FROM Peliculas";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(new Pelicula(
-                    rs.getInt(1),
-                    rs.getString(2),
-                    rs.getString(3),
-                    rs.getInt(4),
-                    rs.getString(5),
-                    rs.getString(6),
-                    rs.getString(7)
-                ));
+    private ConexionDB acceso;
+
+    public PeliculaDAO() {
+        acceso = new ConexionDB();
+    }
+
+    private Pelicula mapear(ResultSet rs) throws SQLException {
+        return new Pelicula(
+            rs.getInt("id_pelicula"),
+            rs.getString("nombre_pelicula"),
+            rs.getString("director"),
+            rs.getInt("duracion"),
+            rs.getString("genero"),
+            rs.getString("sinopsis"),
+            rs.getString("clasificacion_edad")
+        );
+    }
+
+    @Override
+    public ArrayList<Pelicula> listarTodas() {
+        ArrayList<Pelicula> lista = new ArrayList<Pelicula>();
+        String query = "SELECT * FROM Peliculas ORDER BY nombre_pelicula ASC";
+
+        Connection con  = null;
+        Statement stmt  = null;
+        ResultSet rslt  = null;
+
+        try {
+            con  = acceso.getConexion();
+            stmt = con.createStatement();
+            rslt = stmt.executeQuery(query);
+            while (rslt.next()) {
+                lista.add(mapear(rslt));
             }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("PeliculaDAO.getAll: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (stmt != null) stmt.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return lista;
     }
 
-    // Cuenta el total de películas
-    public int contarTotal() {
-        String sql = "SELECT COUNT(*) FROM Peliculas";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) {
-            System.err.println("PeliculaDAO.contarTotal: " + e.getMessage());
-        }
-        return 0;
-    }
+    @Override
+    public ArrayList<Pelicula> buscarPorTitulo(String titulo) {
+        ArrayList<Pelicula> lista = new ArrayList<Pelicula>();
+        String query = "SELECT * FROM Peliculas WHERE nombre_pelicula LIKE ?";
 
-    // Las N películas más alquiladas
-    public List<String[]> getMasAlquiladas(int limite) {
-        List<String[]> lista = new ArrayList<>();
-        String sql =
-            "SELECT p.nombre_pelicula, p.genero, COUNT(a.rowid) AS total " +
-            "FROM Peliculas p " +
-            "JOIN Copias co ON co.id_pelicula = p.rowid " +
-            "JOIN Alquileres a ON a.id_copia = co.rowid " +
-            "GROUP BY p.rowid " +
-            "ORDER BY total DESC " +
-            "LIMIT ?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setInt(1, limite);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                lista.add(new String[]{ rs.getString(1), rs.getString(2) });
+        Connection con       = null;
+        PreparedStatement ps = null;
+        ResultSet rslt       = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
+            ps.setString(1, "%" + titulo + "%");
+            rslt = ps.executeQuery();
+            while (rslt.next()) {
+                lista.add(mapear(rslt));
             }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("PeliculaDAO.getMasAlquiladas: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (ps   != null) ps.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return lista;
     }
 
-    // Insertar nueva película
-    public boolean insertar(Pelicula p) {
-        String sql = "INSERT INTO Peliculas (nombre_pelicula, director, duracion, genero, sinopsis, clasificacion_edad) VALUES (?,?,?,?,?,?)";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, p.getNombre());
-            ps.setString(2, p.getDirector());
-            ps.setInt(3, p.getDuracion());
-            ps.setString(4, p.getGenero());
-            ps.setString(5, p.getSinopsis());
-            ps.setString(6, p.getClasificacionEdad());
-            return ps.executeUpdate() > 0;
+    @Override
+    public int agregar(Pelicula pelicula) {
+        int res = 0;
+        String query = "INSERT INTO Peliculas (nombre_pelicula, director, duracion, " +
+                       "genero, sinopsis, clasificacion_edad) VALUES (?,?,?,?,?,?)";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
+            ps.setString(1, pelicula.getNombrePelicula());
+            ps.setString(2, pelicula.getDirector());
+            ps.setInt(3,    pelicula.getDuracion());
+            ps.setString(4, pelicula.getGenero());
+            ps.setString(5, pelicula.getSinopsis());
+            ps.setString(6, pelicula.getClasificacionEdad());
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("PeliculaDAO.insertar: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 
-    // Actualizar película existente
-    public boolean actualizar(Pelicula p) {
-        String sql = "UPDATE Peliculas SET nombre_pelicula=?, director=?, duracion=?, genero=?, sinopsis=?, clasificacion_edad=? WHERE rowid=?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, p.getNombre());
-            ps.setString(2, p.getDirector());
-            ps.setInt(3, p.getDuracion());
-            ps.setString(4, p.getGenero());
-            ps.setString(5, p.getSinopsis());
-            ps.setString(6, p.getClasificacionEdad());
-            ps.setInt(7, p.getId());
-            return ps.executeUpdate() > 0;
+    @Override
+    public int actualizar(Pelicula pelicula) {
+        int res = 0;
+        String query = "UPDATE Peliculas SET " +
+                       "nombre_pelicula = ?, director = ?, duracion = ?, " +
+                       "genero = ?, sinopsis = ?, clasificacion_edad = ? " +
+                       "WHERE id_pelicula = ?";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
+            ps.setString(1, pelicula.getNombrePelicula());
+            ps.setString(2, pelicula.getDirector());
+            ps.setInt(3,    pelicula.getDuracion());
+            ps.setString(4, pelicula.getGenero());
+            ps.setString(5, pelicula.getSinopsis());
+            ps.setString(6, pelicula.getClasificacionEdad());
+            ps.setInt(7,    pelicula.getId());
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("PeliculaDAO.actualizar: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 
-    // Eliminar película por id
-    public boolean eliminar(int id) {
-        String sql = "DELETE FROM Peliculas WHERE rowid=?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+    @Override
+    public int eliminar(int idPelicula) {
+        int res = 0;
+        String query = "DELETE FROM Peliculas WHERE id_pelicula = ?";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
+            ps.setInt(1, idPelicula);
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("PeliculaDAO.eliminar: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return res;
     }
 }

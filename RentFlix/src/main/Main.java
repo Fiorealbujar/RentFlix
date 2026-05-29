@@ -1,39 +1,72 @@
+// Main.java
 package main;
 
-import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import controller.Controlador;
+import view.*;
 
-import view.LoginFrame;
-
-import javax.swing.*;
-import java.util.prefs.Preferences;
+import javax.swing.SwingUtilities;
 
 public class Main {
+	public static void main(String[] args) {
+		FlatLightLaf.setup();
 
-    public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
 
-        // Recuperar preferencia de tema guardada (por defecto: light)
-        Preferences prefs = Preferences.userNodeForPackage(Main.class);
-        String tema = prefs.get("theme", "light");
+				VentanaPrincipal ventana = new VentanaPrincipal();
+				PanelLogin panelLogin = new PanelLogin();
+				PanelRegistro panelRegistro = new PanelRegistro();
 
-        // Aplicar tema antes de crear cualquier ventana
-        try {
-            if (tema.equals("dark")) {
-                FlatDarkLaf.setup();
-            } else {
-                FlatLightLaf.setup();
-            }
-        } catch (Exception e) {
-            // Si FlatLaf falla, Swing usará el look por defecto
-            e.printStackTrace();
-        }
+				PanelCatalogo catInvitado = new PanelCatalogo(false);
+				PanelCatalogo catCliente = new PanelCatalogo(false);
+				PanelMisAlquileres misAlquileres = new PanelMisAlquileres();
+				PanelCliente panelCliente = new PanelCliente(catCliente, misAlquileres);
 
-        // Lanzar la ventana principal en el hilo de eventos de Swing
-     // Busca esto dentro del método main de tu archivo main/Main.java:
-        SwingUtilities.invokeLater(() -> {
-            // Cambiamos MainFrame por LoginFrame
-            LoginFrame login = new LoginFrame();
-            login.setVisible(true);
-        });
-    }
+				PanelGestionAlquileres gestionAlqEmp = new PanelGestionAlquileres();
+				PanelAnadirPelicula anadirPelEmp = new PanelAnadirPelicula();
+				PanelGestionPeliculas gestionPelEmp = new PanelGestionPeliculas();
+				PanelInformes informesEmp = new PanelInformes();
+				PanelEmpleado panelEmpleado = new PanelEmpleado(gestionAlqEmp, anadirPelEmp, gestionPelEmp,
+						informesEmp);
+
+				PanelGestionAlquileres gestionAlqAdm = new PanelGestionAlquileres();
+				PanelAnadirPelicula anadirPelAdm = new PanelAnadirPelicula();
+				PanelGestionPeliculas gestionPelAdm = new PanelGestionPeliculas();
+				PanelInformes informesAdm = new PanelInformes();
+				PanelGestionEmpleados gestionEmpleados = new PanelGestionEmpleados();
+				PanelGestionClientes gestionClientes = new PanelGestionClientes();
+				PanelAdmin panelAdmin = new PanelAdmin(gestionAlqAdm, anadirPelAdm, gestionPelAdm, informesAdm,
+						gestionEmpleados, gestionClientes);
+
+				Controlador controlador = new Controlador(ventana, catInvitado, catCliente, panelLogin, panelRegistro,
+						panelCliente, misAlquileres, panelEmpleado, gestionAlqEmp, anadirPelEmp, gestionPelEmp,
+						informesEmp, panelAdmin, gestionAlqAdm, anadirPelAdm, gestionPelAdm, informesAdm,
+						gestionEmpleados, gestionClientes);
+
+				ventana.setControlador(controlador);
+				catInvitado.setControlador(controlador);
+				catCliente.setControlador(controlador);
+				panelLogin.setControlador(controlador);
+				panelRegistro.setControlador(controlador);
+				panelCliente.setControlador(controlador);
+				misAlquileres.setControlador(controlador);
+				panelEmpleado.setControlador(controlador);
+				gestionAlqEmp.setControlador(controlador);
+				anadirPelEmp.setControlador(controlador);
+				gestionPelEmp.setControlador(controlador);
+				informesEmp.setControlador(controlador);
+				panelAdmin.setControlador(controlador);
+				gestionAlqAdm.setControlador(controlador);
+				anadirPelAdm.setControlador(controlador);
+				gestionPelAdm.setControlador(controlador);
+				informesAdm.setControlador(controlador);
+				gestionEmpleados.setControlador(controlador);
+				gestionClientes.setControlador(controlador);
+
+				ventana.hacerVisible();
+			}
+		});
+	}
 }

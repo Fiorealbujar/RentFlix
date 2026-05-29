@@ -1,20 +1,40 @@
+// ==========================================
+// CLASE: Actor.java
+// Representa la tabla: Actores
+// ==========================================
 package model;
 
 public class Actor {
-    private int id;
-    private String nombre;
 
-    public Actor() {}
+	private int idActor;
+	private String nombreActor;
 
-    public Actor(int id, String nombre) {
-        this.id = id;
-        this.nombre = nombre;
-    }
+	public Actor() {
+	}
 
-    public int getId()              { return id; }
-    public void setId(int id)       { this.id = id; }
-    public String getNombre()       { return nombre; }
-    public void setNombre(String n) { this.nombre = n; }
+	public Actor(int idActor, String nombreActor) {
+		this.idActor = idActor;
+		this.nombreActor = nombreActor;
+	}
 
-    @Override public String toString() { return nombre; }
+	public int getIdActor() {
+		return idActor;
+	}
+
+	public void setIdActor(int idActor) {
+		this.idActor = idActor;
+	}
+
+	public String getNombreActor() {
+		return nombreActor;
+	}
+
+	public void setNombreActor(String nombre) {
+		this.nombreActor = nombre;
+	}
+
+	@Override
+	public String toString() {
+		return nombreActor;
+	}
 }

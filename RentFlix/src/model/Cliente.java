@@ -1,37 +1,96 @@
+// ==========================================
+// CLASE: Cliente.java
+// Representa la tabla: Clientes
+// ==========================================
 package model;
 
 public class Cliente {
-    private int id;
-    private String nombre;
-    private String apellido;
-    private String email;
-    private String usuario;
-    private String contrasenia;
 
-    public Cliente() {}
+	private int idCliente;
+	private String nombreCliente;
+	private String apellidoCliente;
+	private String emailCliente;
+	private String nombreUsuario;
+	private String contraseniaCliente;
+	private String estado; // "activo", "inactivo"
 
-    public Cliente(int id, String nombre, String apellido,
-                   String email, String usuario, String contrasenia) {
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.email = email;
-        this.usuario = usuario;
-        this.contrasenia = contrasenia;
-    }
+	public Cliente() {
+	}
 
-    public int getId()               { return id; }
-    public void setId(int id)        { this.id = id; }
-    public String getNombre()        { return nombre; }
-    public void setNombre(String n)  { this.nombre = n; }
-    public String getApellido()      { return apellido; }
-    public void setApellido(String a){ this.apellido = a; }
-    public String getEmail()         { return email; }
-    public void setEmail(String e)   { this.email = e; }
-    public String getUsuario()       { return usuario; }
-    public void setUsuario(String u) { this.usuario = u; }
-    public String getContrasenia()   { return contrasenia; }
-    public void setContrasenia(String c) { this.contrasenia = c; }
+	public Cliente(int idCliente, String nombreCliente, String apellidoCliente, String emailCliente,
+			String nombreUsuario, String contraseniaCliente, String estado) {
+		this.idCliente = idCliente;
+		this.nombreCliente = nombreCliente;
+		this.apellidoCliente = apellidoCliente;
+		this.emailCliente = emailCliente;
+		this.nombreUsuario = nombreUsuario;
+		this.contraseniaCliente = contraseniaCliente;
+		this.estado = estado;
+	}
 
-    @Override public String toString() { return apellido + ", " + nombre; }
+	public int getIdCliente() {
+		return idCliente;
+	}
+
+	public void setIdCliente(int idCliente) {
+		this.idCliente = idCliente;
+	}
+
+	public String getNombreCliente() {
+		return nombreCliente;
+	}
+
+	public void setNombreCliente(String nombreCliente) {
+		this.nombreCliente = nombreCliente;
+	}
+
+	public String getApellidoCliente() {
+		return apellidoCliente;
+	}
+
+	public void setApellidoCliente(String apellidoCliente) {
+		this.apellidoCliente = apellidoCliente;
+	}
+
+	public String getEmailCliente() {
+		return emailCliente;
+	}
+
+	public void setEmailCliente(String emailCliente) {
+		this.emailCliente = emailCliente;
+	}
+
+	public String getNombreUsuario() {
+		return nombreUsuario;
+	}
+
+	public void setNombreUsuario(String nombreUsuario) {
+		this.nombreUsuario = nombreUsuario;
+	}
+
+	public String getContraseniaCliente() {
+		return contraseniaCliente;
+	}
+
+	public void setContraseniaCliente(String contraseniaCliente) {
+		this.contraseniaCliente = contraseniaCliente;
+	}
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
+
+	// Nombre completo para mostrar en la vista
+	public String getNombreCompleto() {
+		return nombreCliente + " " + apellidoCliente;
+	}
+
+	@Override
+	public String toString() {
+		return getNombreCompleto() + " (@" + nombreUsuario + ")";
+	}
 }

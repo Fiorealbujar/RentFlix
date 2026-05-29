@@ -4,47 +4,153 @@ import model.Copia;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
-public class CopiaDAO {
+public class CopiaDAO implements ICopiaDAO {
 
-    public List<Copia> getAll() {
-        List<Copia> lista = new ArrayList<>();
-        String sql = "SELECT rowid, id_pelicula, formato, estado, precio_alquiler FROM Copias";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                lista.add(new Copia(
-                    rs.getInt(1), rs.getInt(2),
-                    rs.getString(3), rs.getString(4), rs.getDouble(5)
-                ));
+    private ConexionDB acceso;
+
+    public CopiaDAO() {
+        acceso = new ConexionDB();
+    }
+
+    private Copia mapear(ResultSet rs) throws SQLException {
+        return new Copia(
+            rs.getInt("id_copia"),
+            rs.getInt("id_pelicula"),
+            rs.getString("formato"),
+            rs.getString("estado"),
+            rs.getDouble("precio_alquiler")
+        );
+    }
+
+    @Override
+    public ArrayList<Copia> listarTodasDisponibles() {
+        ArrayList<Copia> lista = new ArrayList<Copia>();
+        String query = "SELECT * FROM Copias WHERE estado = 'disponible' " +
+                       "ORDER BY id_pelicula, formato";
+
+        Connection con  = null;
+        Statement stmt  = null;
+        ResultSet rslt  = null;
+
+        try {
+            con  = acceso.getConexion();
+            stmt = con.createStatement();
+            rslt = stmt.executeQuery(query);
+            while (rslt.next()) {
+                lista.add(mapear(rslt));
             }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("CopiaDAO.getAll: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (stmt != null) stmt.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return lista;
     }
 
-    public int contarDisponibles() {
-        String sql = "SELECT COUNT(*) FROM Copias WHERE estado = 'disponible'";
-        try (Statement st = ConexionDB.getConexion().createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
-            if (rs.next()) return rs.getInt(1);
+    @Override
+    public ArrayList<Copia> listarDisponiblesPorPelicula(int idPelicula) {
+        ArrayList<Copia> lista = new ArrayList<Copia>();
+        String query = "SELECT * FROM Copias " +
+                       "WHERE id_pelicula = ? AND estado = 'disponible'";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+        ResultSet rslt       = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
+            ps.setInt(1, idPelicula);
+            rslt = ps.executeQuery();
+            while (rslt.next()) {
+                lista.add(mapear(rslt));
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("CopiaDAO.contarDisponibles: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (ps   != null) ps.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
-        return 0;
+        return lista;
     }
 
-    public boolean actualizarEstado(int id, String estado) {
-        String sql = "UPDATE Copias SET estado=? WHERE rowid=?";
-        try (PreparedStatement ps = ConexionDB.getConexion().prepareStatement(sql)) {
-            ps.setString(1, estado);
-            ps.setInt(2, id);
-            return ps.executeUpdate() > 0;
+    @Override
+    public ArrayList<Copia> listarDisponiblesPorFormato(String formato) {
+        ArrayList<Copia> lista = new ArrayList<Copia>();
+        String query = "SELECT * FROM Copias " +
+                       "WHERE formato = ? AND estado = 'disponible' " +
+                       "ORDER BY id_pelicula";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+        ResultSet rslt       = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
+            ps.setString(1, formato);
+            rslt = ps.executeQuery();
+            while (rslt.next()) {
+                lista.add(mapear(rslt));
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("CopiaDAO.actualizarEstado: " + e.getMessage());
-            return false;
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rslt != null) rslt.close();
+                if (ps   != null) ps.close();
+                if (con  != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        return lista;
+    }
+
+    @Override
+    public int actualizarEstado(int idCopia, String nuevoEstado) {
+        int res = 0;
+        String query = "UPDATE Copias SET estado = ? WHERE id_copia = ?";
+
+        Connection con       = null;
+        PreparedStatement ps = null;
+
+        try {
+            con  = acceso.getConexion();
+            ps   = con.prepareStatement(query);
+            ps.setString(1, nuevoEstado);
+            ps.setInt(2,    idCopia);
+            res  = ps.executeUpdate();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps  != null) ps.close();
+                if (con != null) con.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return res;
     }
 }
