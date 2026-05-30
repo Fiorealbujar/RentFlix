@@ -1,5 +1,5 @@
 // ==========================================
-// CLASE: VentanaPrincipal.java — CORREGIDA
+// CLASE: VentanaPrincipal.java
 // Un solo botón rojo que cambia de texto
 // según el estado de la sesión.
 // ==========================================
