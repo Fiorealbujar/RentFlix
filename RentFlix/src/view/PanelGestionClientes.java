@@ -101,7 +101,7 @@ public class PanelGestionClientes extends JPanel {
                         if ("activo".equalsIgnoreCase(String.valueOf(value))) {
                             lbl.setBackground(new Color(0xE8F8F0));
                             lbl.setForeground(new Color(0x27AE60));
-							} else {
+                        } else {
                             lbl.setBackground(new Color(0xFDEDEC));
                             lbl.setForeground(COLOR_ACENTO);
                         }
