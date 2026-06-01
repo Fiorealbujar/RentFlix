@@ -16,4 +16,6 @@ public interface IClienteDAO {
 	int actualizar(Cliente cliente);
 
 	int eliminar(int idCliente);
+	
+	int actualizarDatos(Cliente cliente, String nuevaContrasenia);
 }

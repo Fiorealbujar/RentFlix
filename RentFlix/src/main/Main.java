@@ -20,9 +20,10 @@ public class Main {
 				PanelRegistro panelRegistro = new PanelRegistro();
 
 				PanelCatalogo catInvitado = new PanelCatalogo(false);
+				PanelMiCuenta panelMiCuenta = new PanelMiCuenta();
 				PanelCatalogo catCliente = new PanelCatalogo(false);
 				PanelMisAlquileres misAlquileres = new PanelMisAlquileres();
-				PanelCliente panelCliente = new PanelCliente(catCliente, misAlquileres);
+				PanelCliente panelCliente = new PanelCliente(catCliente, misAlquileres, panelMiCuenta);
 
 				PanelGestionAlquileres gestionAlqEmp = new PanelGestionAlquileres();
 				PanelAnadirPelicula anadirPelEmp = new PanelAnadirPelicula();
@@ -41,7 +42,7 @@ public class Main {
 						gestionEmpleados, gestionClientes);
 
 				Controlador controlador = new Controlador(ventana, catInvitado, catCliente, panelLogin, panelRegistro,
-						panelCliente, misAlquileres, panelEmpleado, gestionAlqEmp, anadirPelEmp, gestionPelEmp,
+						panelCliente, misAlquileres, panelMiCuenta, panelEmpleado, gestionAlqEmp, anadirPelEmp, gestionPelEmp,
 						informesEmp, panelAdmin, gestionAlqAdm, anadirPelAdm, gestionPelAdm, informesAdm,
 						gestionEmpleados, gestionClientes);
 
@@ -52,6 +53,7 @@ public class Main {
 				panelRegistro.setControlador(controlador);
 				panelCliente.setControlador(controlador);
 				misAlquileres.setControlador(controlador);
+				panelMiCuenta.setControlador(controlador);
 				panelEmpleado.setControlador(controlador);
 				gestionAlqEmp.setControlador(controlador);
 				anadirPelEmp.setControlador(controlador);

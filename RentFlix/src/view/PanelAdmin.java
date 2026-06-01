@@ -72,7 +72,7 @@ public class PanelAdmin extends JPanel {
 		tabbedPane.addTab("🎞️  Gestión películas", panelGestionPeliculas);
 		tabbedPane.addTab("📊  Informes", panelInformes);
 		tabbedPane.addTab("👥  Empleados", panelGestionEmpleados);
-		tabbedPane.addTab("🧑‍💼  Clientes", panelGestionClientes);
+		tabbedPane.addTab("‍💼  Clientes", panelGestionClientes);
 		return tabbedPane;
 	}
 

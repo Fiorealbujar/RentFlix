@@ -12,16 +12,21 @@ public class PanelCliente extends JPanel {
 
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+	private static final Color COLOR_ACTIVO = new Color(0x27AE60);
 
 	private JLabel lblBienvenida;
+	private JLabel lblContadorActivos;
 	private JTabbedPane tabbedPane;
 
 	private PanelCatalogo panelCatalogo;
 	private PanelMisAlquileres panelMisAlquileres;
+	private PanelMiCuenta panelMiCuenta;
 
-	public PanelCliente(PanelCatalogo panelCatalogo, PanelMisAlquileres panelMisAlquileres) {
+	public PanelCliente(PanelCatalogo panelCatalogo, PanelMisAlquileres panelMisAlquileres,
+			PanelMiCuenta panelMiCuenta) {
 		this.panelCatalogo = panelCatalogo;
 		this.panelMisAlquileres = panelMisAlquileres;
+		this.panelMiCuenta = panelMiCuenta;
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout());
 		initComponents();
@@ -32,10 +37,13 @@ public class PanelCliente extends JPanel {
 		add(buildTabs(), BorderLayout.CENTER);
 	}
 
-	// Solo bienvenida, sin botón cerrar sesión (lo gestiona la TopBar)
 	private JPanel buildHeader() {
-		JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+		JPanel header = new JPanel(new BorderLayout());
 		header.setBackground(COLOR_DARK);
+		header.setBorder(new EmptyBorder(10, 20, 10, 20));
+
+		JPanel izquierda = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+		izquierda.setOpaque(false);
 
 		lblBienvenida = new JLabel("👋 Hola, Cliente");
 		lblBienvenida.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -48,8 +56,18 @@ public class PanelCliente extends JPanel {
 		badge.setOpaque(true);
 		badge.setBorder(new EmptyBorder(3, 8, 3, 8));
 
-		header.add(lblBienvenida);
-		header.add(badge);
+		izquierda.add(lblBienvenida);
+		izquierda.add(badge);
+
+		lblContadorActivos = new JLabel("");
+		lblContadorActivos.setFont(new Font("SansSerif", Font.BOLD, 12));
+		lblContadorActivos.setForeground(COLOR_ACTIVO);
+		lblContadorActivos.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createLineBorder(COLOR_ACTIVO, 1, true), new EmptyBorder(4, 10, 4, 10)));
+		lblContadorActivos.setVisible(false);
+
+		header.add(izquierda, BorderLayout.WEST);
+		header.add(lblContadorActivos, BorderLayout.EAST);
 		return header;
 	}
 
@@ -58,11 +76,23 @@ public class PanelCliente extends JPanel {
 		tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 13));
 		tabbedPane.addTab("🎬  Catálogo", panelCatalogo);
 		tabbedPane.addTab("📋  Mis alquileres", panelMisAlquileres);
+		tabbedPane.addTab("👤  Mi cuenta", panelMiCuenta);
 		return tabbedPane;
 	}
 
+	// ── Métodos para el Controlador ───────────────────────────────────────────
+
 	public void setBienvenida(Cliente cliente) {
 		lblBienvenida.setText("👋 Hola, " + cliente.getNombreCompleto());
+	}
+
+	public void actualizarContadorActivos(int cantidad) {
+		if (cantidad > 0) {
+			lblContadorActivos.setText("🎬 " + cantidad + (cantidad == 1 ? " alquiler activo" : " alquileres activos"));
+			lblContadorActivos.setVisible(true);
+		} else {
+			lblContadorActivos.setVisible(false);
+		}
 	}
 
 	public void irAMisAlquileres() {

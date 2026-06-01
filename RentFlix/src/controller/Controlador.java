@@ -22,6 +22,7 @@ public class Controlador implements ActionListener {
 	private PanelRegistro panelRegistro;
 	private PanelCliente panelCliente;
 	private PanelMisAlquileres misAlquileres;
+	private PanelMiCuenta panelMiCuenta;
 
 	private PanelEmpleado panelEmpleado;
 	private PanelGestionAlquileres gestionAlqEmp;
@@ -55,11 +56,11 @@ public class Controlador implements ActionListener {
 
 	public Controlador(VentanaPrincipal ventana, PanelCatalogo catInvitado, PanelCatalogo catCliente,
 			PanelLogin panelLogin, PanelRegistro panelRegistro, PanelCliente panelCliente,
-			PanelMisAlquileres misAlquileres, PanelEmpleado panelEmpleado, PanelGestionAlquileres gestionAlqEmp,
-			PanelAnadirPelicula anadirPelEmp, PanelGestionPeliculas gestionPelEmp, PanelInformes informesEmp,
-			PanelAdmin panelAdmin, PanelGestionAlquileres gestionAlqAdm, PanelAnadirPelicula anadirPelAdm,
-			PanelGestionPeliculas gestionPelAdm, PanelInformes informesAdm, PanelGestionEmpleados gestionEmpleados,
-			PanelGestionClientes gestionClientes) {
+			PanelMisAlquileres misAlquileres, PanelMiCuenta panelMiCuenta, PanelEmpleado panelEmpleado,
+			PanelGestionAlquileres gestionAlqEmp, PanelAnadirPelicula anadirPelEmp, PanelGestionPeliculas gestionPelEmp,
+			PanelInformes informesEmp, PanelAdmin panelAdmin, PanelGestionAlquileres gestionAlqAdm,
+			PanelAnadirPelicula anadirPelAdm, PanelGestionPeliculas gestionPelAdm, PanelInformes informesAdm,
+			PanelGestionEmpleados gestionEmpleados, PanelGestionClientes gestionClientes) {
 
 		this.ventana = ventana;
 		this.catInvitado = catInvitado;
@@ -68,6 +69,7 @@ public class Controlador implements ActionListener {
 		this.panelRegistro = panelRegistro;
 		this.panelCliente = panelCliente;
 		this.misAlquileres = misAlquileres;
+		this.panelMiCuenta = panelMiCuenta;
 		this.panelEmpleado = panelEmpleado;
 		this.gestionAlqEmp = gestionAlqEmp;
 		this.anadirPelEmp = anadirPelEmp;
@@ -95,11 +97,11 @@ public class Controlador implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 
-		// ── JButton ───────────────────────────────────────────────────────────
+		// ── JButton ───────────────────────────────────────────────────────────────
 		if (src instanceof JButton) {
 			switch (e.getActionCommand()) {
 
-			// ── VentanaPrincipal ──────────────────────────────────────────
+			// ── VentanaPrincipal ──────────────────────────────────────────────
 			case "ABRIR_LOGIN":
 				panelLogin.limpiar();
 				ventana.cargarPanel(panelLogin);
@@ -112,7 +114,7 @@ public class Controlador implements ActionListener {
 				cerrarSesion();
 				break;
 
-			// ── PanelLogin ────────────────────────────────────────────────
+			// ── PanelLogin ────────────────────────────────────────────────────
 			case "LOGIN":
 				procesarLogin();
 				break;
@@ -120,7 +122,7 @@ public class Controlador implements ActionListener {
 				ventana.cargarPanel(catInvitado);
 				break;
 
-			// ── PanelRegistro ─────────────────────────────────────────────
+			// ── PanelRegistro ─────────────────────────────────────────────────
 			case "REGISTRAR_CLIENTE":
 				procesarRegistro();
 				break;
@@ -128,7 +130,7 @@ public class Controlador implements ActionListener {
 				ventana.cargarPanel(catInvitado);
 				break;
 
-			// ── PanelCatalogo ─────────────────────────────────────────────
+			// ── PanelCatalogo ─────────────────────────────────────────────────
 			case "BUSCAR_PELICULA":
 				buscarPelicula(e);
 				break;
@@ -136,12 +138,17 @@ public class Controlador implements ActionListener {
 				alquilarDesdeClienteCatalogo();
 				break;
 
-			// ── PanelMisAlquileres ────────────────────────────────────────
+			// ── PanelMisAlquileres ────────────────────────────────────────────
 			case "SOLICITAR_DEVOLUCION":
 				procesarSolicitudDevolucion();
 				break;
 
-			// ── PanelGestionAlquileres ────────────────────────────────────
+			// ── PanelMiCuenta ─────────────────────────────────────────────────
+			case "MODIFICAR_DATOS_CLIENTE":
+				modificarDatosCliente();
+				break;
+
+			// ── PanelGestionAlquileres ────────────────────────────────────────
 			case "ABRIR_FORM_ALQUILER":
 				abrirFormAlquiler();
 				break;
@@ -155,7 +162,7 @@ public class Controlador implements ActionListener {
 				procesarAceptarDevolucion();
 				break;
 
-			// ── PanelAnadirPelicula ───────────────────────────────────────
+			// ── PanelAnadirPelicula ───────────────────────────────────────────
 			case "GUARDAR_PELICULA":
 				guardarPelicula();
 				break;
@@ -163,7 +170,7 @@ public class Controlador implements ActionListener {
 				getPanelAnadirActivo().limpiar();
 				break;
 
-			// ── PanelGestionPeliculas ─────────────────────────────────────
+			// ── PanelGestionPeliculas ─────────────────────────────────────────
 			case "EDITAR_PELICULA":
 				editarPelicula();
 				break;
@@ -171,12 +178,12 @@ public class Controlador implements ActionListener {
 				eliminarPelicula();
 				break;
 
-			// ── PanelInformes ─────────────────────────────────────────────
+			// ── PanelInformes ─────────────────────────────────────────────────
 			case "ACTUALIZAR_INFORMES":
 				cargarInformes();
 				break;
 
-			// ── PanelGestionEmpleados ─────────────────────────────────────
+			// ── PanelGestionEmpleados ─────────────────────────────────────────
 			case "CREAR_EMPLEADO":
 				crearEmpleado();
 				break;
@@ -187,7 +194,7 @@ public class Controlador implements ActionListener {
 				gestionEmpleados.limpiar();
 				break;
 
-			// ── PanelGestionClientes ──────────────────────────────────────
+			// ── PanelGestionClientes ──────────────────────────────────────────
 			case "EDITAR_CLIENTE":
 				editarCliente();
 				break;
@@ -196,18 +203,23 @@ public class Controlador implements ActionListener {
 				break;
 			}
 
-			// ── JComboBox ─────────────────────────────────────────────────────────
+			// ── JComboBox ─────────────────────────────────────────────────────────────
 		} else if (src instanceof JComboBox) {
 			switch (e.getActionCommand()) {
 
-			// ── PanelCatalogo ─────────────────────────────────────────────
+			// ── PanelCatalogo ─────────────────────────────────────────────────
 			case "FILTRAR_FORMATO_CATALOGO":
 				filtrarFormato(e);
 				break;
 
-			// ── PanelGestionAlquileres ────────────────────────────────────
+			// ── PanelGestionAlquileres ────────────────────────────────────────
 			case "FILTRAR_ALQUILERES":
 				filtrarAlquileres();
+				break;
+
+			// ── PanelMisAlquileres ────────────────────────────────────────────
+			case "FILTRAR_MIS_ALQUILERES":
+				filtrarMisAlquileres();
 				break;
 			}
 		}
@@ -307,6 +319,115 @@ public class Controlador implements ActionListener {
 			copias = copiaDAO.listarDisponiblesPorFormato(filtro);
 		}
 		origen.cargarCopias(peliculas, copias);
+	}
+
+	private void modificarDatosCliente() {
+		// Campos de datos personales
+		JTextField txtNombre = new JTextField(clienteActivo.getNombreCliente());
+		JTextField txtApellido = new JTextField(clienteActivo.getApellidoCliente());
+		JTextField txtEmail = new JTextField(clienteActivo.getEmailCliente());
+		JTextField txtUsuario = new JTextField(clienteActivo.getNombreUsuario());
+
+		// Campos de contraseña
+		JPasswordField txtContraActual = new JPasswordField();
+		JPasswordField txtContraNueva = new JPasswordField();
+		JPasswordField txtContraRepetir = new JPasswordField();
+
+		JPanel form = new JPanel(new GridLayout(0, 2, 8, 8));
+		form.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+		form.add(new JLabel("Nombre:"));
+		form.add(txtNombre);
+		form.add(new JLabel("Apellido:"));
+		form.add(txtApellido);
+		form.add(new JLabel("Email:"));
+		form.add(txtEmail);
+		form.add(new JLabel("Usuario:"));
+		form.add(txtUsuario);
+		form.add(new JLabel("── Cambiar contraseña (opcional) ──────"));
+		form.add(new JLabel(""));
+		form.add(new JLabel("Contraseña actual:"));
+		form.add(txtContraActual);
+		form.add(new JLabel("Nueva contraseña:"));
+		form.add(txtContraNueva);
+		form.add(new JLabel("Repetir contraseña:"));
+		form.add(txtContraRepetir);
+
+		int res = JOptionPane.showConfirmDialog(ventana, form, "Modificar mis datos", JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE);
+
+		if (res != JOptionPane.OK_OPTION) {
+			return;
+		}
+
+		// Validar campos obligatorios
+		String nuevoNombre = txtNombre.getText().trim();
+		String nuevoApellido = txtApellido.getText().trim();
+		String nuevoEmail = txtEmail.getText().trim();
+		String nuevoUsuario = txtUsuario.getText().trim();
+
+		if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty() || nuevoEmail.isEmpty() || nuevoUsuario.isEmpty()) {
+			JOptionPane.showMessageDialog(ventana, "Nombre, apellido, email y usuario son obligatorios.",
+					"Campos vacíos", JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+
+		// Determinar la contraseña final
+		String contraActual = new String(txtContraActual.getPassword());
+		String contraNueva = new String(txtContraNueva.getPassword());
+		String contraRepetir = new String(txtContraRepetir.getPassword());
+
+		String contraFinal = clienteActivo.getContraseniaCliente();
+
+		// Si el cliente ha rellenado algún campo de contraseña, validar
+		if (!contraActual.isEmpty() || !contraNueva.isEmpty() || !contraRepetir.isEmpty()) {
+
+			// Verificar que la contraseña actual es correcta
+			if (!contraActual.equals(clienteActivo.getContraseniaCliente())) {
+				JOptionPane.showMessageDialog(ventana, "La contraseña actual no es correcta.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			// Verificar que la nueva contraseña no está vacía
+			if (contraNueva.isEmpty()) {
+				JOptionPane.showMessageDialog(ventana, "La nueva contraseña no puede estar vacía.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			// Verificar que las dos nuevas contraseñas coinciden
+			if (!contraNueva.equals(contraRepetir)) {
+				JOptionPane.showMessageDialog(ventana, "Las contraseñas nuevas no coinciden.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+
+			contraFinal = contraNueva;
+		}
+
+		// Aplicar los cambios al objeto cliente
+		clienteActivo.setNombreCliente(nuevoNombre);
+		clienteActivo.setApellidoCliente(nuevoApellido);
+		clienteActivo.setEmailCliente(nuevoEmail);
+		clienteActivo.setNombreUsuario(nuevoUsuario);
+
+		// Guardar en base de datos
+		if (clienteDAO.actualizarDatos(clienteActivo, contraFinal) > 0) {
+			// Actualizar la contraseña en el objeto de sesión si se cambió
+			clienteActivo.setContraseniaCliente(contraFinal);
+
+			JOptionPane.showMessageDialog(ventana, "Datos actualizados correctamente. ✅", "Éxito",
+					JOptionPane.INFORMATION_MESSAGE);
+
+			// Refrescar la vista de Mi cuenta y la bienvenida
+			panelMiCuenta.cargarDatos(clienteActivo);
+			panelCliente.setBienvenida(clienteActivo);
+
+		} else {
+			JOptionPane.showMessageDialog(ventana, "Error al guardar los cambios. El usuario puede ya existir.",
+					"Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	// ── Alquiler cliente ──────────────────────────────────────────────────────
@@ -493,6 +614,11 @@ public class Controlador implements ActionListener {
 		} else {
 			Cliente cli = clienteDAO.login(usuario, contrasenia);
 			if (cli != null) {
+				// Comprobar si la cuenta está bloqueada
+				if ("bloqueado".equalsIgnoreCase(cli.getEstado())) {
+					panelLogin.mostrarError("Cuenta bloqueada. Contacta con el administrador.");
+					return;
+				}
 				clienteActivo = cli;
 				ventana.modoSesionActiva();
 				cargarPanelCliente();
@@ -525,7 +651,22 @@ public class Controlador implements ActionListener {
 		panelCliente.setBienvenida(clienteActivo);
 		recargarCatalogoCliente();
 		catCliente.habilitarAcciones(true);
-		misAlquileres.cargarAlquileres(alquilerDAO.listarPorCliente(clienteActivo.getIdCliente()));
+
+		ArrayList<Alquiler> alquileres = alquilerDAO.listarPorCliente(clienteActivo.getIdCliente());
+		misAlquileres.cargarAlquileres(alquileres);
+
+		// Contar activos y actualizar el contador del header
+		int activos = 0;
+		for (Alquiler a : alquileres) {
+			if ("activo".equalsIgnoreCase(a.getEstadoAlquiler())) {
+				activos++;
+			}
+		}
+		panelCliente.actualizarContadorActivos(activos);
+
+		// Cargar datos en Mi cuenta
+		panelMiCuenta.cargarDatos(clienteActivo);
+
 		ventana.cargarPanel(panelCliente);
 	}
 
@@ -605,6 +746,25 @@ public class Controlador implements ActionListener {
 			}
 		}
 		panel.cargarAlquileres(filtrados);
+	}
+
+	// Controlador.java — método nuevo para filtrar mis alquileres
+	private void filtrarMisAlquileres() {
+		String filtro = misAlquileres.getFiltroEstado();
+		ArrayList<Alquiler> todos = alquilerDAO.listarPorCliente(clienteActivo.getIdCliente());
+
+		if (filtro == null) {
+			misAlquileres.cargarAlquileres(todos);
+			return;
+		}
+
+		ArrayList<Alquiler> filtrados = new ArrayList<Alquiler>();
+		for (Alquiler a : todos) {
+			if (filtro.equalsIgnoreCase(a.getEstadoAlquiler())) {
+				filtrados.add(a);
+			}
+		}
+		misAlquileres.cargarAlquileres(filtrados);
 	}
 
 	// ── Películas ─────────────────────────────────────────────────────────────
