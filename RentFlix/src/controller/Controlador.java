@@ -93,94 +93,123 @@ public class Controlador implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		switch (e.getActionCommand()) {
+		Object src = e.getSource();
 
-		case "ABRIR_LOGIN":
-			panelLogin.limpiar();
-			ventana.cargarPanel(panelLogin);
-			break;
-		case "ABRIR_REGISTRO":
-			panelRegistro.limpiar();
-			ventana.cargarPanel(panelRegistro);
-			break;
-		case "CANCELAR_LOGIN":
-		case "CANCELAR_REGISTRO":
-			ventana.cargarPanel(catInvitado);
-			break;
-		case "CERRAR_SESION":
-			cerrarSesion();
-			break;
+		// ── JButton ───────────────────────────────────────────────────────────
+		if (src instanceof JButton) {
+			switch (e.getActionCommand()) {
 
-		case "BUSCAR_PELICULA":
-			buscarPelicula(e);
-			break;
-		case "FILTRAR_FORMATO_CATALOGO":
-			filtrarFormato(e);
-			break;
-		case "ALQUILAR_PELICULA":
-			alquilarDesdeClienteCatalogo();
-			break;
+			// ── VentanaPrincipal ──────────────────────────────────────────
+			case "ABRIR_LOGIN":
+				panelLogin.limpiar();
+				ventana.cargarPanel(panelLogin);
+				break;
+			case "ABRIR_REGISTRO":
+				panelRegistro.limpiar();
+				ventana.cargarPanel(panelRegistro);
+				break;
+			case "CERRAR_SESION":
+				cerrarSesion();
+				break;
 
-		case "LOGIN":
-			procesarLogin();
-			break;
-		case "REGISTRAR_CLIENTE":
-			procesarRegistro();
-			break;
+			// ── PanelLogin ────────────────────────────────────────────────
+			case "LOGIN":
+				procesarLogin();
+				break;
+			case "CANCELAR_LOGIN":
+				ventana.cargarPanel(catInvitado);
+				break;
 
-		case "SOLICITAR_DEVOLUCION":
-			procesarSolicitudDevolucion();
-			break;
+			// ── PanelRegistro ─────────────────────────────────────────────
+			case "REGISTRAR_CLIENTE":
+				procesarRegistro();
+				break;
+			case "CANCELAR_REGISTRO":
+				ventana.cargarPanel(catInvitado);
+				break;
 
-		case "FILTRAR_ALQUILERES":
-			filtrarAlquileres();
-			break;
-		case "ACEPTAR_DEVOLUCION":
-			procesarAceptarDevolucion();
-			break;
-		case "ABRIR_FORM_ALQUILER":
-			abrirFormAlquiler();
-			break;
-		case "CANCELAR_FORM_ALQUILER":
-			getPanelGestionActivo().mostrarFormAlquiler(false);
-			break;
-		case "CONFIRMAR_ALQUILER_EMPLEADO":
-			confirmarAlquilerEmpleado();
-			break;
+			// ── PanelCatalogo ─────────────────────────────────────────────
+			case "BUSCAR_PELICULA":
+				buscarPelicula(e);
+				break;
+			case "ALQUILAR_PELICULA":
+				alquilarDesdeClienteCatalogo();
+				break;
 
-		case "GUARDAR_PELICULA":
-			guardarPelicula();
-			break;
-		case "LIMPIAR_FORM_PELICULA":
-			getPanelAnadirActivo().limpiar();
-			break;
-		case "EDITAR_PELICULA":
-			editarPelicula();
-			break;
-		case "ELIMINAR_PELICULA":
-			eliminarPelicula();
-			break;
+			// ── PanelMisAlquileres ────────────────────────────────────────
+			case "SOLICITAR_DEVOLUCION":
+				procesarSolicitudDevolucion();
+				break;
 
-		case "ACTUALIZAR_INFORMES":
-			cargarInformes();
-			break;
+			// ── PanelGestionAlquileres ────────────────────────────────────
+			case "ABRIR_FORM_ALQUILER":
+				abrirFormAlquiler();
+				break;
+			case "CANCELAR_FORM_ALQUILER":
+				getPanelGestionActivo().mostrarFormAlquiler(false);
+				break;
+			case "CONFIRMAR_ALQUILER_EMPLEADO":
+				confirmarAlquilerEmpleado();
+				break;
+			case "ACEPTAR_DEVOLUCION":
+				procesarAceptarDevolucion();
+				break;
 
-		case "CREAR_EMPLEADO":
-			crearEmpleado();
-			break;
-		case "ELIMINAR_EMPLEADO":
-			eliminarEmpleado();
-			break;
-		case "LIMPIAR_FORM_EMPLEADO":
-			gestionEmpleados.limpiar();
-			break;
+			// ── PanelAnadirPelicula ───────────────────────────────────────
+			case "GUARDAR_PELICULA":
+				guardarPelicula();
+				break;
+			case "LIMPIAR_FORM_PELICULA":
+				getPanelAnadirActivo().limpiar();
+				break;
 
-		case "EDITAR_CLIENTE":
-			editarCliente();
-			break;
-		case "ELIMINAR_CLIENTE":
-			eliminarCliente();
-			break;
+			// ── PanelGestionPeliculas ─────────────────────────────────────
+			case "EDITAR_PELICULA":
+				editarPelicula();
+				break;
+			case "ELIMINAR_PELICULA":
+				eliminarPelicula();
+				break;
+
+			// ── PanelInformes ─────────────────────────────────────────────
+			case "ACTUALIZAR_INFORMES":
+				cargarInformes();
+				break;
+
+			// ── PanelGestionEmpleados ─────────────────────────────────────
+			case "CREAR_EMPLEADO":
+				crearEmpleado();
+				break;
+			case "ELIMINAR_EMPLEADO":
+				eliminarEmpleado();
+				break;
+			case "LIMPIAR_FORM_EMPLEADO":
+				gestionEmpleados.limpiar();
+				break;
+
+			// ── PanelGestionClientes ──────────────────────────────────────
+			case "EDITAR_CLIENTE":
+				editarCliente();
+				break;
+			case "ELIMINAR_CLIENTE":
+				eliminarCliente();
+				break;
+			}
+
+			// ── JComboBox ─────────────────────────────────────────────────────────
+		} else if (src instanceof JComboBox) {
+			switch (e.getActionCommand()) {
+
+			// ── PanelCatalogo ─────────────────────────────────────────────
+			case "FILTRAR_FORMATO_CATALOGO":
+				filtrarFormato(e);
+				break;
+
+			// ── PanelGestionAlquileres ────────────────────────────────────
+			case "FILTRAR_ALQUILERES":
+				filtrarAlquileres();
+				break;
+			}
 		}
 	}
 
@@ -734,7 +763,7 @@ public class Controlador implements ActionListener {
 		JTextField txtApellido = new JTextField(c.getApellidoCliente());
 		JTextField txtEmail = new JTextField(c.getEmailCliente());
 		JTextField txtUsuario = new JTextField(c.getNombreUsuario());
-		JComboBox<String> cmbEstado = new JComboBox<>(new String[] { "activo", "inactivo" });
+		JComboBox<String> cmbEstado = new JComboBox<>(new String[] { "activo", "bloqueado" });
 		cmbEstado.setSelectedItem(c.getEstado());
 
 		JPanel form = new JPanel(new GridLayout(0, 2, 8, 8));
@@ -820,7 +849,7 @@ public class Controlador implements ActionListener {
 		informesAdm.cargarInformes(todos, total);
 	}
 
-	// ── Cerrar sesión ────────────────────────────────────────────────────────
+	// ── Cerrar sesión ─────────────────────────────────────────────────────────
 
 	private void cerrarSesion() {
 		int conf = JOptionPane.showConfirmDialog(ventana, "¿Seguro que quieres cerrar sesión?", "Cerrar sesión",

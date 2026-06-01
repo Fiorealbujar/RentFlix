@@ -1,15 +1,15 @@
-// ==========================================
-// INTERFAZ: IEmpleadoDAO.java — ACTUALIZADA
-// Añade eliminar.
-// ==========================================
+// IEmpleadoDAO.java
 package dao;
 
 import model.Empleado;
-import java.util.List;
+import java.util.ArrayList;
 
 public interface IEmpleadoDAO {
-    Empleado login(String usuarioEmpleado, String contrasenia);
-    boolean  crear(Empleado empleado);
-    boolean  eliminar(int idEmpleado);
-    List<Empleado> listarTodos();
+	Empleado login(String usuarioEmpleado, String contrasenia);
+
+	int crear(Empleado empleado);
+
+	int eliminar(int idEmpleado);
+
+	ArrayList<Empleado> listarTodos();
 }
