@@ -14,4 +14,6 @@ public interface IAlquilerDAO {
 	int solicitarDevolucion(int idAlquiler);
 
 	int aceptarDevolucion(int idAlquiler, String fechaDevolucionReal);
+	
+	int marcarVencidos();
 }

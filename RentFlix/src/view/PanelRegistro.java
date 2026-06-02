@@ -1,7 +1,4 @@
-// ==========================================
-// CLASE: PanelRegistro.java
-// Formulario de registro para nuevos clientes.
-// ==========================================
+// PanelRegistro.java
 package view;
 
 import controller.Controlador;
@@ -36,6 +33,7 @@ public class PanelRegistro extends JPanel {
 		tarjeta.setBackground(Color.WHITE);
 		tarjeta.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(0xDDDDDD)),
 				new EmptyBorder(36, 44, 36, 44)));
+		tarjeta.setMaximumSize(new Dimension(400, 600));
 
 		JLabel lblTitulo = new JLabel("Crear cuenta");
 		lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 24));
@@ -50,11 +48,12 @@ public class PanelRegistro extends JPanel {
 		txtNombre = buildCampo("Nombre");
 		txtApellido = buildCampo("Apellido");
 		txtEmail = buildCampo("Email");
-		txtUsuario = buildCampo("Nombre de usuario");
+		txtUsuario = buildCampo("Usuario");
 		txtContrasenia = new JPasswordField();
 		txtContrasenia.putClientProperty("JTextField.placeholderText", "Contraseña");
 		txtContrasenia.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
 		txtContrasenia.setFont(new Font("SansSerif", Font.PLAIN, 13));
+		txtContrasenia.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		lblError = new JLabel(" ");
 		lblError.setFont(new Font("SansSerif", Font.PLAIN, 12));
@@ -74,19 +73,19 @@ public class PanelRegistro extends JPanel {
 		tarjeta.add(buildLabel("Nombre"));
 		tarjeta.add(Box.createVerticalStrut(4));
 		tarjeta.add(txtNombre);
-		tarjeta.add(Box.createVerticalStrut(12));
+		tarjeta.add(Box.createVerticalStrut(14));
 		tarjeta.add(buildLabel("Apellido"));
 		tarjeta.add(Box.createVerticalStrut(4));
 		tarjeta.add(txtApellido);
-		tarjeta.add(Box.createVerticalStrut(12));
+		tarjeta.add(Box.createVerticalStrut(14));
 		tarjeta.add(buildLabel("Email"));
 		tarjeta.add(Box.createVerticalStrut(4));
 		tarjeta.add(txtEmail);
-		tarjeta.add(Box.createVerticalStrut(12));
+		tarjeta.add(Box.createVerticalStrut(14));
 		tarjeta.add(buildLabel("Usuario"));
 		tarjeta.add(Box.createVerticalStrut(4));
 		tarjeta.add(txtUsuario);
-		tarjeta.add(Box.createVerticalStrut(12));
+		tarjeta.add(Box.createVerticalStrut(14));
 		tarjeta.add(buildLabel("Contraseña"));
 		tarjeta.add(Box.createVerticalStrut(4));
 		tarjeta.add(txtContrasenia);
@@ -105,6 +104,7 @@ public class PanelRegistro extends JPanel {
 		campo.putClientProperty("JTextField.placeholderText", placeholder);
 		campo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
 		campo.setFont(new Font("SansSerif", Font.PLAIN, 13));
+		campo.setAlignmentX(Component.CENTER_ALIGNMENT);
 		return campo;
 	}
 
@@ -112,6 +112,8 @@ public class PanelRegistro extends JPanel {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 12));
 		lbl.setForeground(new Color(0x444444));
+		lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lbl.setHorizontalAlignment(SwingConstants.CENTER);
 		return lbl;
 	}
 
@@ -128,8 +130,6 @@ public class PanelRegistro extends JPanel {
 		return btn;
 	}
 
-	// ── Métodos públicos que usa el Controlador ─────────────────────────────
-
 	public void mostrarError(String mensaje) {
 		lblError.setText(mensaje);
 	}
@@ -143,7 +143,6 @@ public class PanelRegistro extends JPanel {
 		lblError.setText(" ");
 	}
 
-	// Validación básica antes de enviar al controlador
 	public boolean datosValidos() {
 		return !txtNombre.getText().trim().isEmpty() && !txtApellido.getText().trim().isEmpty()
 				&& !txtEmail.getText().trim().isEmpty() && !txtUsuario.getText().trim().isEmpty()
@@ -155,7 +154,6 @@ public class PanelRegistro extends JPanel {
 		btnCancelar.addActionListener(controlador);
 	}
 
-	// Getters
 	public String getNombre() {
 		return txtNombre.getText().trim();
 	}
@@ -174,5 +172,13 @@ public class PanelRegistro extends JPanel {
 
 	public String getContrasenia() {
 		return new String(txtContrasenia.getPassword());
+	}
+
+	public JButton getBtnRegistrar() {
+		return btnRegistrar;
+	}
+
+	public JButton getBtnCancelar() {
+		return btnCancelar;
 	}
 }

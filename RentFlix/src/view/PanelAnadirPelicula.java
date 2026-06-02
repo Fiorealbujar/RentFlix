@@ -1,8 +1,4 @@
-// ==========================================
-// CLASE: PanelAnadirPelicula.java
-// Formulario para añadir nuevas películas.
-// Disponible para Empleado y Administrador.
-// ==========================================
+// PanelAnadirPelicula.java
 package view;
 
 import controller.Controlador;
@@ -16,15 +12,16 @@ public class PanelAnadirPelicula extends JPanel {
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
 	private static final Color COLOR_ACENTO = new Color(0xE50914);
+	private static final Color COLOR_ACTIVO = new Color(0x27AE60);
 
 	private JTextField txtTitulo;
 	private JTextField txtDirector;
 	private JTextField txtDuracion;
 	private JComboBox<String> cmbGenero;
 	private JComboBox<String> cmbClasificacion;
-	private JTextArea txtSinopsis;
-	private JTextField txtFormato;
+	private JComboBox<String> cmbFormato; // ← ahora es ComboBox
 	private JTextField txtPrecio;
+	private JTextArea txtSinopsis;
 	private JButton btnGuardar;
 	private JButton btnLimpiar;
 	private JLabel lblMensaje;
@@ -42,7 +39,7 @@ public class PanelAnadirPelicula extends JPanel {
 		add(buildAcciones(), BorderLayout.SOUTH);
 	}
 
-	// ── Título ──────────────────────────────────────────────────────────────
+	// ── Título ───────────────────────────────────────────────────────────────
 
 	private JPanel buildTitulo() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -56,7 +53,7 @@ public class PanelAnadirPelicula extends JPanel {
 		return panel;
 	}
 
-	// ── Formulario ──────────────────────────────────────────────────────────
+	// ── Formulario ───────────────────────────────────────────────────────────
 
 	private JPanel buildFormulario() {
 		JPanel panel = new JPanel(new GridBagLayout());
@@ -69,13 +66,9 @@ public class PanelAnadirPelicula extends JPanel {
 		gbc.anchor = GridBagConstraints.WEST;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 
-		// Columna de labels (0) y campos (1)
-		// Columna de labels (2) y campos (3)
-
 		txtTitulo = buildTextField();
 		txtDirector = buildTextField();
 		txtDuracion = buildTextField();
-		txtFormato = buildTextField();
 		txtPrecio = buildTextField();
 
 		cmbGenero = new JComboBox<>(new String[] { "Acción", "Aventura", "Animación", "Ciencia Ficción", "Comedia",
@@ -84,6 +77,10 @@ public class PanelAnadirPelicula extends JPanel {
 
 		cmbClasificacion = new JComboBox<>(new String[] { "TP", "7", "12", "16", "18" });
 		cmbClasificacion.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+		// ← ComboBox de formato en lugar de TextField
+		cmbFormato = new JComboBox<>(new String[] { "DVD", "Blu-ray", "4K Ultra HD" });
+		cmbFormato.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
 		txtSinopsis = new JTextArea(4, 20);
 		txtSinopsis.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -96,15 +93,14 @@ public class PanelAnadirPelicula extends JPanel {
 		// Fila 1
 		agregarFila(panel, gbc, 1, "Duración (min) *", txtDuracion, "Género *", cmbGenero);
 		// Fila 2
-		agregarFila(panel, gbc, 2, "Clasificación edad *", cmbClasificacion, "Formato copia *", txtFormato);
+		agregarFila(panel, gbc, 2, "Clasificación edad *", cmbClasificacion, "Formato copia *", cmbFormato);
 		// Fila 3
 		agregarFila(panel, gbc, 3, "Precio alquiler/día (€) *", txtPrecio, "", new JLabel());
-		// Fila 4: Sinopsis ocupa todo el ancho
+		// Fila 4: sinopsis ocupa todo el ancho
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		gbc.gridwidth = 1;
 		panel.add(buildLabel("Sinopsis"), gbc);
-
 		gbc.gridx = 1;
 		gbc.gridy = 4;
 		gbc.gridwidth = 3;
@@ -117,15 +113,19 @@ public class PanelAnadirPelicula extends JPanel {
 	private void agregarFila(JPanel panel, GridBagConstraints gbc, int fila, String label1, JComponent comp1,
 			String label2, JComponent comp2) {
 		gbc.gridy = fila;
+
 		gbc.weightx = 0;
 		gbc.gridx = 0;
 		panel.add(buildLabel(label1), gbc);
+
 		gbc.weightx = 1;
 		gbc.gridx = 1;
 		panel.add(comp1, gbc);
+
 		gbc.weightx = 0;
 		gbc.gridx = 2;
 		panel.add(buildLabel(label2), gbc);
+
 		gbc.weightx = 1;
 		gbc.gridx = 3;
 		panel.add(comp2, gbc);
@@ -145,7 +145,7 @@ public class PanelAnadirPelicula extends JPanel {
 		return lbl;
 	}
 
-	// ── Acciones ────────────────────────────────────────────────────────────
+	// ── Acciones ──────────────────────────────────────────────────────────────
 
 	private JPanel buildAcciones() {
 		JPanel panel = new JPanel(new BorderLayout());
@@ -184,17 +184,17 @@ public class PanelAnadirPelicula extends JPanel {
 		return panel;
 	}
 
-	// ── Métodos públicos para el Controlador ────────────────────────────────
+	// ── Métodos para el Controlador ───────────────────────────────────────────
 
 	public void limpiar() {
 		txtTitulo.setText("");
 		txtDirector.setText("");
 		txtDuracion.setText("");
 		txtSinopsis.setText("");
-		txtFormato.setText("");
 		txtPrecio.setText("");
 		cmbGenero.setSelectedIndex(0);
 		cmbClasificacion.setSelectedIndex(0);
+		cmbFormato.setSelectedIndex(0);
 		lblMensaje.setText(" ");
 		lblMensaje.setForeground(Color.BLACK);
 	}
@@ -204,11 +204,9 @@ public class PanelAnadirPelicula extends JPanel {
 		lblMensaje.setForeground(esError ? COLOR_ACENTO : COLOR_ACTIVO);
 	}
 
-	// Valida que los campos obligatorios no estén vacíos
 	public boolean datosValidos() {
 		if (txtTitulo.getText().trim().isEmpty() || txtDirector.getText().trim().isEmpty()
-				|| txtDuracion.getText().trim().isEmpty() || txtFormato.getText().trim().isEmpty()
-				|| txtPrecio.getText().trim().isEmpty()) {
+				|| txtDuracion.getText().trim().isEmpty() || txtPrecio.getText().trim().isEmpty()) {
 			mostrarMensaje("Rellena todos los campos obligatorios (*).", true);
 			return false;
 		}
@@ -227,7 +225,7 @@ public class PanelAnadirPelicula extends JPanel {
 		btnLimpiar.addActionListener(controlador);
 	}
 
-	// ── Getters de datos ────────────────────────────────────────────────────
+	// ── Getters ───────────────────────────────────────────────────────────────
 
 	public String getTitulo() {
 		return txtTitulo.getText().trim();
@@ -254,7 +252,7 @@ public class PanelAnadirPelicula extends JPanel {
 	}
 
 	public String getFormato() {
-		return txtFormato.getText().trim();
+		return (String) cmbFormato.getSelectedItem();
 	}
 
 	public double getPrecio() {
@@ -268,7 +266,4 @@ public class PanelAnadirPelicula extends JPanel {
 	public JButton getBtnLimpiar() {
 		return btnLimpiar;
 	}
-
-	// Color positivo para el mensaje de éxito
-	private static final Color COLOR_ACTIVO = new Color(0x27AE60);
 }

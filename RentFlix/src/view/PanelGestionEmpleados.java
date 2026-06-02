@@ -1,7 +1,4 @@
-// ==========================================
-// CLASE: PanelGestionEmpleados.java — CORREGIDA
-// Añade botón "Eliminar empleado".
-// ==========================================
+// PanelGestionEmpleados.java
 package view;
 
 import controller.Controlador;
@@ -14,7 +11,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
+import java.util.ArrayList;
 
 public class PanelGestionEmpleados extends JPanel {
 
@@ -24,6 +21,7 @@ public class PanelGestionEmpleados extends JPanel {
 
 	private DefaultTableModel modeloTabla;
 	private JTable tblEmpleados;
+	private JButton btnEditarEmpleado;
 	private JButton btnEliminarEmpleado;
 	private JTextField txtNombre;
 	private JTextField txtApellido;
@@ -55,7 +53,7 @@ public class PanelGestionEmpleados extends JPanel {
 		return lbl;
 	}
 
-	// ── Tabla + botón eliminar ───────────────────────────────────────────────
+	// ── Tabla + botones ──────────────────────────────────────────────────────
 
 	private JPanel buildTabla() {
 		JPanel panel = new JPanel(new BorderLayout(0, 8));
@@ -84,8 +82,9 @@ public class PanelGestionEmpleados extends JPanel {
 		tblEmpleados.getTableHeader().setForeground(Color.WHITE);
 
 		int[] anchos = { 40, 130, 130, 200, 130, 100 };
-		for (int i = 0; i < anchos.length; i++)
+		for (int i = 0; i < anchos.length; i++) {
 			tblEmpleados.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+		}
 
 		// Renderer colores Rol
 		tblEmpleados.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
@@ -110,7 +109,17 @@ public class PanelGestionEmpleados extends JPanel {
 			}
 		});
 
-		// Botón eliminar bajo la tabla
+		// Botones bajo la tabla
+		btnEditarEmpleado = new JButton("✏️  Editar empleado");
+		btnEditarEmpleado.setActionCommand("EDITAR_EMPLEADO");
+		btnEditarEmpleado.setFont(new Font("SansSerif", Font.BOLD, 13));
+		btnEditarEmpleado.setBackground(COLOR_DARK);
+		btnEditarEmpleado.setForeground(Color.WHITE);
+		btnEditarEmpleado.setFocusPainted(false);
+		btnEditarEmpleado.setBorder(new EmptyBorder(8, 18, 8, 18));
+		btnEditarEmpleado.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnEditarEmpleado.setEnabled(false);
+
 		btnEliminarEmpleado = new JButton("🗑️  Eliminar empleado");
 		btnEliminarEmpleado.setActionCommand("ELIMINAR_EMPLEADO");
 		btnEliminarEmpleado.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -121,15 +130,16 @@ public class PanelGestionEmpleados extends JPanel {
 		btnEliminarEmpleado.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnEliminarEmpleado.setEnabled(false);
 
-		JPanel filaBtnEliminar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		filaBtnEliminar.setOpaque(false);
-		filaBtnEliminar.add(btnEliminarEmpleado);
+		JPanel filaBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+		filaBotones.setOpaque(false);
+		filaBotones.add(btnEditarEmpleado);
+		filaBotones.add(btnEliminarEmpleado);
 
 		JScrollPane scroll = new JScrollPane(tblEmpleados);
 		scroll.setBorder(BorderFactory.createLineBorder(new Color(0xDDDDDD)));
 
 		panel.add(scroll, BorderLayout.CENTER);
-		panel.add(filaBtnEliminar, BorderLayout.SOUTH);
+		panel.add(filaBotones, BorderLayout.SOUTH);
 		return panel;
 	}
 
@@ -209,33 +219,51 @@ public class PanelGestionEmpleados extends JPanel {
 		return f;
 	}
 
-	// ── Métodos para el controlador ─────────────────────────────────────────
+	// ── Métodos para el Controlador ───────────────────────────────────────────
 
-	public void cargarEmpleados(List<Empleado> empleados) {
+	public void cargarEmpleados(ArrayList<Empleado> empleados) {
 		modeloTabla.setRowCount(0);
 		for (Empleado e : empleados) {
 			modeloTabla.addRow(new Object[] { e.getIdEmpleado(), e.getNombreEmpleado(), e.getApellidoEmpleado(),
 					e.getEmailEmpleado(), e.getUsuarioEmpleado(), e.esAdministrador() ? "Administrador" : "Empleado" });
 		}
+		btnEditarEmpleado.setEnabled(false);
 		btnEliminarEmpleado.setEnabled(false);
 	}
 
-	public void actualizarBotonEliminar() {
+	public void actualizarBotones() {
 		int fila = tblEmpleados.getSelectedRow();
 		if (fila >= 0) {
 			String rol = String.valueOf(modeloTabla.getValueAt(fila, 5));
-			// No se puede eliminar al administrador
-			btnEliminarEmpleado.setEnabled(!"Administrador".equals(rol));
+			// El admin no se puede editar ni eliminar
+			boolean esAdmin = "Administrador".equals(rol);
+			btnEditarEmpleado.setEnabled(!esAdmin);
+			btnEliminarEmpleado.setEnabled(!esAdmin);
 		} else {
+			btnEditarEmpleado.setEnabled(false);
 			btnEliminarEmpleado.setEnabled(false);
 		}
 	}
 
 	public int getIdEmpleadoSeleccionado() {
 		int fila = tblEmpleados.getSelectedRow();
-		if (fila < 0)
+		if (fila < 0) {
 			return -1;
+		}
 		return (int) modeloTabla.getValueAt(fila, 0);
+	}
+
+	// Devuelve un Empleado con los datos de la fila seleccionada
+	public Empleado getEmpleadoSeleccionado() {
+		int fila = tblEmpleados.getSelectedRow();
+		if (fila < 0) {
+			return null;
+		}
+		return new Empleado((int) modeloTabla.getValueAt(fila, 0), (String) modeloTabla.getValueAt(fila, 1),
+				(String) modeloTabla.getValueAt(fila, 2), (String) modeloTabla.getValueAt(fila, 3),
+				(String) modeloTabla.getValueAt(fila, 4), "", // contraseña no se muestra en tabla
+				null // id_jefe no se muestra en tabla
+		);
 	}
 
 	public void limpiar() {
@@ -261,14 +289,14 @@ public class PanelGestionEmpleados extends JPanel {
 	public void setControlador(Controlador controlador) {
 		btnCrearEmpleado.addActionListener(controlador);
 		btnLimpiar.addActionListener(controlador);
+		btnEditarEmpleado.addActionListener(controlador);
 		btnEliminarEmpleado.addActionListener(controlador);
 
-		// Sin programación funcional:
 		tblEmpleados.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (!e.getValueIsAdjusting()) {
-					actualizarBotonEliminar();
+					actualizarBotones();
 				}
 			}
 		});

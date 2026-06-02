@@ -12,4 +12,6 @@ public interface IEmpleadoDAO {
 	int eliminar(int idEmpleado);
 
 	ArrayList<Empleado> listarTodos();
+	
+	int actualizar(Empleado empleado);
 }

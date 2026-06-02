@@ -1,8 +1,4 @@
-// ==========================================
-// CLASE: PanelLogin.java
-// Formulario de inicio de sesión.
-// Permite elegir entre Cliente y Empleado.
-// ==========================================
+// PanelLogin.java
 package view;
 
 import controller.Controlador;
@@ -25,12 +21,11 @@ public class PanelLogin extends JPanel {
 
 	public PanelLogin() {
 		setBackground(COLOR_FONDO);
-		setLayout(new GridBagLayout()); // centrado perfecto
+		setLayout(new GridBagLayout());
 		initComponents();
 	}
 
 	private void initComponents() {
-		// Tarjeta central del formulario
 		JPanel tarjeta = new JPanel();
 		tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
 		tarjeta.setBackground(Color.WHITE);
@@ -38,7 +33,6 @@ public class PanelLogin extends JPanel {
 				new EmptyBorder(36, 44, 36, 44)));
 		tarjeta.setMaximumSize(new Dimension(400, 500));
 
-		// Título
 		JLabel lblTitulo = new JLabel("Iniciar sesión");
 		lblTitulo.setFont(new Font("SansSerif", Font.BOLD, 24));
 		lblTitulo.setForeground(new Color(0x1a1a2e));
@@ -49,32 +43,29 @@ public class PanelLogin extends JPanel {
 		lblSub.setForeground(new Color(0x888888));
 		lblSub.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		// Selector de rol
 		cmbRol = new JComboBox<>(new String[] { "Cliente", "Empleado / Administrador" });
 		cmbRol.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
 		cmbRol.setFont(new Font("SansSerif", Font.PLAIN, 13));
+		cmbRol.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		// Campos
 		txtUsuario = buildCampo("Usuario");
 		txtContrasenia = new JPasswordField();
 		txtContrasenia.putClientProperty("JTextField.placeholderText", "Contraseña");
 		txtContrasenia.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
 		txtContrasenia.setFont(new Font("SansSerif", Font.PLAIN, 13));
+		txtContrasenia.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		// Label de error (oculto por defecto)
 		lblError = new JLabel(" ");
 		lblError.setFont(new Font("SansSerif", Font.PLAIN, 12));
 		lblError.setForeground(COLOR_ACENTO);
 		lblError.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-		// Botones
 		btnEntrar = buildBoton("Entrar", COLOR_ACENTO, Color.WHITE);
 		btnEntrar.setActionCommand("LOGIN");
 
 		btnCancelar = buildBoton("Cancelar", new Color(0xEEEEEE), new Color(0x333333));
 		btnCancelar.setActionCommand("CANCELAR_LOGIN");
 
-		// Ensamblar tarjeta
 		tarjeta.add(lblTitulo);
 		tarjeta.add(Box.createVerticalStrut(6));
 		tarjeta.add(lblSub);
@@ -105,6 +96,7 @@ public class PanelLogin extends JPanel {
 		campo.putClientProperty("JTextField.placeholderText", placeholder);
 		campo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
 		campo.setFont(new Font("SansSerif", Font.PLAIN, 13));
+		campo.setAlignmentX(Component.CENTER_ALIGNMENT);
 		return campo;
 	}
 
@@ -112,6 +104,8 @@ public class PanelLogin extends JPanel {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 12));
 		lbl.setForeground(new Color(0x444444));
+		lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+		lbl.setHorizontalAlignment(SwingConstants.CENTER);
 		return lbl;
 	}
 
@@ -128,8 +122,6 @@ public class PanelLogin extends JPanel {
 		return btn;
 	}
 
-	// ── Métodos públicos que usa el Controlador ─────────────────────────────
-
 	public void mostrarError(String mensaje) {
 		lblError.setText(mensaje);
 	}
@@ -145,12 +137,6 @@ public class PanelLogin extends JPanel {
 		return cmbRol.getSelectedIndex() == 1;
 	}
 
-	public void setControlador(Controlador controlador) {
-		btnEntrar.addActionListener(controlador);
-		btnCancelar.addActionListener(controlador);
-	}
-
-	// Getters
 	public String getUsuario() {
 		return txtUsuario.getText().trim();
 	}
@@ -165,5 +151,10 @@ public class PanelLogin extends JPanel {
 
 	public JButton getBtnCancelar() {
 		return btnCancelar;
+	}
+
+	public void setControlador(Controlador controlador) {
+		btnEntrar.addActionListener(controlador);
+		btnCancelar.addActionListener(controlador);
 	}
 }
