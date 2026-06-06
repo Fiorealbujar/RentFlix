@@ -19,23 +19,42 @@ import java.awt.*;
  */
 public class PanelAdmin extends JPanel {
 
+	/** Color de fondo oscuro de la cabecera del panel. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color dorado utilizado en el badge de administrador. */
 	private static final Color COLOR_GOLD = new Color(0xF0C040);
+
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
 
+	/** Etiqueta de bienvenida con el nombre del administrador. */
 	private JLabel lblBienvenida;
+
+	/** Contenedor de pestañas con los subpaneles del administrador. */
 	private JTabbedPane tabbedPane;
 
+	/** Subpanel de gestión de alquileres. */
 	private PanelGestionAlquileres panelGestionAlquileres;
+
+	/** Subpanel de alta de nuevas películas. */
 	private PanelAnadirPelicula panelAnadirPelicula;
+
+	/** Subpanel de gestión del catálogo de películas. */
 	private PanelGestionPeliculas panelGestionPeliculas;
+
+	/** Subpanel de informes de ventas. */
 	private PanelInformes panelInformes;
+
+	/** Subpanel de gestión de empleados (exclusivo del administrador). */
 	private PanelGestionEmpleados panelGestionEmpleados;
+
+	/** Subpanel de gestión de clientes. */
 	private PanelGestionClientes panelGestionClientes;
 
 	/**
-	 * Constructor que recibe los subpaneles ya instanciados y los asigna
-	 * a las pestañas correspondientes.
+	 * Constructor que recibe los subpaneles ya instanciados y los asigna a las
+	 * pestañas correspondientes.
 	 *
 	 * @param panelGestionAlquileres panel de gestión de alquileres
 	 * @param panelAnadirPelicula    panel de alta de películas
@@ -44,7 +63,7 @@ public class PanelAdmin extends JPanel {
 	 * @param panelGestionEmpleados  panel de gestión de empleados
 	 * @param panelGestionClientes   panel de gestión de clientes
 	 */
-	
+
 	public PanelAdmin(PanelGestionAlquileres panelGestionAlquileres, PanelAnadirPelicula panelAnadirPelicula,
 			PanelGestionPeliculas panelGestionPeliculas, PanelInformes panelInformes,
 			PanelGestionEmpleados panelGestionEmpleados, PanelGestionClientes panelGestionClientes) {
@@ -63,18 +82,19 @@ public class PanelAdmin extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildHeader(), BorderLayout.NORTH);
 		add(buildTabs(), BorderLayout.CENTER);
 	}
 
 	/**
-	 * Construye la cabecera con el saludo de bienvenida y el badge de administrador.
+	 * Construye la cabecera con el saludo de bienvenida y el badge de
+	 * administrador.
 	 *
 	 * @return panel de cabecera configurado
 	 */
-	
+
 	private JPanel buildHeader() {
 		JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
 		header.setBackground(COLOR_DARK);
@@ -96,11 +116,12 @@ public class PanelAdmin extends JPanel {
 	}
 
 	/**
-	 * Construye el contenedor de pestañas con todos los subpaneles del administrador.
+	 * Construye el contenedor de pestañas con todos los subpaneles del
+	 * administrador.
 	 *
 	 * @return panel de pestañas configurado
 	 */
-	
+
 	private JTabbedPane buildTabs() {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -118,7 +139,7 @@ public class PanelAdmin extends JPanel {
 	 *
 	 * @param emp empleado administrador en sesión
 	 */
-	
+
 	public void setBienvenida(Empleado emp) {
 		lblBienvenida.setText("👑 Hola, " + emp.getNombreCompleto());
 	}
@@ -126,9 +147,9 @@ public class PanelAdmin extends JPanel {
 	/**
 	 * Requerido por el patrón de inicialización de la aplicación.
 	 * <p>
-	 * Este panel es un contenedor de pestañas sin botones propios, por lo que
-	 * no registra listeners directamente. Los listeners de cada subpanel
-	 * se registran en sus propios {@code setControlador()}.
+	 * Este panel es un contenedor de pestañas sin botones propios, por lo que no
+	 * registra listeners directamente. Los listeners de cada subpanel se registran
+	 * en sus propios {@code setControlador()}.
 	 * </p>
 	 *
 	 * @param controlador controlador principal de la aplicación

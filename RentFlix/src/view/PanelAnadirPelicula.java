@@ -19,27 +19,55 @@ import java.awt.*;
  */
 public class PanelAnadirPelicula extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color oscuro utilizado en títulos y botones principales. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color de acento rojo utilizado para mensajes de error. */
 	private static final Color COLOR_ACENTO = new Color(0xE50914);
+
+	/** Color verde utilizado para mensajes de éxito. */
 	private static final Color COLOR_ACTIVO = new Color(0x27AE60);
 
+	/** Campo de texto para el título de la película. */
 	private JTextField txtTitulo;
+
+	/** Campo de texto para el nombre del director. */
 	private JTextField txtDirector;
+
+	/** Campo de texto para la duración en minutos. */
 	private JTextField txtDuracion;
+
+	/** Combo desplegable para seleccionar el género cinematográfico. */
 	private JComboBox<String> cmbGenero;
+
+	/** Combo desplegable para seleccionar la clasificación por edad. */
 	private JComboBox<String> cmbClasificacion;
+
+	/** Combo desplegable para seleccionar el formato de la copia. */
 	private JComboBox<String> cmbFormato;
+
+	/** Spinner para indicar el número de copias a crear (entre 1 y 10). */
 	private JSpinner spinnerCopias;
+
+	/** Área de texto para la sinopsis de la película. */
 	private JTextArea txtSinopsis;
+
+	/** Botón para guardar la nueva película en la base de datos. */
 	private JButton btnGuardar;
+
+	/** Botón para limpiar todos los campos del formulario. */
 	private JButton btnLimpiar;
+
+	/** Etiqueta para mostrar mensajes de éxito o error bajo el formulario. */
 	private JLabel lblMensaje;
 
 	/**
 	 * Constructor que inicializa el panel y construye el formulario de alta.
 	 */
-	
+
 	public PanelAnadirPelicula() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout());
@@ -50,7 +78,7 @@ public class PanelAnadirPelicula extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildTitulo(), BorderLayout.NORTH);
 		add(buildFormulario(), BorderLayout.CENTER);
@@ -62,7 +90,7 @@ public class PanelAnadirPelicula extends JPanel {
 	 *
 	 * @return panel de título configurado
 	 */
-	
+
 	private JPanel buildTitulo() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.setOpaque(false);
@@ -80,7 +108,7 @@ public class PanelAnadirPelicula extends JPanel {
 	 *
 	 * @return panel del formulario configurado
 	 */
-	
+
 	private JPanel buildFormulario() {
 		JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBackground(Color.WHITE);
@@ -149,7 +177,7 @@ public class PanelAnadirPelicula extends JPanel {
 	 * @param label2 etiqueta del segundo campo
 	 * @param comp2  segundo componente de entrada
 	 */
-	
+
 	private void agregarFila(JPanel panel, GridBagConstraints gbc, int fila, String label1, JComponent comp1,
 			String label2, JComponent comp2) {
 		gbc.gridy = fila;
@@ -176,7 +204,7 @@ public class PanelAnadirPelicula extends JPanel {
 	 *
 	 * @return campo de texto configurado
 	 */
-	
+
 	private JTextField buildTextField() {
 		JTextField campo = new JTextField();
 		campo.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -190,7 +218,7 @@ public class PanelAnadirPelicula extends JPanel {
 	 * @param texto texto de la etiqueta
 	 * @return etiqueta configurada
 	 */
-	
+
 	private JLabel buildLabel(String texto) {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -203,7 +231,7 @@ public class PanelAnadirPelicula extends JPanel {
 	 *
 	 * @return panel de acciones configurado
 	 */
-	
+
 	private JPanel buildAcciones() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setOpaque(false);

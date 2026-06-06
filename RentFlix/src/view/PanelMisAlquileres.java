@@ -25,26 +25,49 @@ import java.util.ArrayList;
  */
 public class PanelMisAlquileres extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color oscuro de cabecera y botones. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color verde para alquileres en estado activo. */
 	private static final Color COLOR_ACTIVO = new Color(0x27AE60);
+
+	/** Color naranja para alquileres en estado pendiente de devolución. */
 	private static final Color COLOR_PENDIENTE = new Color(0xF39C12);
+
+	/** Color gris para alquileres en estado devuelto. */
 	private static final Color COLOR_DEVUELTO = new Color(0x7F8C8D);
+
+	/** Color rojo para alquileres en estado vencido. */
 	private static final Color COLOR_VENCIDO = new Color(0xE50914);
 
+	/** Modelo de datos de la tabla de alquileres. */
 	private DefaultTableModel modeloTabla;
+
+	/** Tabla que muestra el historial de alquileres del cliente. */
 	private JTable tblAlquileres;
+
+	/** Botón para solicitar la devolución del alquiler activo seleccionado. */
 	private JButton btnSolicitarDevolucion;
+
+	/** Combo desplegable para filtrar los alquileres por estado. */
 	private JComboBox<String> cmbFiltroEstado;
+
+	/** Etiqueta informativa sobre cómo usar el botón de devolución. */
 	private JLabel lblInfo;
 
-	// Lista paralela para guardar los ids sin mostrarlos en la tabla
+	/**
+	 * Lista paralela que almacena los ids de los alquileres sin mostrarlos en la
+	 * tabla.
+	 */
 	private ArrayList<Integer> listaIds = new ArrayList<Integer>();
 
 	/**
 	 * Constructor que inicializa el panel y construye sus componentes visuales.
 	 */
-	
+
 	public PanelMisAlquileres() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout());
@@ -55,7 +78,7 @@ public class PanelMisAlquileres extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildPanelSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
@@ -67,7 +90,7 @@ public class PanelMisAlquileres extends JPanel {
 	 *
 	 * @return panel superior configurado
 	 */
-	
+
 	private JPanel buildPanelSuperior() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setOpaque(false);
@@ -113,7 +136,7 @@ public class PanelMisAlquileres extends JPanel {
 	 * @param color color asociado al estado
 	 * @return etiqueta de leyenda configurada
 	 */
-	
+
 	private JLabel buildChip(String texto, Color color) {
 		JLabel chip = new JLabel("● " + texto);
 		chip.setFont(new Font("SansSerif", Font.PLAIN, 11));
@@ -122,11 +145,12 @@ public class PanelMisAlquileres extends JPanel {
 	}
 
 	/**
-	 * Construye la tabla de alquileres con sus columnas y renderers de color por estado.
+	 * Construye la tabla de alquileres con sus columnas y renderers de color por
+	 * estado.
 	 *
 	 * @return scroll pane con la tabla configurada
 	 */
-	
+
 	private JScrollPane buildTabla() {
 		// Sin columna ID: el cliente no necesita verlo
 		String[] columnas = { "Película", "F. Alquiler", "F. Devolución prev.", "Estado", "Importe" };
@@ -207,11 +231,12 @@ public class PanelMisAlquileres extends JPanel {
 	}
 
 	/**
-	 * Construye el panel inferior con el texto informativo y el botón de devolución.
+	 * Construye el panel inferior con el texto informativo y el botón de
+	 * devolución.
 	 *
 	 * @return panel de acciones configurado
 	 */
-	
+
 	private JPanel buildPanelAcciones() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setOpaque(false);
@@ -242,7 +267,7 @@ public class PanelMisAlquileres extends JPanel {
 	 *
 	 * @param alquileres lista de alquileres del cliente autenticado
 	 */
-	
+
 	public void cargarAlquileres(ArrayList<Alquiler> alquileres) {
 		modeloTabla.setRowCount(0);
 		listaIds.clear();
@@ -263,7 +288,7 @@ public class PanelMisAlquileres extends JPanel {
 	 * Habilita el botón "Solicitar devolución" solo si el alquiler seleccionado
 	 * está en estado {@code activo}.
 	 */
-	
+
 	public void actualizarBotonDevolucion() {
 		int fila = tblAlquileres.getSelectedRow();
 		if (fila >= 0) {
@@ -280,7 +305,7 @@ public class PanelMisAlquileres extends JPanel {
 	 *
 	 * @return id del alquiler, o {@code -1} si no hay selección
 	 */
-	
+
 	public int getIdAlquilerSeleccionado() {
 		int fila = tblAlquileres.getSelectedRow();
 		if (fila < 0) {
@@ -295,7 +320,7 @@ public class PanelMisAlquileres extends JPanel {
 	 *
 	 * @return estado del filtro, o {@code null}
 	 */
-	
+
 	public String getFiltroEstado() {
 		String sel = (String) cmbFiltroEstado.getSelectedItem();
 		if ("Todos".equals(sel)) {
@@ -309,7 +334,7 @@ public class PanelMisAlquileres extends JPanel {
 	 *
 	 * @param controlador controlador principal de la aplicación
 	 */
-	
+
 	public void setControlador(Controlador controlador) {
 		btnSolicitarDevolucion.addActionListener(controlador);
 		cmbFiltroEstado.addActionListener(controlador);

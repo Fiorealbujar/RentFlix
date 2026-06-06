@@ -19,6 +19,7 @@ import java.util.ArrayList;
  */
 public class AlquilerDAO implements IAlquilerDAO {
 
+	/** Objeto de acceso a la base de datos SQLite utilizado por este DAO. */
 	private ConexionDB acceso;
 
 	/**
@@ -28,6 +29,10 @@ public class AlquilerDAO implements IAlquilerDAO {
 		acceso = new ConexionDB();
 	}
 
+	/**
+	 * Consulta SQL base con JOINs para obtener alquileres enriquecidos con datos de
+	 * película, cliente e importe.
+	 */
 	private static final String SQL_CON_DETALLE = "SELECT a.*, " + "       p.nombre_pelicula, "
 			+ "       c.nombre_cliente || ' ' || c.apellido_cliente AS nombre_cliente, "
 			+ "       COALESCE(pg.monto_cobro, 0) AS monto_cobro " + "FROM Alquileres a "
@@ -214,7 +219,6 @@ public class AlquilerDAO implements IAlquilerDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int aceptarDevolucion(int idAlquiler, String fechaDevolucionReal) {
 		int idCopia = -1;

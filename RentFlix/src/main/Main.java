@@ -22,6 +22,19 @@ import javax.swing.*;
 public class Main {
 
 	/**
+	 * Constructor privado para evitar la instanciación de esta clase.
+	 * <p>
+	 * {@code Main} únicamente contiene el método estático {@link #main(String[])}
+	 * y no representa ninguna entidad del dominio, por lo que no tiene sentido
+	 * crear objetos de ella con {@code new Main()}. Al declarar este constructor
+	 * como {@code private}, se impide dicha instanciación y se elimina el
+	 * constructor por defecto que Java generaría automáticamente en su ausencia.
+	 * </p>
+	 */
+	private Main() {
+	}
+
+	/**
 	 * Método principal de la aplicación.
 	 * <p>
 	 * Configura el tema visual, crea todas las vistas agrupadas por rol (cliente,

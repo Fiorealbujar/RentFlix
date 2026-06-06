@@ -19,20 +19,32 @@ import java.awt.*;
  */
 public class PanelMiCuenta extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color oscuro utilizado en títulos y botones. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
 
+	/** Etiqueta que muestra el nombre del cliente en modo lectura. */
 	private JLabel lblNombre;
+
+	/** Etiqueta que muestra el apellido del cliente en modo lectura. */
 	private JLabel lblApellido;
+
+	/** Etiqueta que muestra el email del cliente en modo lectura. */
 	private JLabel lblEmail;
+
+	/** Etiqueta que muestra el nombre de usuario del cliente en modo lectura. */
 	private JLabel lblUsuario;
 
+	/** Botón para abrir el diálogo de edición de datos personales. */
 	private JButton btnModificar;
 
 	/**
-	 * Constructor que inicializa el panel y construye la tarjeta de datos personales.
+	 * Constructor que inicializa el panel y construye la tarjeta de datos
+	 * personales.
 	 */
-	
+
 	public PanelMiCuenta() {
 		setBackground(COLOR_FONDO);
 		setLayout(new GridBagLayout());
@@ -42,7 +54,7 @@ public class PanelMiCuenta extends JPanel {
 	/**
 	 * Inicializa y añade la tarjeta central de datos personales.
 	 */
-	
+
 	private void initComponents() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -56,7 +68,7 @@ public class PanelMiCuenta extends JPanel {
 	 *
 	 * @return tarjeta configurada
 	 */
-	
+
 	private JPanel buildTarjeta() {
 		JPanel tarjeta = new JPanel(new BorderLayout(0, 16));
 		tarjeta.setBackground(Color.WHITE);
@@ -74,7 +86,7 @@ public class PanelMiCuenta extends JPanel {
 	 *
 	 * @return panel de cabecera configurado
 	 */
-	
+
 	private JPanel buildCabecera() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
 		panel.setOpaque(false);
@@ -118,7 +130,7 @@ public class PanelMiCuenta extends JPanel {
 	 *
 	 * @return panel de datos configurado
 	 */
-	
+
 	private JPanel buildDatos() {
 		JPanel panel = new JPanel(new GridLayout(0, 1, 0, 10));
 		panel.setOpaque(false);
@@ -144,7 +156,7 @@ public class PanelMiCuenta extends JPanel {
 	 * @param lblValor etiqueta donde se mostrará el valor
 	 * @return fila configurada
 	 */
-	
+
 	private JPanel buildFila(String etiqueta, JLabel lblValor) {
 		JPanel fila = new JPanel(new BorderLayout());
 		fila.setBackground(new Color(0xF8F8F8));
@@ -169,7 +181,7 @@ public class PanelMiCuenta extends JPanel {
 	 *
 	 * @return panel de acciones configurado
 	 */
-	
+
 	private JPanel buildAcciones() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		panel.setOpaque(false);
@@ -187,13 +199,13 @@ public class PanelMiCuenta extends JPanel {
 		panel.add(btnModificar);
 		return panel;
 	}
-	
+
 	/**
 	 * Muestra los datos del cliente autenticado en los campos de la tarjeta.
 	 *
 	 * @param cliente cliente cuya información se va a mostrar
 	 */
-	
+
 	public void cargarDatos(Cliente cliente) {
 		lblNombre.setText(cliente.getNombreCliente());
 		lblApellido.setText(cliente.getApellidoCliente());
@@ -208,7 +220,7 @@ public class PanelMiCuenta extends JPanel {
 	 *
 	 * @param controlador controlador principal de la aplicación
 	 */
-	
+
 	public void setControlador(Controlador controlador) {
 		btnModificar.addActionListener(controlador);
 	}

@@ -23,7 +23,14 @@ import java.util.Properties;
  */
 public class ConexionDB {
 
+	/**
+	 * Nombre de la clase del driver JDBC cargado desde el fichero de propiedades.
+	 */
 	private String driver;
+	/**
+	 * URL de conexión a la base de datos SQLite, cargada desde el fichero de
+	 * propiedades.
+	 */
 	private String url;
 
 	/**

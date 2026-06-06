@@ -17,8 +17,14 @@ package model;
  */
 public class Pago {
 
+	/** Identificador único de la transacción de pago. */
 	private int idTransaccion;
-	private String metodoPago; // "efectivo", "tarjeta", "transferencia"
+	/**
+	 * Método de pago utilizado: {@code efectivo}, {@code tarjeta} o
+	 * {@code transferencia}.
+	 */
+	private String metodoPago;
+	/** Importe total cobrado en esta transacción, en euros. */
 	private double montoCobro;
 
 	/**
@@ -34,7 +40,7 @@ public class Pago {
 		this.metodoPago = metodoPago;
 		this.montoCobro = montoCobro;
 	}
-	
+
 	/**
 	 * Devuelve el método de pago utilizado en esta transacción.
 	 *
@@ -52,5 +58,5 @@ public class Pago {
 	public double getMontoCobro() {
 		return montoCobro;
 	}
-	
+
 }

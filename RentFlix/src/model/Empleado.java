@@ -21,13 +21,25 @@ package model;
  */
 public class Empleado {
 
+	/** Identificador único del empleado. */
 	private int idEmpleado;
+	/** Nombre del empleado. */
 	private String nombreEmpleado;
+	/** Apellido del empleado. */
 	private String apellidoEmpleado;
+	/** Correo electrónico del empleado. */
 	private String emailEmpleado;
+	/**
+	 * Nombre de usuario utilizado para iniciar sesión (único en la base de datos).
+	 */
 	private String usuarioEmpleado;
+	/** Contraseña de acceso del empleado. */
 	private String contraseniaEmpleado;
-	private Integer idJefe; // NULL si es el administrador (jefe de todos)
+	/**
+	 * Identificador del empleado supervisor, o {@code null} si este empleado es el
+	 * administrador.
+	 */
+	private Integer idJefe;
 
 	/**
 	 * Constructor completo con todos los campos de la tabla Empleados.

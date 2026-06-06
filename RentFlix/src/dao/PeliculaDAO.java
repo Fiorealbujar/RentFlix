@@ -19,6 +19,7 @@ import java.util.ArrayList;
  */
 public class PeliculaDAO implements IPeliculaDAO {
 
+	/** Objeto de acceso a la base de datos SQLite utilizado por este DAO. */
 	private ConexionDB acceso;
 
 	/**
@@ -36,18 +37,11 @@ public class PeliculaDAO implements IPeliculaDAO {
 	 * @throws SQLException si ocurre un error al leer el ResultSet
 	 */
 	private Pelicula mapear(ResultSet rs) throws SQLException {
-	    return new Pelicula(
-	        rs.getInt("id_pelicula"),
-	        rs.getString("nombre_pelicula"),
-	        rs.getString("director"),
-	        rs.getInt("duracion"),
-	        rs.getString("genero"),
-	        rs.getString("sinopsis"),
-	        rs.getString("clasificacion_edad"),
-	        rs.getString("estado")
-	    );
+		return new Pelicula(rs.getInt("id_pelicula"), rs.getString("nombre_pelicula"), rs.getString("director"),
+				rs.getInt("duracion"), rs.getString("genero"), rs.getString("sinopsis"),
+				rs.getString("clasificacion_edad"), rs.getString("estado"));
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -132,7 +126,8 @@ public class PeliculaDAO implements IPeliculaDAO {
 	@Override
 	public int agregar(Pelicula pelicula) {
 		int idGenerado = -1;
-		// El campo 'estado' se omite intencionadamente: la BD asigna DEFAULT 'activa' automáticamente
+		// El campo 'estado' se omite intencionadamente: la BD asigna DEFAULT 'activa'
+		// automáticamente
 		String query = "INSERT INTO Peliculas (nombre_pelicula, director, duracion, "
 				+ "genero, sinopsis, clasificacion_edad) VALUES (?,?,?,?,?,?)";
 

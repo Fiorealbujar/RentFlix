@@ -26,21 +26,37 @@ import java.util.ArrayList;
  */
 public class PanelGestionClientes extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color oscuro de cabecera y botones principales. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color de acento rojo para el botón de eliminar y estado bloqueado. */
 	private static final Color COLOR_ACENTO = new Color(0xE50914);
 
+	/** Modelo de datos de la tabla de clientes. */
 	private DefaultTableModel modeloTabla;
+
+	/** Tabla que muestra el listado de clientes. */
 	private JTable tblClientes;
+
+	/** Botón para eliminar el cliente seleccionado. */
 	private JButton btnEliminarCliente;
+
+	/** Botón para editar los datos del cliente seleccionado. */
 	private JButton btnEditarCliente;
+
+	/** Botón para bloquear o desbloquear el cliente seleccionado. */
 	private JButton btnBloquearCliente;
+
+	/** Combo desplegable para filtrar clientes por estado (activo/bloqueado). */
 	private JComboBox<String> cmbFiltroEstado;
 
 	/**
 	 * Constructor que inicializa el panel y construye sus componentes visuales.
 	 */
-	
+
 	public PanelGestionClientes() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout(0, 12));
@@ -51,7 +67,7 @@ public class PanelGestionClientes extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
@@ -62,7 +78,7 @@ public class PanelGestionClientes extends JPanel {
 	 *
 	 * @return etiqueta de título configurada
 	 */
-	
+
 	private JLabel buildTitulo() {
 		JLabel lbl = new JLabel("‍💼 Gestión de clientes");
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
@@ -76,7 +92,7 @@ public class PanelGestionClientes extends JPanel {
 	 *
 	 * @return panel superior configurado
 	 */
-	
+
 	private JPanel buildSuperior() {
 		JPanel panel = new JPanel(new BorderLayout(12, 0));
 		panel.setOpaque(false);
@@ -100,11 +116,12 @@ public class PanelGestionClientes extends JPanel {
 	}
 
 	/**
-	 * Construye la tabla de clientes con sus columnas, renderers y botones de acción.
+	 * Construye la tabla de clientes con sus columnas, renderers y botones de
+	 * acción.
 	 *
 	 * @return panel con la tabla y los botones configurados
 	 */
-	
+
 	private JPanel buildTabla() {
 		JPanel panel = new JPanel(new BorderLayout(0, 8));
 		panel.setOpaque(false);

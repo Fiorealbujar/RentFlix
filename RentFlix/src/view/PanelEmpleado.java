@@ -20,22 +20,39 @@ import java.awt.*;
  */
 public class PanelEmpleado extends JPanel {
 
+	/** Color oscuro de la cabecera del panel. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color dorado utilizado en el badge de empleado. */
 	private static final Color COLOR_GOLD = new Color(0xF0C040);
+
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
 
+	/** Etiqueta de bienvenida con el nombre del empleado. */
 	private JLabel lblBienvenida;
+
+	/** Contenedor de pestañas con los subpaneles del empleado. */
 	private JTabbedPane tabbedPane;
 
+	/** Subpanel de gestión de alquileres. */
 	private PanelGestionAlquileres panelGestionAlquileres;
+
+	/** Subpanel de alta de nuevas películas. */
 	private PanelAnadirPelicula panelAnadirPelicula;
+
+	/** Subpanel de gestión del catálogo de películas. */
 	private PanelGestionPeliculas panelGestionPeliculas;
+
+	/** Subpanel de informes de ventas. */
 	private PanelInformes panelInformes;
+
+	/** Subpanel de gestión de clientes. */
 	private PanelGestionClientes panelGestionClientes;
 
 	/**
-	 * Constructor que recibe los subpaneles ya instanciados y los asigna
-	 * a las pestañas correspondientes.
+	 * Constructor que recibe los subpaneles ya instanciados y los asigna a las
+	 * pestañas correspondientes.
 	 *
 	 * @param panelGestionAlquileres panel de gestión de alquileres
 	 * @param panelAnadirPelicula    panel de alta de películas
@@ -43,7 +60,7 @@ public class PanelEmpleado extends JPanel {
 	 * @param panelInformes          panel de informes de ventas
 	 * @param panelGestionClientes   panel de gestión de clientes
 	 */
-	
+
 	public PanelEmpleado(PanelGestionAlquileres panelGestionAlquileres, PanelAnadirPelicula panelAnadirPelicula,
 			PanelGestionPeliculas panelGestionPeliculas, PanelInformes panelInformes,
 			PanelGestionClientes panelGestionClientes) {
@@ -61,7 +78,7 @@ public class PanelEmpleado extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildHeader(), BorderLayout.NORTH);
 		add(buildTabs(), BorderLayout.CENTER);
@@ -72,7 +89,7 @@ public class PanelEmpleado extends JPanel {
 	 *
 	 * @return panel de cabecera configurado
 	 */
-	
+
 	private JPanel buildHeader() {
 		JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
 		header.setBackground(COLOR_DARK);
@@ -98,7 +115,7 @@ public class PanelEmpleado extends JPanel {
 	 *
 	 * @return panel de pestañas configurado
 	 */
-	
+
 	private JTabbedPane buildTabs() {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -115,17 +132,17 @@ public class PanelEmpleado extends JPanel {
 	 *
 	 * @param emp empleado en sesión
 	 */
-	
+
 	public void setBienvenida(Empleado emp) {
 		lblBienvenida.setText("👋 Hola, " + emp.getNombreCompleto());
 	}
-	
+
 	/**
 	 * Requerido por el patrón de inicialización de la aplicación.
 	 * <p>
-	 * Este panel es un contenedor de pestañas sin botones propios, por lo que
-	 * no registra listeners directamente. Los listeners de cada subpanel
-	 * se registran en sus propios {@code setControlador()}.
+	 * Este panel es un contenedor de pestañas sin botones propios, por lo que no
+	 * registra listeners directamente. Los listeners de cada subpanel se registran
+	 * en sus propios {@code setControlador()}.
 	 * </p>
 	 *
 	 * @param controlador controlador principal de la aplicación

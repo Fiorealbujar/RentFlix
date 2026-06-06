@@ -13,12 +13,12 @@ import java.util.ArrayList;
  */
 public class ClienteDAO implements IClienteDAO {
 
+	/** Objeto de acceso a la base de datos SQLite utilizado por este DAO. */
 	private ConexionDB acceso;
 
 	/**
 	 * Constructor que inicializa la conexión a la base de datos.
 	 */
-
 	public ClienteDAO() {
 		acceso = new ConexionDB();
 	}
@@ -30,14 +30,12 @@ public class ClienteDAO implements IClienteDAO {
 	 * @return objeto Cliente con todos sus campos rellenos
 	 * @throws SQLException si ocurre un error al leer el ResultSet
 	 */
-	
 	private Cliente mapear(ResultSet rs) throws SQLException {
 		return new Cliente(rs.getInt("id_cliente"), rs.getString("nombre_cliente"), rs.getString("apellido_cliente"),
 				rs.getString("email_cliente"), rs.getString("nombre_usuario"), rs.getString("contrasenia_cliente"),
 				rs.getString("estado"));
 	}
 
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -81,7 +79,6 @@ public class ClienteDAO implements IClienteDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int registrar(Cliente cliente) throws RuntimeException {
 		int res = 0;
@@ -123,7 +120,6 @@ public class ClienteDAO implements IClienteDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public ArrayList<Cliente> listarTodos() {
 		ArrayList<Cliente> lista = new ArrayList<Cliente>();
@@ -162,7 +158,6 @@ public class ClienteDAO implements IClienteDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int actualizar(Cliente cliente) {
 		int res = 0;
@@ -198,11 +193,10 @@ public class ClienteDAO implements IClienteDAO {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int eliminar(int idCliente) {
 		int res = 0;
@@ -232,11 +226,10 @@ public class ClienteDAO implements IClienteDAO {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int actualizarDatos(Cliente cliente, String nuevaContrasenia) throws RuntimeException {
 		int res = 0;

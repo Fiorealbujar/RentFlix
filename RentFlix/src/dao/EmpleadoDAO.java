@@ -19,26 +19,25 @@ import java.util.ArrayList;
 
 public class EmpleadoDAO implements IEmpleadoDAO {
 
+	/** Objeto de acceso a la base de datos SQLite utilizado por este DAO. */
 	private ConexionDB acceso;
 
 	/**
 	 * Constructor que inicializa la conexión a la base de datos.
 	 */
-	
 	public EmpleadoDAO() {
 		acceso = new ConexionDB();
 	}
 
 	/**
-	 * Mapea una fila del {@link ResultSet} a un objeto {@link Empleado}.
-	 * Utiliza {@link ResultSet#getObject} para el campo {@code id_jefe},
-	 * que puede ser {@code null} cuando el empleado es administrador.
+	 * Mapea una fila del {@link ResultSet} a un objeto {@link Empleado}. Utiliza
+	 * {@link ResultSet#getObject} para el campo {@code id_jefe}, que puede ser
+	 * {@code null} cuando el empleado es administrador.
 	 *
 	 * @param rs fila del ResultSet
 	 * @return objeto Empleado con todos sus campos rellenos
 	 * @throws SQLException si ocurre un error al leer el ResultSet
 	 */
-	
 	private Empleado mapear(ResultSet rs) throws SQLException {
 		return new Empleado(rs.getInt("id_empleado"), rs.getString("nombre_empleado"),
 				rs.getString("apellido_empleado"), rs.getString("email_empleado"), rs.getString("usuario_empleado"),
@@ -48,7 +47,6 @@ public class EmpleadoDAO implements IEmpleadoDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public Empleado login(String usuarioEmpleado, String contrasenia) {
 		Empleado empleado = null;
@@ -89,7 +87,6 @@ public class EmpleadoDAO implements IEmpleadoDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int crear(Empleado empleado) throws RuntimeException {
 		int res = 0;
@@ -132,7 +129,6 @@ public class EmpleadoDAO implements IEmpleadoDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int eliminar(int idEmpleado) {
 		int res = 0;
@@ -166,7 +162,6 @@ public class EmpleadoDAO implements IEmpleadoDAO {
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public ArrayList<Empleado> listarTodos() {
 		ArrayList<Empleado> lista = new ArrayList<Empleado>();
@@ -201,11 +196,10 @@ public class EmpleadoDAO implements IEmpleadoDAO {
 		}
 		return lista;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public int actualizar(Empleado empleado) {
 		int res = 0;

@@ -19,16 +19,34 @@ import java.awt.*;
  */
 public class PanelRegistro extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color de acento rojo para mensajes de error y botón principal. */
 	private static final Color COLOR_ACENTO = new Color(0xE50914);
 
+	/** Campo de texto para el nombre del nuevo cliente. */
 	private JTextField txtNombre;
+
+	/** Campo de texto para el apellido del nuevo cliente. */
 	private JTextField txtApellido;
+
+	/** Campo de texto para el email del nuevo cliente. */
 	private JTextField txtEmail;
+
+	/** Campo de texto para el nombre de usuario del nuevo cliente. */
 	private JTextField txtUsuario;
+
+	/** Campo de contraseña para el nuevo cliente. */
 	private JPasswordField txtContrasenia;
+
+	/** Botón para enviar el formulario y crear la cuenta. */
 	private JButton btnRegistrar;
+
+	/** Botón para cancelar el registro y volver al catálogo. */
 	private JButton btnCancelar;
+
+	/** Etiqueta para mostrar mensajes de error de validación. */
 	private JLabel lblError;
 
 	/**
@@ -43,7 +61,7 @@ public class PanelRegistro extends JPanel {
 	/**
 	 * Inicializa y construye la tarjeta central con el formulario de registro.
 	 */
-	
+
 	private void initComponents() {
 		JPanel tarjeta = new JPanel();
 		tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
@@ -122,7 +140,7 @@ public class PanelRegistro extends JPanel {
 	 * @param placeholder texto de ayuda que se muestra cuando el campo está vacío
 	 * @return campo de texto configurado
 	 */
-	
+
 	private JTextField buildCampo(String placeholder) {
 		JTextField campo = new JTextField();
 		campo.putClientProperty("JTextField.placeholderText", placeholder);
@@ -138,7 +156,7 @@ public class PanelRegistro extends JPanel {
 	 * @param texto texto de la etiqueta
 	 * @return etiqueta configurada
 	 */
-	
+
 	private JLabel buildLabel(String texto) {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -151,12 +169,12 @@ public class PanelRegistro extends JPanel {
 	/**
 	 * Construye un botón con el estilo estándar del formulario de registro.
 	 *
-	 * @param texto  texto del botón
-	 * @param fondo  color de fondo
-	 * @param letra  color del texto
+	 * @param texto texto del botón
+	 * @param fondo color de fondo
+	 * @param letra color del texto
 	 * @return botón configurado
 	 */
-	
+
 	private JButton buildBoton(String texto, Color fondo, Color letra) {
 		JButton btn = new JButton(texto);
 		btn.setFont(new Font("SansSerif", Font.BOLD, 14));

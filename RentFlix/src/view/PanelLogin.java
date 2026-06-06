@@ -18,20 +18,36 @@ import java.awt.*;
  */
 public class PanelLogin extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color de acento rojo para mensajes de error y botón principal. */
 	private static final Color COLOR_ACENTO = new Color(0xE50914);
 
+	/** Campo de texto para introducir el nombre de usuario. */
 	private JTextField txtUsuario;
+
+	/** Campo de contraseña para introducir la clave de acceso. */
 	private JPasswordField txtContrasenia;
+
+	/**
+	 * Combo desplegable para seleccionar el tipo de usuario (cliente o empleado).
+	 */
 	private JComboBox<String> cmbRol;
+
+	/** Botón para enviar las credenciales e iniciar sesión. */
 	private JButton btnEntrar;
+
+	/** Botón para cancelar el inicio de sesión y volver al catálogo. */
 	private JButton btnCancelar;
+
+	/** Etiqueta para mostrar mensajes de error de autenticación. */
 	private JLabel lblError;
 
 	/**
 	 * Constructor que inicializa el panel y construye el formulario de login.
 	 */
-	
+
 	public PanelLogin() {
 		setBackground(COLOR_FONDO);
 		setLayout(new GridBagLayout());
@@ -41,7 +57,7 @@ public class PanelLogin extends JPanel {
 	/**
 	 * Inicializa y construye la tarjeta central con el formulario de login.
 	 */
-	
+
 	private void initComponents() {
 		JPanel tarjeta = new JPanel();
 		tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
@@ -114,7 +130,7 @@ public class PanelLogin extends JPanel {
 	 * @param placeholder texto de ayuda que se muestra cuando el campo está vacío
 	 * @return campo de texto configurado
 	 */
-	
+
 	private JTextField buildCampo(String placeholder) {
 		JTextField campo = new JTextField();
 		campo.putClientProperty("JTextField.placeholderText", placeholder);
@@ -130,7 +146,7 @@ public class PanelLogin extends JPanel {
 	 * @param texto texto de la etiqueta
 	 * @return etiqueta configurada
 	 */
-	
+
 	private JLabel buildLabel(String texto) {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -143,12 +159,12 @@ public class PanelLogin extends JPanel {
 	/**
 	 * Construye un botón con el estilo estándar del formulario de login.
 	 *
-	 * @param texto  texto del botón
-	 * @param fondo  color de fondo
-	 * @param letra  color del texto
+	 * @param texto texto del botón
+	 * @param fondo color de fondo
+	 * @param letra color del texto
 	 * @return botón configurado
 	 */
-	
+
 	private JButton buildBoton(String texto, Color fondo, Color letra) {
 		JButton btn = new JButton(texto);
 		btn.setFont(new Font("SansSerif", Font.BOLD, 14));
@@ -167,7 +183,7 @@ public class PanelLogin extends JPanel {
 	 *
 	 * @param mensaje texto del error a mostrar
 	 */
-	
+
 	public void mostrarError(String mensaje) {
 		lblError.setText(mensaje);
 	}
@@ -175,7 +191,7 @@ public class PanelLogin extends JPanel {
 	/**
 	 * Limpia los campos de usuario y contraseña y resetea el combo de rol.
 	 */
-	
+
 	public void limpiar() {
 		txtUsuario.setText("");
 		txtContrasenia.setText("");
@@ -184,11 +200,12 @@ public class PanelLogin extends JPanel {
 	}
 
 	/**
-	 * Indica si el tipo de usuario seleccionado en el combo es empleado o administrador.
+	 * Indica si el tipo de usuario seleccionado en el combo es empleado o
+	 * administrador.
 	 *
 	 * @return {@code true} si se seleccionó "Empleado / Administrador"
 	 */
-	
+
 	public boolean esRolEmpleado() {
 		return cmbRol.getSelectedIndex() == 1;
 	}
@@ -198,7 +215,7 @@ public class PanelLogin extends JPanel {
 	 *
 	 * @return nombre de usuario
 	 */
-	
+
 	public String getUsuario() {
 		return txtUsuario.getText().trim();
 	}
@@ -208,7 +225,7 @@ public class PanelLogin extends JPanel {
 	 *
 	 * @return contraseña en texto plano
 	 */
-	
+
 	public String getContrasenia() {
 		return new String(txtContrasenia.getPassword());
 	}
@@ -218,7 +235,7 @@ public class PanelLogin extends JPanel {
 	 *
 	 * @param controlador controlador principal de la aplicación
 	 */
-	
+
 	public void setControlador(Controlador controlador) {
 		btnEntrar.addActionListener(controlador);
 		btnCancelar.addActionListener(controlador);

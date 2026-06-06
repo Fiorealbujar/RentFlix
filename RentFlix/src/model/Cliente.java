@@ -17,14 +17,22 @@ package model;
  */
 public class Cliente {
 
+	/** Identificador único del cliente. */
 	private int idCliente;
+	/** Nombre del cliente. */
 	private String nombreCliente;
+	/** Apellido del cliente. */
 	private String apellidoCliente;
+	/** Correo electrónico de contacto del cliente. */
 	private String emailCliente;
+	/**
+	 * Nombre de usuario utilizado para iniciar sesión (único en la base de datos).
+	 */
 	private String nombreUsuario;
+	/** Contraseña de acceso del cliente. */
 	private String contraseniaCliente;
-	private String estado; // "activo", "bloqueado"
-
+	/** Estado de la cuenta del cliente: {@code activo} o {@code bloqueado}. */
+	private String estado;
 
 	/**
 	 * Constructor completo con todos los campos de la tabla Clientes.

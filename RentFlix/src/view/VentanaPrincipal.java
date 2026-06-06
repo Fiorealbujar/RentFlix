@@ -18,15 +18,25 @@ import java.awt.*;
  */
 public class VentanaPrincipal extends JFrame {
 
+	/**
+	 * Panel central que actúa como contenedor intercambiable de paneles de la
+	 * aplicación.
+	 */
 	private JPanel panelContenido;
+
+	/** Botón de la barra superior para navegar al panel de inicio de sesión. */
 	private JButton btnLogin;
+
+	/** Botón de la barra superior para navegar al panel de registro. */
 	private JButton btnRegistro;
+
+	/** Botón de la barra superior para cerrar la sesión activa. */
 	private JButton btnCerrarSesion;
 
 	/**
 	 * Constructor que configura la ventana y construye la interfaz principal.
 	 */
-	
+
 	public VentanaPrincipal() {
 		super("RentFlix 🎬");
 		configurarVentana();
@@ -36,21 +46,21 @@ public class VentanaPrincipal extends JFrame {
 	/**
 	 * Configura las propiedades básicas de la ventana: tamaño, cierre y posición.
 	 */
-	
+
 	private void configurarVentana() {
-	    int ancho = 1100;
-	    int alto = 680;
-	    setSize(ancho, alto);
-	    setMinimumSize(new Dimension(900, 580));
-	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    setLocationRelativeTo(null);
-	    setLayout(new BorderLayout());
+		int ancho = 1100;
+		int alto = 680;
+		setSize(ancho, alto);
+		setMinimumSize(new Dimension(900, 580));
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+		setLayout(new BorderLayout());
 	}
 
 	/**
 	 * Construye la interfaz añadiendo la barra superior y el panel de contenido.
 	 */
-	
+
 	private void construirUI() {
 		add(buildTopBar(), BorderLayout.NORTH);
 		panelContenido = new JPanel(new BorderLayout());
@@ -62,7 +72,7 @@ public class VentanaPrincipal extends JFrame {
 	 *
 	 * @return panel de la barra superior configurado
 	 */
-	
+
 	private JPanel buildTopBar() {
 		JPanel topBar = new JPanel(new BorderLayout());
 		topBar.setBackground(new Color(0x1a1a2e));
@@ -97,7 +107,7 @@ public class VentanaPrincipal extends JFrame {
 	 * @param actionCommand comando de acción asociado al botón
 	 * @return botón configurado
 	 */
-	
+
 	private JButton buildBoton(String texto, String actionCommand) {
 		JButton btn = new JButton(texto);
 		btn.setActionCommand(actionCommand);
@@ -115,7 +125,7 @@ public class VentanaPrincipal extends JFrame {
 	 *
 	 * @param panel nuevo panel a mostrar en el área de contenido
 	 */
-	
+
 	public void cargarPanel(JPanel panel) {
 		panelContenido.removeAll();
 		panelContenido.add(panel, BorderLayout.CENTER);
@@ -127,7 +137,7 @@ public class VentanaPrincipal extends JFrame {
 	 * Configura la barra de navegación para el modo invitado: muestra los botones
 	 * de login y registro, y oculta el de cerrar sesión.
 	 */
-	
+
 	public void modoInvitado() {
 		btnLogin.setVisible(true);
 		btnRegistro.setVisible(true);
@@ -138,7 +148,7 @@ public class VentanaPrincipal extends JFrame {
 	 * Configura la barra de navegación para el modo con sesión activa: oculta los
 	 * botones de login y registro, y muestra el de cerrar sesión.
 	 */
-	
+
 	public void modoSesionActiva() {
 		btnLogin.setVisible(false);
 		btnRegistro.setVisible(false);
@@ -148,17 +158,18 @@ public class VentanaPrincipal extends JFrame {
 	/**
 	 * Hace visible la ventana principal en el hilo de despacho de eventos de Swing.
 	 */
-	
+
 	public void hacerVisible() {
 		setVisible(true);
 	}
 
 	/**
-	 * Registra el controlador como listener de los botones de la barra de navegación.
+	 * Registra el controlador como listener de los botones de la barra de
+	 * navegación.
 	 *
 	 * @param controlador controlador principal de la aplicación
 	 */
-	
+
 	public void setControlador(Controlador controlador) {
 		btnLogin.addActionListener(controlador);
 		btnRegistro.addActionListener(controlador);

@@ -21,14 +21,25 @@ package model;
  */
 public class Pelicula {
 
+	/** Identificador único de la película. */
 	private int idPelicula;
+	/** Título de la película. */
 	private String nombrePelicula;
+	/** Nombre del director de la película. */
 	private String director;
-	private int duracion; // en minutos
+	/** Duración de la película en minutos. */
+	private int duracion;
+	/** Género cinematográfico de la película. */
 	private String genero;
+	/** Breve descripción argumental de la película. */
 	private String sinopsis;
-	private String clasificacionEdad; // "TP", "7", "12", "16", "18"
-	private String estado; // "activa", "inactiva"
+	/**
+	 * Clasificación por edad: {@code TP}, {@code 7}, {@code 12}, {@code 16} o
+	 * {@code 18}.
+	 */
+	private String clasificacionEdad;
+	/** Estado de la película en el catálogo: {@code activa} o {@code inactiva}. */
+	private String estado;
 
 	/**
 	 * Constructor completo con todos los campos de la tabla Peliculas.

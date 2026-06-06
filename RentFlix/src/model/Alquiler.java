@@ -22,19 +22,54 @@ package model;
  */
 public class Alquiler {
 
+	/** Identificador único del alquiler. */
 	private int idAlquiler;
+	/** Identificador del cliente que realizó el alquiler. */
 	private int idCliente;
+	/** Identificador de la copia física alquilada. */
 	private int idCopia;
-	private Integer idEmpleado; // puede ser null (alquiler por el propio cliente)
-	private Integer idTransaccion; // puede ser null hasta que se pague
+	/**
+	 * Identificador del empleado que registró el alquiler, o {@code null} si lo
+	 * registró el propio cliente.
+	 */
+	private Integer idEmpleado;
+	/**
+	 * Identificador de la transacción de pago asociada, o {@code null} si aún no se
+	 * ha procesado.
+	 */
+	private Integer idTransaccion;
+	/** Fecha de inicio del alquiler en formato {@code yyyy-MM-dd}. */
 	private String fechaAlquiler;
+	/**
+	 * Fecha de devolución pactada al registrar el alquiler, en formato
+	 * {@code yyyy-MM-dd}.
+	 */
 	private String fechaDevolucionPrevista;
-	private String fechaDevolucionReal; // null si aún no se devolvió
-	private String estadoAlquiler; // "activo", "pendiente_devolucion", "devuelto", "vencido"
+	/**
+	 * Fecha real de devolución de la copia, o {@code null} si el alquiler sigue
+	 * activo.
+	 */
+	private String fechaDevolucionReal;
+	/**
+	 * Estado actual del alquiler: {@code activo}, {@code pendiente_devolucion},
+	 * {@code devuelto} o {@code vencido}.
+	 */
+	private String estadoAlquiler;
 
 	// Campos extra para mostrar en la vista (resultado de JOINs)
+	/**
+	 * Título de la película asociada, obtenido mediante JOIN en la capa DAO (no
+	 * pertenece a la tabla Alquileres).
+	 */
 	private String nombrePelicula;
+	/**
+	 * Nombre completo del cliente asociado, obtenido mediante JOIN en la capa DAO
+	 * (no pertenece a la tabla Alquileres).
+	 */
 	private String nombreCliente;
+	/**
+	 * Importe cobrado en este alquiler, obtenido mediante JOIN con la tabla Pagos.
+	 */
 	private double montoCobro;
 
 	/**

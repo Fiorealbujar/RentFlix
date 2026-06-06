@@ -10,9 +10,10 @@ package model;
  * <p>
  * Mapea la tabla {@code Copias} de la base de datos SQLite. Una misma película
  * puede tener múltiples copias en distintos formatos (DVD, Blu-ray, 4K Ultra
- * HD). El campo {@code estado} refleja la disponibilidad actual de la copia: {@code disponible} 
- * cuando está libre para alquilar, o {@code alquilada} cuando tiene un alquiler activo.
- * El precio de alquiler reside en esta entidad (no en Peliculas) para permitir precios diferenciados por formato.
+ * HD). El campo {@code estado} refleja la disponibilidad actual de la copia:
+ * {@code disponible} cuando está libre para alquilar, o {@code alquilada}
+ * cuando tiene un alquiler activo. El precio de alquiler reside en esta entidad
+ * (no en Peliculas) para permitir precios diferenciados por formato.
  * </p>
  *
  * @author Gabriel Fernández Cañadas
@@ -20,10 +21,20 @@ package model;
  */
 public class Copia {
 
+	/** Identificador único de la copia física. */
 	private int idCopia;
-	private int idPelicula; // FK → Peliculas
-	private String formato; // "DVD", "Blu-ray", "4K Ultra HD"
-	private String estado; // "disponible", "alquilada"
+	/**
+	 * Identificador de la película a la que pertenece esta copia (FK → Peliculas).
+	 */
+	private int idPelicula;
+	/**
+	 * Formato físico de la copia: {@code DVD}, {@code Blu-ray} o
+	 * {@code 4K Ultra HD}.
+	 */
+	private String formato;
+	/** Estado actual de la copia: {@code disponible} o {@code alquilada}. */
+	private String estado;
+	/** Precio de alquiler por día de esta copia en euros. */
 	private double precioAlquiler;
 
 	/**
@@ -33,7 +44,7 @@ public class Copia {
 	 * @param idPelicula     identificador de la película a la que pertenece (FK)
 	 * @param formato        formato físico: {@code DVD}, {@code Blu-ray} o
 	 *                       {@code 4K Ultra HD}
-	 * @param estado         estado actual: {@code disponible} o {@code alquilada} 
+	 * @param estado         estado actual: {@code disponible} o {@code alquilada}
 	 * @param precioAlquiler precio por día de alquiler en euros
 	 */
 	public Copia(int idCopia, int idPelicula, String formato, String estado, double precioAlquiler) {

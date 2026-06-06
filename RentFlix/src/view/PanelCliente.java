@@ -21,27 +21,42 @@ import java.awt.*;
  */
 public class PanelCliente extends JPanel {
 
+	/** Color oscuro de la cabecera del panel. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color verde del indicador de alquileres activos. */
 	private static final Color COLOR_ACTIVO = new Color(0x27AE60);
 
+	/** Etiqueta de bienvenida con el nombre del cliente. */
 	private JLabel lblBienvenida;
+
+	/** Etiqueta indicadora del número de alquileres activos en curso. */
 	private JLabel lblContadorActivos;
+
+	/** Contenedor de pestañas con los subpaneles del cliente. */
 	private JTabbedPane tabbedPane;
 
+	/** Subpanel del catálogo de películas. */
 	private PanelCatalogo panelCatalogo;
+
+	/** Subpanel del historial de alquileres del cliente. */
 	private PanelMisAlquileres panelMisAlquileres;
+
+	/** Subpanel de datos personales del cliente. */
 	private PanelMiCuenta panelMiCuenta;
 
 	/**
-	 * Constructor que recibe los subpaneles ya instanciados y los asigna
-	 * a las pestañas correspondientes.
+	 * Constructor que recibe los subpaneles ya instanciados y los asigna a las
+	 * pestañas correspondientes.
 	 *
 	 * @param panelCatalogo      panel del catálogo de películas
 	 * @param panelMisAlquileres panel del historial de alquileres del cliente
 	 * @param panelMiCuenta      panel de datos personales del cliente
 	 */
-	
+
 	public PanelCliente(PanelCatalogo panelCatalogo, PanelMisAlquileres panelMisAlquileres,
 			PanelMiCuenta panelMiCuenta) {
 		this.panelCatalogo = panelCatalogo;
@@ -55,18 +70,19 @@ public class PanelCliente extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildHeader(), BorderLayout.NORTH);
 		add(buildTabs(), BorderLayout.CENTER);
 	}
 
 	/**
-	 * Construye la cabecera con el saludo, el badge de cliente y el contador de alquileres activos.
+	 * Construye la cabecera con el saludo, el badge de cliente y el contador de
+	 * alquileres activos.
 	 *
 	 * @return panel de cabecera configurado
 	 */
-	
+
 	private JPanel buildHeader() {
 		JPanel header = new JPanel(new BorderLayout());
 		header.setBackground(COLOR_DARK);
@@ -106,7 +122,7 @@ public class PanelCliente extends JPanel {
 	 *
 	 * @return panel de pestañas configurado
 	 */
-	
+
 	private JTabbedPane buildTabs() {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 13));

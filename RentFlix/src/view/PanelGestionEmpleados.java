@@ -27,27 +27,55 @@ import java.util.ArrayList;
  */
 public class PanelGestionEmpleados extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color oscuro de cabecera y botones principales. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color de acento rojo para el botón de eliminar. */
 	private static final Color COLOR_ACENTO = new Color(0xE50914);
 
+	/** Modelo de datos de la tabla de empleados. */
 	private DefaultTableModel modeloTabla;
+
+	/** Tabla que muestra el listado de empleados. */
 	private JTable tblEmpleados;
+
+	/** Botón para editar los datos del empleado seleccionado. */
 	private JButton btnEditarEmpleado;
+
+	/** Botón para eliminar el empleado seleccionado. */
 	private JButton btnEliminarEmpleado;
+
+	/** Campo de texto para el nombre del nuevo empleado. */
 	private JTextField txtNombre;
+
+	/** Campo de texto para el apellido del nuevo empleado. */
 	private JTextField txtApellido;
+
+	/** Campo de texto para el email del nuevo empleado. */
 	private JTextField txtEmail;
+
+	/** Campo de texto para el nombre de usuario del nuevo empleado. */
 	private JTextField txtUsuario;
+
+	/** Campo de contraseña para el nuevo empleado. */
 	private JPasswordField txtContrasenia;
+
+	/** Botón para crear el nuevo empleado con los datos del formulario. */
 	private JButton btnCrearEmpleado;
+
+	/** Botón para limpiar los campos del formulario de creación. */
 	private JButton btnLimpiar;
+
+	/** Etiqueta para mostrar mensajes de éxito o error bajo el formulario. */
 	private JLabel lblMensaje;
 
 	/**
 	 * Constructor que inicializa el panel y construye sus componentes visuales.
 	 */
-	
+
 	public PanelGestionEmpleados() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout(0, 12));
@@ -58,7 +86,7 @@ public class PanelGestionEmpleados extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildTitulo(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
@@ -70,7 +98,7 @@ public class PanelGestionEmpleados extends JPanel {
 	 *
 	 * @return etiqueta de título configurada
 	 */
-	
+
 	private JLabel buildTitulo() {
 		JLabel lbl = new JLabel("👥 Gestión de empleados");
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
@@ -80,11 +108,12 @@ public class PanelGestionEmpleados extends JPanel {
 	}
 
 	/**
-	 * Construye la tabla de empleados con sus columnas, renderers y botones de acción.
+	 * Construye la tabla de empleados con sus columnas, renderers y botones de
+	 * acción.
 	 *
 	 * @return panel con la tabla y los botones configurados
 	 */
-	
+
 	private JPanel buildTabla() {
 		JPanel panel = new JPanel(new BorderLayout(0, 8));
 		panel.setOpaque(false);
@@ -178,7 +207,7 @@ public class PanelGestionEmpleados extends JPanel {
 	 *
 	 * @return panel del formulario configurado
 	 */
-	
+
 	private JPanel buildFormulario() {
 		JPanel panel = new JPanel(new BorderLayout(0, 10));
 		panel.setBackground(Color.WHITE);
@@ -252,7 +281,7 @@ public class PanelGestionEmpleados extends JPanel {
 	 * @param placeholder texto de ayuda que se muestra cuando el campo está vacío
 	 * @return campo de texto configurado
 	 */
-	
+
 	private JTextField buildCampo(String placeholder) {
 		JTextField f = new JTextField();
 		f.putClientProperty("JTextField.placeholderText", placeholder);
@@ -260,6 +289,11 @@ public class PanelGestionEmpleados extends JPanel {
 		return f;
 	}
 
+	/**
+	 * Carga la lista de empleados en la tabla y deshabilita los botones de acción.
+	 *
+	 * @param empleados lista de empleados a mostrar
+	 */
 	public void cargarEmpleados(ArrayList<Empleado> empleados) {
 		modeloTabla.setRowCount(0);
 		for (Empleado e : empleados) {
@@ -272,10 +306,10 @@ public class PanelGestionEmpleados extends JPanel {
 
 	/**
 	 * Habilita o deshabilita los botones de editar y eliminar según la fila
-	 * seleccionada. Los botones permanecen deshabilitados si la fila corresponde
-	 * al administrador.
+	 * seleccionada. Los botones permanecen deshabilitados si la fila corresponde al
+	 * administrador.
 	 */
-	
+
 	public void actualizarBotones() {
 		int fila = tblEmpleados.getSelectedRow();
 		if (fila >= 0) {
@@ -295,7 +329,7 @@ public class PanelGestionEmpleados extends JPanel {
 	 *
 	 * @return id del empleado, o {@code -1} si no hay selección
 	 */
-	
+
 	public int getIdEmpleadoSeleccionado() {
 		int fila = tblEmpleados.getSelectedRow();
 		if (fila < 0) {
@@ -310,7 +344,7 @@ public class PanelGestionEmpleados extends JPanel {
 	 *
 	 * @return empleado seleccionado, o {@code null} si no hay selección
 	 */
-	
+
 	public Empleado getEmpleadoSeleccionado() {
 		int fila = tblEmpleados.getSelectedRow();
 		if (fila < 0) {
@@ -326,7 +360,7 @@ public class PanelGestionEmpleados extends JPanel {
 	/**
 	 * Limpia todos los campos del formulario de creación de empleado.
 	 */
-	
+
 	public void limpiar() {
 		txtNombre.setText("");
 		txtApellido.setText("");
@@ -340,9 +374,10 @@ public class PanelGestionEmpleados extends JPanel {
 	 * Muestra un mensaje de resultado bajo el formulario de creación.
 	 *
 	 * @param msg     texto del mensaje
-	 * @param esError {@code true} para rojo (error), {@code false} para verde (éxito)
+	 * @param esError {@code true} para rojo (error), {@code false} para verde
+	 *                (éxito)
 	 */
-	
+
 	public void mostrarMensaje(String msg, boolean esError) {
 		lblMensaje.setText(msg);
 		lblMensaje.setForeground(esError ? COLOR_ACENTO : new Color(0x27AE60));
@@ -397,7 +432,7 @@ public class PanelGestionEmpleados extends JPanel {
 	 *
 	 * @param controlador controlador principal de la aplicación
 	 */
-	
+
 	public void setControlador(Controlador controlador) {
 		btnCrearEmpleado.addActionListener(controlador);
 		btnLimpiar.addActionListener(controlador);
@@ -431,7 +466,7 @@ public class PanelGestionEmpleados extends JPanel {
 	public String getApellido() {
 		return txtApellido.getText().trim();
 	}
-	
+
 	/**
 	 * Devuelve el email introducido en el formulario.
 	 *

@@ -15,14 +15,13 @@ import java.util.ArrayList;
  * @version 1.0
  */
 public interface ICopiaDAO {
-	
+
 	/**
 	 * Devuelve todas las copias con estado {@code disponible}, ordenadas por
 	 * película y formato.
 	 *
 	 * @return lista de copias disponibles, o lista vacía si no hay ninguna
 	 */
-	
 	ArrayList<Copia> listarTodasDisponibles();
 
 	/**
@@ -31,16 +30,16 @@ public interface ICopiaDAO {
 	 * @param idPelicula identificador de la película
 	 * @return lista de copias disponibles de esa película
 	 */
-	
 	ArrayList<Copia> listarDisponiblesPorPelicula(int idPelicula);
 
 	/**
-	 * Devuelve las copias disponibles de un formato concreto, ordenadas por película.
+	 * Devuelve las copias disponibles de un formato concreto, ordenadas por
+	 * película.
 	 *
-	 * @param formato formato físico: {@code DVD}, {@code Blu-ray} o {@code 4K Ultra HD}
+	 * @param formato formato físico: {@code DVD}, {@code Blu-ray} o
+	 *                {@code 4K Ultra HD}
 	 * @return lista de copias disponibles en ese formato
 	 */
-	
 	ArrayList<Copia> listarDisponiblesPorFormato(String formato);
 
 	/**
@@ -49,7 +48,6 @@ public interface ICopiaDAO {
 	 * @param copia objeto con los datos de la nueva copia
 	 * @return número de filas afectadas (1 si se insertó correctamente, 0 si falló)
 	 */
-	
 	int crear(Copia copia);
 
 	/**
@@ -59,7 +57,6 @@ public interface ICopiaDAO {
 	 * @param nuevoEstado nuevo estado de la copia
 	 * @return número de filas afectadas (1 si se actualizó, 0 si falló)
 	 */
-	
 	int actualizarEstado(int idCopia, String nuevoEstado);
 
 	/**
@@ -68,7 +65,6 @@ public interface ICopiaDAO {
 	 * @param idPelicula identificador de la película
 	 * @return número de copias disponibles
 	 */
-	
 	int contarDisponiblesPorPelicula(int idPelicula);
 
 	/**
@@ -78,6 +74,5 @@ public interface ICopiaDAO {
 	 * @param idPelicula identificador de la película
 	 * @return número de copias actualmente alquiladas
 	 */
-	
 	int contarAlquiladasPorPelicula(int idPelicula);
 }

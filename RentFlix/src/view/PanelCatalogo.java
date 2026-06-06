@@ -23,17 +23,34 @@ import java.util.ArrayList;
  */
 public class PanelCatalogo extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color oscuro utilizado en la cabecera y botones. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color de acento rojo del botón "Alquilar película". */
 	private static final Color COLOR_ACENTO = new Color(0xE50914);
 
+	/** Campo de texto para la búsqueda de películas por título. */
 	private JTextField txtBuscar;
+
+	/** Botón para ejecutar la búsqueda por título. */
 	private JButton btnBuscar;
+
+	/** Botón para iniciar el proceso de alquiler de la copia seleccionada. */
 	private JButton btnAlquilar;
+
+	/** Combo desplegable para filtrar las copias por formato. */
 	private JComboBox<String> cmbFiltroFormato;
+
+	/** Tabla que muestra las copias disponibles del catálogo. */
 	private JTable tblPeliculas;
+
+	/** Modelo de datos de la tabla del catálogo. */
 	private DefaultTableModel modeloTabla;
 
+	/** Indica si se debe mostrar la columna ID de copia en la tabla. */
 	private final boolean mostrarId;
 
 	/**
@@ -55,7 +72,7 @@ public class PanelCatalogo extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
@@ -63,11 +80,12 @@ public class PanelCatalogo extends JPanel {
 	}
 
 	/**
-	 * Construye el panel superior con el título, el filtro de formato y la búsqueda.
+	 * Construye el panel superior con el título, el filtro de formato y la
+	 * búsqueda.
 	 *
 	 * @return panel superior configurado
 	 */
-	
+
 	private JPanel buildSuperior() {
 		JPanel panel = new JPanel(new BorderLayout(12, 0));
 		panel.setOpaque(false);
@@ -114,7 +132,7 @@ public class PanelCatalogo extends JPanel {
 	 *
 	 * @return scroll pane con la tabla configurada
 	 */
-	
+
 	private JScrollPane buildTabla() {
 		String[] columnasSinId = { "Título", "Director", "Género", "Duración", "Clasificación", "Formato",
 				"Precio/día" };
@@ -167,7 +185,7 @@ public class PanelCatalogo extends JPanel {
 	 *
 	 * @param cols índices de las columnas a centrar
 	 */
-	
+
 	private void centrar(int[] cols) {
 		DefaultTableCellRenderer c = new DefaultTableCellRenderer();
 		c.setHorizontalAlignment(SwingConstants.CENTER);
@@ -181,7 +199,7 @@ public class PanelCatalogo extends JPanel {
 	 *
 	 * @return panel de acciones configurado
 	 */
-	
+
 	private JPanel buildAcciones() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
 		panel.setOpaque(false);

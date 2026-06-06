@@ -17,6 +17,7 @@ import java.sql.*;
  */
 public class PagoDAO implements IPagoDAO {
 
+	/** Objeto de acceso a la base de datos SQLite utilizado por este DAO. */
 	private ConexionDB acceso;
 
 	/**

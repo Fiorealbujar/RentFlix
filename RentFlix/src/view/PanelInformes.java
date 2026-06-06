@@ -21,23 +21,42 @@ import java.util.ArrayList;
  */
 public class PanelInformes extends JPanel {
 
+	/** Color de fondo general del panel. */
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
+
+	/** Color oscuro de cabecera y tarjetas. */
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
+
+	/** Color de acento rojo para la tarjeta de pendientes de devolución. */
 	private static final Color COLOR_ACENTO = new Color(0xE50914);
+
+	/** Color verde para la tarjeta de ingresos. */
 	private static final Color COLOR_VERDE = new Color(0x27AE60);
 
+	/** Etiqueta del indicador con el número total de alquileres. */
 	private JLabel lblTotalAlquileres;
+
+	/** Etiqueta del indicador con los ingresos totales acumulados. */
 	private JLabel lblTotalIngresos;
+
+	/** Etiqueta del indicador con el número de alquileres activos. */
 	private JLabel lblAlquileresActivos;
+
+	/**
+	 * Etiqueta del indicador con el número de alquileres pendientes de devolución.
+	 */
 	private JLabel lblPendientesDevolucion;
 
+	/** Modelo de datos de la tabla de detalle de alquileres. */
 	private DefaultTableModel modeloTabla;
+
+	/** Tabla de detalle con todos los alquileres del sistema. */
 	private JTable tblDetalle;
 
 	/**
 	 * Constructor que inicializa el panel y construye sus componentes visuales.
 	 */
-	
+
 	public PanelInformes() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout(0, 16));
@@ -48,7 +67,7 @@ public class PanelInformes extends JPanel {
 	/**
 	 * Inicializa y añade los componentes principales del panel.
 	 */
-	
+
 	private void initComponents() {
 		add(buildTitulo(), BorderLayout.NORTH);
 		add(buildCuerpo(), BorderLayout.CENTER);
@@ -59,7 +78,7 @@ public class PanelInformes extends JPanel {
 	 *
 	 * @return panel de título configurado
 	 */
-	
+
 	private JPanel buildTitulo() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setOpaque(false);
@@ -74,11 +93,12 @@ public class PanelInformes extends JPanel {
 	}
 
 	/**
-	 * Construye el cuerpo del panel con las tarjetas de indicadores y la tabla de detalle.
+	 * Construye el cuerpo del panel con las tarjetas de indicadores y la tabla de
+	 * detalle.
 	 *
 	 * @return panel de cuerpo configurado
 	 */
-	
+
 	private JPanel buildCuerpo() {
 		JPanel panel = new JPanel(new BorderLayout(0, 16));
 		panel.setOpaque(false);
@@ -92,7 +112,7 @@ public class PanelInformes extends JPanel {
 	 *
 	 * @return panel de tarjetas configurado
 	 */
-	
+
 	private JPanel buildTarjetas() {
 		JPanel panel = new JPanel(new GridLayout(1, 4, 12, 0));
 		panel.setOpaque(false);
@@ -122,7 +142,7 @@ public class PanelInformes extends JPanel {
 	 * @param colorFondo color de fondo del icono
 	 * @return tarjeta configurada
 	 */
-	
+
 	private JPanel buildTarjeta(String titulo, JLabel lblValor, String icono, Color colorValor, Color colorFondo) {
 		JPanel tarjeta = new JPanel(new BorderLayout());
 		tarjeta.setBackground(Color.WHITE);
@@ -161,7 +181,7 @@ public class PanelInformes extends JPanel {
 	 *
 	 * @return scroll pane con la tabla configurada
 	 */
-	
+
 	private JScrollPane buildTabla() {
 		String[] columnas = { "#", "Cliente", "Película", "F. Alquiler", "F. Dev. Prev.", "Estado", "Importe" };
 
@@ -193,14 +213,14 @@ public class PanelInformes extends JPanel {
 	}
 
 	/**
-	 * Carga los datos de alquileres en las tarjetas de indicadores y en la tabla
-	 * de detalle. Calcula el total de alquileres, alquileres activos y pendientes
-	 * de devolución mediante iteración sobre la lista recibida.
+	 * Carga los datos de alquileres en las tarjetas de indicadores y en la tabla de
+	 * detalle. Calcula el total de alquileres, alquileres activos y pendientes de
+	 * devolución mediante iteración sobre la lista recibida.
 	 *
 	 * @param alquileres    lista completa de alquileres del sistema
 	 * @param totalIngresos importe total acumulado de todos los alquileres
 	 */
-	
+
 	public void cargarInformes(ArrayList<Alquiler> alquileres, double totalIngresos) {
 		int totalAlq = alquileres.size();
 		int activos = 0;

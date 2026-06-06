@@ -15,17 +15,16 @@ import java.util.ArrayList;
  * @version 1.0
  */
 public interface IClienteDAO {
-	
-	
+
 	/**
-	 * Verifica las credenciales de un cliente y devuelve su objeto si son correctas.
+	 * Verifica las credenciales de un cliente y devuelve su objeto si son
+	 * correctas.
 	 *
 	 * @param nombreUsuario nombre de usuario introducido en el login
 	 * @param contrasenia   contraseña introducida en el login
 	 * @return objeto {@link model.Cliente} si las credenciales son válidas, o
 	 *         {@code null} si no coinciden o el cliente está bloqueado
 	 */
-	
 	Cliente login(String nombreUsuario, String contrasenia);
 
 	/**
@@ -35,7 +34,6 @@ public interface IClienteDAO {
 	 * @return número de filas afectadas (1 si se insertó correctamente, 0 si falló)
 	 * @throws RuntimeException si el usuario o email ya existe en la base de datos
 	 */
-	
 	int registrar(Cliente cliente) throws RuntimeException;
 
 	/**
@@ -43,16 +41,15 @@ public interface IClienteDAO {
 	 *
 	 * @return lista de todos los clientes
 	 */
-	
 	ArrayList<Cliente> listarTodos();
 
 	/**
-	 * Actualiza el estado de un cliente (activo/bloqueado) sin modificar su contraseña.
+	 * Actualiza el estado de un cliente (activo/bloqueado) sin modificar su
+	 * contraseña.
 	 *
 	 * @param cliente objeto con los datos actualizados (debe incluir el id)
 	 * @return número de filas afectadas (1 si se actualizó, 0 si falló)
 	 */
-	
 	int actualizar(Cliente cliente);
 
 	/**
@@ -61,17 +58,15 @@ public interface IClienteDAO {
 	 * @param idCliente identificador del cliente a eliminar
 	 * @return número de filas afectadas (1 si se eliminó, 0 si falló)
 	 */
-	
 	int eliminar(int idCliente);
 
 	/**
 	 * Actualiza los datos personales y la contraseña de un cliente autenticado.
 	 *
-	 * @param cliente         objeto con los datos personales actualizados
+	 * @param cliente          objeto con los datos personales actualizados
 	 * @param nuevaContrasenia nueva contraseña en texto plano
 	 * @return número de filas afectadas (1 si se actualizó, 0 si falló)
 	 * @throws RuntimeException si el nuevo usuario o email ya está en uso
 	 */
-	
 	int actualizarDatos(Cliente cliente, String nuevaContrasenia) throws RuntimeException;
 }
