@@ -1,4 +1,3 @@
-// PanelMisAlquileres.java
 package view;
 
 import controller.Controlador;
@@ -13,6 +12,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Panel del historial de alquileres del cliente autenticado.
+ * <p>
+ * Tabla con Película, F. Alquiler, F. Devolución prev., Estado e Importe. El
+ * botón "Solicitar devolución" se habilita solo con un alquiler activo
+ * seleccionado.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelMisAlquileres extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -257,11 +267,4 @@ public class PanelMisAlquileres extends JPanel {
 		});
 	}
 
-	public JButton getBtnSolicitarDevolucion() {
-		return btnSolicitarDevolucion;
-	}
-
-	public JComboBox<String> getCmbFiltroEstado() {
-		return cmbFiltroEstado;
-	}
 }

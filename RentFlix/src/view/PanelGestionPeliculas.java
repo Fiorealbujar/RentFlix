@@ -1,7 +1,7 @@
 // ==========================================
 // CLASE: PanelGestionPeliculas.java
 // CRUD completo de películas para el Admin.
-// Editar y eliminar desde la tabla directamente.
+// Editar y dar de baja desde la tabla directamente.
 // ==========================================
 package view;
 
@@ -21,13 +21,13 @@ public class PanelGestionPeliculas extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
-	private static final Color COLOR_ACENTO = new Color(0xE50914);
-	private static final Color COLOR_VERDE = new Color(0x27AE60);
 
 	private DefaultTableModel modeloTabla;
 	private JTable tblPeliculas;
 	private JButton btnEditar;
-	private JButton btnEliminar;
+	private JButton btnDarDeBaja;
+	private JTextField txtBuscar;
+	private JButton btnBuscar;
 
 	public PanelGestionPeliculas() {
 		setBackground(COLOR_FONDO);
@@ -45,27 +45,50 @@ public class PanelGestionPeliculas extends JPanel {
 	// ── Superior ────────────────────────────────────────────────────────────
 
 	private JPanel buildSuperior() {
-		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		JPanel panel = new JPanel(new BorderLayout(12, 0));
 		panel.setOpaque(false);
 		panel.setBorder(new EmptyBorder(0, 0, 16, 0));
 
 		JLabel lbl = new JLabel("🎞️  Gestión de películas");
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
 		lbl.setForeground(COLOR_DARK);
-		panel.add(lbl);
 
-		JLabel sublbl = new JLabel("  —  Selecciona una película para editarla o eliminarla");
+		JLabel sublbl = new JLabel("  —  Selecciona una película para editarla o darla de baja");
 		sublbl.setFont(new Font("SansSerif", Font.PLAIN, 13));
 		sublbl.setForeground(new Color(0x888888));
-		panel.add(sublbl);
 
+		JPanel izquierda = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		izquierda.setOpaque(false);
+		izquierda.add(lbl);
+		izquierda.add(sublbl);
+
+		JPanel controles = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+		controles.setOpaque(false);
+
+		txtBuscar = new JTextField(18);
+		txtBuscar.putClientProperty("JTextField.placeholderText", "Buscar película...");
+
+		btnBuscar = new JButton("Buscar");
+		btnBuscar.setActionCommand("BUSCAR_PELICULA_GESTION");
+		btnBuscar.setBackground(COLOR_DARK);
+		btnBuscar.setForeground(Color.WHITE);
+		btnBuscar.setFocusPainted(false);
+		btnBuscar.setBorder(new EmptyBorder(6, 14, 6, 14));
+		btnBuscar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+		controles.add(txtBuscar);
+		controles.add(btnBuscar);
+
+		panel.add(izquierda, BorderLayout.WEST);
+		panel.add(controles, BorderLayout.EAST);
 		return panel;
 	}
 
 	// ── Tabla ───────────────────────────────────────────────────────────────
 
 	private JScrollPane buildTabla() {
-		String[] columnas = { "ID", "Título", "Director", "Género", "Duración", "Clasificación", "Sinopsis" };
+		String[] columnas = { "ID", "Título", "Director", "Género", "Duración", "Clasificación", "Nº copias",
+				"Sinopsis" };
 
 		modeloTabla = new DefaultTableModel(columnas, 0) {
 			@Override
@@ -87,17 +110,33 @@ public class PanelGestionPeliculas extends JPanel {
 		tblPeliculas.getTableHeader().setBackground(COLOR_DARK);
 		tblPeliculas.getTableHeader().setForeground(Color.WHITE);
 
-		int[] anchos = { 40, 220, 160, 110, 80, 100, 260 };
+		int[] anchos = { 40, 220, 130, 110, 80, 90, 80, 520 };
 		for (int i = 0; i < anchos.length; i++) {
 			tblPeliculas.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
 		}
 
-		// Centrar columnas ID, Duración y Clasificación
+		// Centrar columnas: ID, Género, Duración, Clasificación y Nº copias
 		DefaultTableCellRenderer centrado = new DefaultTableCellRenderer();
 		centrado.setHorizontalAlignment(SwingConstants.CENTER);
-		for (int col : new int[] { 0, 4, 5 }) {
+		for (int col : new int[] { 0, 3, 4, 5, 6 }) {
 			tblPeliculas.getColumnModel().getColumn(col).setCellRenderer(centrado);
 		}
+
+		// Columna Sinopsis: ancho fijo + tooltip para ver el texto completo al pasar el
+		// ratón
+		tblPeliculas.getColumnModel().getColumn(7).setCellRenderer(new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
+				JLabel lbl = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row,
+						column);
+				lbl.setToolTipText(String.valueOf(value));
+				return lbl;
+			}
+		});
+
+		// Desactivar redimensionado automático para respetar los anchos definidos
+		tblPeliculas.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		JScrollPane scroll = new JScrollPane(tblPeliculas);
 		scroll.setBorder(BorderFactory.createLineBorder(new Color(0xDDDDDD)));
@@ -114,11 +153,11 @@ public class PanelGestionPeliculas extends JPanel {
 		btnEditar = buildBoton("✏️  Editar película", COLOR_DARK, Color.WHITE, "EDITAR_PELICULA");
 		btnEditar.setEnabled(false);
 
-		btnEliminar = buildBoton("🗑️  Eliminar película", COLOR_ACENTO, Color.WHITE, "ELIMINAR_PELICULA");
-		btnEliminar.setEnabled(false);
+		btnDarDeBaja = buildBoton("🚫  Dar de baja", new Color(0xE67E22), Color.WHITE, "DAR_DE_BAJA_PELICULA");
+		btnDarDeBaja.setEnabled(false);
 
 		panel.add(btnEditar);
-		panel.add(btnEliminar);
+		panel.add(btnDarDeBaja);
 		return panel;
 	}
 
@@ -136,11 +175,20 @@ public class PanelGestionPeliculas extends JPanel {
 
 	// ── Métodos públicos para el Controlador ────────────────────────────────
 
-	public void cargarPeliculas(List<Pelicula> peliculas) {
+	/**
+	 * Carga la lista de películas en la tabla junto con el número de copias
+	 * disponibles.
+	 *
+	 * @param peliculas lista de películas a mostrar
+	 * @param copias    lista de conteos de copias disponibles por película
+	 */
+	public void cargarPeliculas(List<Pelicula> peliculas, List<Integer> copias) {
 		modeloTabla.setRowCount(0);
-		for (Pelicula p : peliculas) {
+		for (int i = 0; i < peliculas.size(); i++) {
+			Pelicula p = peliculas.get(i);
+			int numCopias = copias.get(i);
 			modeloTabla.addRow(new Object[] { p.getId(), p.getNombrePelicula(), p.getDirector(), p.getGenero(),
-					p.getDuracion() + " min", p.getClasificacionEdad(), p.getSinopsis() });
+					p.getDuracion() + " min", p.getClasificacionEdad(), numCopias, p.getSinopsis() });
 		}
 		actualizarBotones();
 	}
@@ -148,7 +196,7 @@ public class PanelGestionPeliculas extends JPanel {
 	public void actualizarBotones() {
 		boolean haySeleccion = tblPeliculas.getSelectedRow() >= 0;
 		btnEditar.setEnabled(haySeleccion);
-		btnEliminar.setEnabled(haySeleccion);
+		btnDarDeBaja.setEnabled(haySeleccion);
 	}
 
 	// Devuelve el ID de la película seleccionada
@@ -161,23 +209,29 @@ public class PanelGestionPeliculas extends JPanel {
 
 	// Devuelve todos los datos de la fila seleccionada como objeto Pelicula
 	public Pelicula getPeliculaSeleccionada() {
-		int fila = tblPeliculas.getSelectedRow();
-		if (fila < 0)
-			return null;
+	    int fila = tblPeliculas.getSelectedRow();
+	    if (fila < 0)
+	        return null;
 
-		String duracionStr = String.valueOf(modeloTabla.getValueAt(fila, 4)).replace(" min", "");
+	    String duracionStr = String.valueOf(modeloTabla.getValueAt(fila, 4)).replace(" min", "");
 
-		return new Pelicula((int) modeloTabla.getValueAt(fila, 0), (String) modeloTabla.getValueAt(fila, 1),
-				(String) modeloTabla.getValueAt(fila, 2), Integer.parseInt(duracionStr),
-				(String) modeloTabla.getValueAt(fila, 3), (String) modeloTabla.getValueAt(fila, 6),
-				(String) modeloTabla.getValueAt(fila, 5));
+	    return new Pelicula(
+	        (int) modeloTabla.getValueAt(fila, 0),
+	        (String) modeloTabla.getValueAt(fila, 1),
+	        (String) modeloTabla.getValueAt(fila, 2),
+	        Integer.parseInt(duracionStr),
+	        (String) modeloTabla.getValueAt(fila, 3),
+	        (String) modeloTabla.getValueAt(fila, 7),
+	        (String) modeloTabla.getValueAt(fila, 5),
+	        "activa"
+	    );
 	}
 
 	public void setControlador(Controlador controlador) {
 		btnEditar.addActionListener(controlador);
-		btnEliminar.addActionListener(controlador);
+		btnDarDeBaja.addActionListener(controlador);
+		btnBuscar.addActionListener(controlador);
 
-		// Sin programación funcional:
 		tblPeliculas.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -188,11 +242,8 @@ public class PanelGestionPeliculas extends JPanel {
 		});
 	}
 
-	public JButton getBtnEditar() {
-		return btnEditar;
+	public JTextField getTxtBuscar() {
+		return txtBuscar;
 	}
 
-	public JButton getBtnEliminar() {
-		return btnEliminar;
-	}
 }

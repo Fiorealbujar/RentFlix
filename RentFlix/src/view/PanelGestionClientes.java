@@ -13,6 +13,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Panel de gestión de clientes para empleado y administrador.
+ * <p>
+ * Muestra la tabla de clientes con columnas ID, Nombre, Apellido, Email,
+ * Usuario y Estado (activo/bloqueado con color). Los botones de editar y
+ * eliminar se habilitan al seleccionar una fila.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelGestionClientes extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -23,6 +34,8 @@ public class PanelGestionClientes extends JPanel {
 	private JTable tblClientes;
 	private JButton btnEliminarCliente;
 	private JButton btnEditarCliente;
+	private JButton btnBloquearCliente;
+	private JComboBox<String> cmbFiltroEstado;
 
 	public PanelGestionClientes() {
 		setBackground(COLOR_FONDO);
@@ -32,7 +45,7 @@ public class PanelGestionClientes extends JPanel {
 	}
 
 	private void initComponents() {
-		add(buildTitulo(), BorderLayout.NORTH);
+		add(buildSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
 	}
 
@@ -42,6 +55,29 @@ public class PanelGestionClientes extends JPanel {
 		lbl.setForeground(COLOR_DARK);
 		lbl.setBorder(new EmptyBorder(0, 0, 4, 0));
 		return lbl;
+	}
+
+	// Construye el título + el combo
+	private JPanel buildSuperior() {
+		JPanel panel = new JPanel(new BorderLayout(12, 0));
+		panel.setOpaque(false);
+		panel.setBorder(new EmptyBorder(0, 0, 8, 0));
+
+		panel.add(buildTitulo(), BorderLayout.WEST);
+
+		cmbFiltroEstado = new JComboBox<>(new String[] { "Todos", "activo", "bloqueado" });
+		cmbFiltroEstado.setActionCommand("FILTRAR_CLIENTES");
+		cmbFiltroEstado.setFont(new Font("SansSerif", Font.PLAIN, 13));
+		cmbFiltroEstado.setBackground(Color.WHITE);
+		cmbFiltroEstado.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+		JPanel derecha = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+		derecha.setOpaque(false);
+		derecha.add(new JLabel("Filtrar: "));
+		derecha.add(cmbFiltroEstado);
+		panel.add(derecha, BorderLayout.EAST);
+
+		return panel;
 	}
 
 	// ── Tabla + botones ──────────────────────────────────────────────────────
@@ -119,6 +155,16 @@ public class PanelGestionClientes extends JPanel {
 		btnEditarCliente.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnEditarCliente.setEnabled(false);
 
+		btnBloquearCliente = new JButton("🚫  Bloquear / Desbloquear");
+		btnBloquearCliente.setActionCommand("BLOQUEAR_CLIENTE");
+		btnBloquearCliente.setFont(new Font("SansSerif", Font.BOLD, 13));
+		btnBloquearCliente.setBackground(new Color(0xE67E22));
+		btnBloquearCliente.setForeground(Color.WHITE);
+		btnBloquearCliente.setFocusPainted(false);
+		btnBloquearCliente.setBorder(new EmptyBorder(8, 18, 8, 18));
+		btnBloquearCliente.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnBloquearCliente.setEnabled(false);
+
 		btnEliminarCliente = new JButton("🗑️  Eliminar cliente");
 		btnEliminarCliente.setActionCommand("ELIMINAR_CLIENTE");
 		btnEliminarCliente.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -130,6 +176,7 @@ public class PanelGestionClientes extends JPanel {
 		btnEliminarCliente.setEnabled(false);
 
 		filaBotones.add(btnEditarCliente);
+		filaBotones.add(btnBloquearCliente);
 		filaBotones.add(btnEliminarCliente);
 
 		JScrollPane scroll = new JScrollPane(tblClientes);
@@ -142,6 +189,11 @@ public class PanelGestionClientes extends JPanel {
 
 	// ── Métodos para el Controlador ──────────────────────────────────────────
 
+	/**
+	 * Carga la lista de clientes en la tabla.
+	 *
+	 * @param clientes lista de clientes a mostrar
+	 */
 	public void cargarClientes(ArrayList<Cliente> clientes) {
 		modeloTabla.setRowCount(0);
 		for (Cliente c : clientes) {
@@ -151,12 +203,22 @@ public class PanelGestionClientes extends JPanel {
 		actualizarBotones();
 	}
 
+	/**
+	 * Habilita o deshabilita los botones de editar y eliminar según si hay fila
+	 * seleccionada.
+	 */
 	public void actualizarBotones() {
 		boolean haySeleccion = tblClientes.getSelectedRow() >= 0;
 		btnEditarCliente.setEnabled(haySeleccion);
+		btnBloquearCliente.setEnabled(haySeleccion);
 		btnEliminarCliente.setEnabled(haySeleccion);
 	}
 
+	/**
+	 * Devuelve el id del cliente de la fila seleccionada.
+	 *
+	 * @return id del cliente, o {@code -1} si no hay selección
+	 */
 	public int getIdClienteSeleccionado() {
 		int fila = tblClientes.getSelectedRow();
 		if (fila < 0) {
@@ -165,6 +227,12 @@ public class PanelGestionClientes extends JPanel {
 		return (int) modeloTabla.getValueAt(fila, 0);
 	}
 
+	/**
+	 * Devuelve un objeto {@link model.Cliente} con los datos de la fila
+	 * seleccionada. La contraseña no se incluye (no se muestra en la tabla).
+	 *
+	 * @return cliente seleccionado, o {@code null} si no hay selección
+	 */
 	public Cliente getClienteSeleccionado() {
 		int fila = tblClientes.getSelectedRow();
 		if (fila < 0) {
@@ -175,9 +243,27 @@ public class PanelGestionClientes extends JPanel {
 				(String) modeloTabla.getValueAt(fila, 4), "", (String) modeloTabla.getValueAt(fila, 5));
 	}
 
+	/**
+	 * Devuelve el estado seleccionado en el combo filtro, o {@code null} si se
+	 * seleccionó "Todos".
+	 *
+	 * @return "activo", "bloqueado", o {@code null}
+	 */
+	public String getFiltroEstado() {
+		String sel = (String) cmbFiltroEstado.getSelectedItem();
+		return "Todos".equals(sel) ? null : sel;
+	}
+
+	/**
+	 * Registra el controlador como listener de los botones y la tabla.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
 	public void setControlador(Controlador controlador) {
 		btnEditarCliente.addActionListener(controlador);
+		btnBloquearCliente.addActionListener(controlador);
 		btnEliminarCliente.addActionListener(controlador);
+		cmbFiltroEstado.addActionListener(controlador);
 
 		tblClientes.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override

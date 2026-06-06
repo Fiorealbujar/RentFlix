@@ -1,4 +1,3 @@
-// PanelCliente.java
 package view;
 
 import controller.Controlador;
@@ -8,6 +7,18 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Panel principal del cliente autenticado en RentFlix.
+ * <p>
+ * Contenedor de 3 pestañas: Catálogo, Mis alquileres y Mi cuenta. Muestra en la
+ * cabecera el nombre del cliente, su badge de rol y un indicador con el número
+ * de alquileres activos en curso, que se actualiza al iniciar sesión, al
+ * registrar un alquiler y al solicitar una devolución.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelCliente extends JPanel {
 
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
@@ -82,10 +93,21 @@ public class PanelCliente extends JPanel {
 
 	// ── Métodos para el Controlador ───────────────────────────────────────────
 
+	/**
+	 * Actualiza el texto de bienvenida con el nombre completo del cliente.
+	 *
+	 * @param cliente cliente en sesión
+	 */
 	public void setBienvenida(Cliente cliente) {
 		lblBienvenida.setText("👋 Hola, " + cliente.getNombreCompleto());
 	}
 
+	/**
+	 * Actualiza el indicador de alquileres activos en la cabecera. Lo oculta si la
+	 * cantidad es 0.
+	 *
+	 * @param cantidad número de alquileres en estado activo
+	 */
 	public void actualizarContadorActivos(int cantidad) {
 		if (cantidad > 0) {
 			lblContadorActivos.setText("🎬 " + cantidad + (cantidad == 1 ? " alquiler activo" : " alquileres activos"));
@@ -95,10 +117,18 @@ public class PanelCliente extends JPanel {
 		}
 	}
 
+	/**
+	 * Navega a la pestaña "Mis alquileres".
+	 */
 	public void irAMisAlquileres() {
 		tabbedPane.setSelectedIndex(1);
 	}
 
+	/**
+	 * Registra el controlador (sin listeners adicionales en este panel).
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
 	public void setControlador(Controlador controlador) {
 	}
 }

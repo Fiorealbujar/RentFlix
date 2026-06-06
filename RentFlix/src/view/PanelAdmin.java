@@ -1,4 +1,3 @@
-// PanelAdmin.java — ACTUALIZADO
 package view;
 
 import controller.Controlador;
@@ -8,6 +7,16 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Panel principal del administrador de RentFlix.
+ * <p>
+ * Contenedor de pestañas con acceso a alquileres, películas, informes,
+ * empleados y clientes. Muestra el nombre del admin con badge dorado.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelAdmin extends JPanel {
 
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
@@ -80,10 +89,16 @@ public class PanelAdmin extends JPanel {
 		lblBienvenida.setText("👑 Hola, " + emp.getNombreCompleto());
 	}
 
-	public void irAGestionAlquileres() {
-		tabbedPane.setSelectedIndex(0);
-	}
-
+	/**
+	 * Requerido por el patrón de inicialización de la aplicación.
+	 * <p>
+	 * Este panel es un contenedor de pestañas sin botones propios, por lo que
+	 * no registra listeners directamente. Los listeners de cada subpanel
+	 * se registran en sus propios {@code setControlador()}.
+	 * </p>
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
 	public void setControlador(Controlador controlador) {
 	}
 }

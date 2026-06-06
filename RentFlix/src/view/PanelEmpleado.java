@@ -1,4 +1,3 @@
-// PanelEmpleado.java
 package view;
 
 import controller.Controlador;
@@ -8,6 +7,17 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Panel principal del empleado de RentFlix.
+ * <p>
+ * Contenedor de pestañas con acceso a los módulos operativos del empleado:
+ * alquileres, alta de películas, gestión de películas, informes y clientes.
+ * Muestra en la cabecera el nombre del empleado con badge amarillo.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelEmpleado extends JPanel {
 
 	private static final Color COLOR_DARK = new Color(0x1a1a2e);
@@ -53,7 +63,7 @@ public class PanelEmpleado extends JPanel {
 		JLabel badge = new JLabel("EMPLEADO");
 		badge.setFont(new Font("SansSerif", Font.BOLD, 10));
 		badge.setForeground(COLOR_DARK);
-		badge.setBackground(new Color(0xF0C040));
+		badge.setBackground(COLOR_GOLD);
 		badge.setOpaque(true);
 		badge.setBorder(new EmptyBorder(3, 8, 3, 8));
 
@@ -76,7 +86,17 @@ public class PanelEmpleado extends JPanel {
 	public void setBienvenida(Empleado emp) {
 		lblBienvenida.setText("👋 Hola, " + emp.getNombreCompleto());
 	}
-
+	
+	/**
+	 * Requerido por el patrón de inicialización de la aplicación.
+	 * <p>
+	 * Este panel es un contenedor de pestañas sin botones propios, por lo que
+	 * no registra listeners directamente. Los listeners de cada subpanel
+	 * se registran en sus propios {@code setControlador()}.
+	 * </p>
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
 	public void setControlador(Controlador controlador) {
 	}
 }

@@ -1,4 +1,3 @@
-// PanelMiCuenta.java
 package view;
 
 import controller.Controlador;
@@ -8,6 +7,16 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Panel de datos personales del cliente autenticado.
+ * <p>
+ * Muestra en modo lectura los datos del cliente. El botón "Modificar datos"
+ * abre un diálogo para editar los campos y cambiar la contraseña.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelMiCuenta extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -160,7 +169,4 @@ public class PanelMiCuenta extends JPanel {
 		btnModificar.addActionListener(controlador);
 	}
 
-	public JButton getBtnModificar() {
-		return btnModificar;
-	}
 }

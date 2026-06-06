@@ -15,6 +15,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Panel de gestión de alquileres para empleado y administrador.
+ * <p>
+ * Muestra la tabla completa de alquileres con filtro por estado. Las filas en
+ * estado {@code pendiente_devolucion} se resaltan en rojo. Incluye el botón
+ * "Aceptar devolución" y el formulario de nuevo alquiler para clientes.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelGestionAlquileres extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -28,6 +39,7 @@ public class PanelGestionAlquileres extends JPanel {
 	private JTable tblAlquileres;
 	private JButton btnAceptarDevolucion;
 	private JButton btnNuevoAlquiler;
+	private JButton btnBloquearCliente;
 	private JComboBox<String> cmbFiltroEstado;
 
 	private JPanel panelFormAlquiler;
@@ -86,8 +98,8 @@ public class PanelGestionAlquileres extends JPanel {
 	// ── Tabla ───────────────────────────────────────────────────────────────
 
 	private JScrollPane buildTabla() {
-		String[] columnas = { "#", "Cliente", "Película", "Formato", "F. Alquiler", "F. Dev. Prev.", "Estado",
-				"Importe" };
+		// Columna Formato eliminada: el dato no está disponible en el objeto Alquiler
+		String[] columnas = { "#", "Cliente", "Película", "F. Alquiler", "F. Dev. Prev.", "Estado", "Importe" };
 
 		modeloTabla = new DefaultTableModel(columnas, 0) {
 			@Override
@@ -109,17 +121,12 @@ public class PanelGestionAlquileres extends JPanel {
 		tblAlquileres.getTableHeader().setBackground(COLOR_DARK);
 		tblAlquileres.getTableHeader().setForeground(Color.WHITE);
 
-		int[] anchos = { 40, 140, 180, 90, 100, 110, 150, 80 };
+		int[] anchos = { 40, 140, 180, 100, 110, 150, 80 };
 		for (int i = 0; i < anchos.length; i++) {
 			tblAlquileres.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
 		}
 
-		// Renderer de fila completa: pinta toda la fila en rojo
-		// si el estado es pendiente_devolucion
-		RendererFilaAlquileres rendererFila = new RendererFilaAlquileres();
-
-		// Aplicar a todas las columnas excepto la de Estado (col 6)
-		// Las columnas numéricas también centradas
+		// Renderer con color de fila para columnas centradas: #(0), F.Alquiler(3), F.Dev(4), Importe(6)
 		DefaultTableCellRenderer centrado = new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -131,6 +138,7 @@ public class PanelGestionAlquileres extends JPanel {
 			}
 		};
 
+		// Renderer con color de fila para columnas alineadas a la izquierda: Cliente(1), Película(2)
 		DefaultTableCellRenderer normal = new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
@@ -141,17 +149,15 @@ public class PanelGestionAlquileres extends JPanel {
 			}
 		};
 
-		// Columnas centradas: #(0), Formato(3), F.Alquiler(4), F.Dev(5), Importe(7)
 		tblAlquileres.getColumnModel().getColumn(0).setCellRenderer(centrado);
 		tblAlquileres.getColumnModel().getColumn(1).setCellRenderer(normal);
 		tblAlquileres.getColumnModel().getColumn(2).setCellRenderer(normal);
 		tblAlquileres.getColumnModel().getColumn(3).setCellRenderer(centrado);
 		tblAlquileres.getColumnModel().getColumn(4).setCellRenderer(centrado);
-		tblAlquileres.getColumnModel().getColumn(5).setCellRenderer(centrado);
-		tblAlquileres.getColumnModel().getColumn(7).setCellRenderer(centrado);
+		tblAlquileres.getColumnModel().getColumn(6).setCellRenderer(centrado);
 
-		// Renderer especial para columna Estado (col 6): color + fondo de fila
-		tblAlquileres.getColumnModel().getColumn(6).setCellRenderer(new DefaultTableCellRenderer() {
+		// Renderer especial para columna Estado (col 5): color según estado
+		tblAlquileres.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
 			@Override
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
 					boolean hasFocus, int row, int column) {
@@ -194,11 +200,10 @@ public class PanelGestionAlquileres extends JPanel {
 		return scroll;
 	}
 
-	// Método estático de utilidad: aplica el color de fondo de fila
-	// según el estado de la columna 6 de esa fila
+	// Aplica color de fondo a la fila completa cuando el estado es pendiente_devolucion
 	private void aplicarColorFila(JTable table, Component c, int row, boolean isSelected) {
 		if (!isSelected) {
-			String estado = String.valueOf(table.getModel().getValueAt(row, 6)).toLowerCase();
+			String estado = String.valueOf(table.getModel().getValueAt(row, 5)).toLowerCase();
 			if ("pendiente_devolucion".equals(estado)) {
 				c.setBackground(new Color(0xFFCDD2));
 				c.setForeground(new Color(0xB71C1C));
@@ -206,17 +211,6 @@ public class PanelGestionAlquileres extends JPanel {
 				c.setBackground(table.getBackground());
 				c.setForeground(table.getForeground());
 			}
-		}
-	}
-
-	// Renderer de fila completa (para posible uso futuro)
-	private class RendererFilaAlquileres extends DefaultTableCellRenderer {
-		@Override
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
-				int row, int column) {
-			Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-			aplicarColorFila(table, c, row, isSelected);
-			return c;
 		}
 	}
 
@@ -233,10 +227,15 @@ public class PanelGestionAlquileres extends JPanel {
 		btnAceptarDevolucion = buildBoton("✅  Aceptar devolución", COLOR_ACTIVO, Color.WHITE, "ACEPTAR_DEVOLUCION");
 		btnAceptarDevolucion.setEnabled(false);
 
+		btnBloquearCliente = buildBoton("🚫  Bloquear cliente", new Color(0xE67E22), Color.WHITE,
+				"BLOQUEAR_CLIENTE_ALQUILER");
+		btnBloquearCliente.setEnabled(false);
+
 		btnNuevoAlquiler = buildBoton("🎬  Nuevo alquiler para cliente", COLOR_DARK, Color.WHITE,
 				"ABRIR_FORM_ALQUILER");
 
 		botones.add(btnAceptarDevolucion);
+		botones.add(btnBloquearCliente);
 		botones.add(btnNuevoAlquiler);
 
 		panelFormAlquiler = buildFormAlquiler();
@@ -315,32 +314,53 @@ public class PanelGestionAlquileres extends JPanel {
 
 	// ── Métodos para el Controlador ─────────────────────────────────────────
 
+	/**
+	 * Carga la lista de alquileres en la tabla.
+	 *
+	 * @param alquileres lista de alquileres a mostrar
+	 */
 	public void cargarAlquileres(List<Alquiler> alquileres) {
 		modeloTabla.setRowCount(0);
 		for (Alquiler a : alquileres) {
-			modeloTabla.addRow(new Object[] { a.getIdAlquiler(), a.getNombreCliente(), a.getNombrePelicula(), "",
+			modeloTabla.addRow(new Object[] { a.getIdAlquiler(), a.getNombreCliente(), a.getNombrePelicula(),
 					a.getFechaAlquiler(), a.getFechaDevolucionPrevista(), a.getEstadoAlquiler(),
 					String.format("%.2f €", a.getMontoCobro()) });
 		}
 		actualizarBotonDevolucion();
 	}
 
+	/**
+	 * Habilita o deshabilita los botones de acción según el estado del alquiler
+	 * seleccionado.
+	 */
 	public void actualizarBotonDevolucion() {
 		int fila = tblAlquileres.getSelectedRow();
 		if (fila >= 0) {
-			String estado = String.valueOf(modeloTabla.getValueAt(fila, 6));
+			String estado = String.valueOf(modeloTabla.getValueAt(fila, 5));
 			btnAceptarDevolucion.setEnabled("pendiente_devolucion".equalsIgnoreCase(estado));
+			btnBloquearCliente.setEnabled("vencido".equalsIgnoreCase(estado));
 		} else {
 			btnAceptarDevolucion.setEnabled(false);
+			btnBloquearCliente.setEnabled(false);
 		}
 	}
 
+	/**
+	 * Muestra u oculta el formulario de nuevo alquiler.
+	 *
+	 * @param visible {@code true} para mostrar, {@code false} para ocultar
+	 */
 	public void mostrarFormAlquiler(boolean visible) {
 		panelFormAlquiler.setVisible(visible);
 		panelFormAlquiler.revalidate();
 		panelFormAlquiler.repaint();
 	}
 
+	/**
+	 * Carga la lista de clientes en el combo del formulario de nuevo alquiler.
+	 *
+	 * @param clientes lista de clientes activos
+	 */
 	public void cargarComboClientes(List<Cliente> clientes) {
 		cmbClientes.removeAllItems();
 		for (Cliente c : clientes) {
@@ -348,6 +368,11 @@ public class PanelGestionAlquileres extends JPanel {
 		}
 	}
 
+	/**
+	 * Carga la lista de películas en el combo del formulario de nuevo alquiler.
+	 *
+	 * @param peliculas lista de películas activas
+	 */
 	public void cargarComboPeliculas(List<Pelicula> peliculas) {
 		cmbPeliculas.removeAllItems();
 		for (Pelicula p : peliculas) {
@@ -355,6 +380,11 @@ public class PanelGestionAlquileres extends JPanel {
 		}
 	}
 
+	/**
+	 * Devuelve el id del alquiler de la fila seleccionada.
+	 *
+	 * @return id del alquiler, o {@code -1} si no hay selección
+	 */
 	public int getIdAlquilerSeleccionado() {
 		int fila = tblAlquileres.getSelectedRow();
 		if (fila < 0)
@@ -362,39 +392,88 @@ public class PanelGestionAlquileres extends JPanel {
 		return (int) modeloTabla.getValueAt(fila, 0);
 	}
 
+	/**
+	 * Devuelve el nombre del cliente de la fila seleccionada, para mostrarlo en el
+	 * diálogo de bloqueo.
+	 *
+	 * @return nombre del cliente, o cadena vacía si no hay selección
+	 */
+	public String getNombreClienteSeleccionado() {
+		int fila = tblAlquileres.getSelectedRow();
+		if (fila < 0)
+			return "";
+		return String.valueOf(modeloTabla.getValueAt(fila, 1));
+	}
+
+	/**
+	 * Devuelve el estado seleccionado en el combo filtro, o {@code null} si se
+	 * seleccionó "Todos".
+	 *
+	 * @return estado del filtro, o {@code null}
+	 */
 	public String getFiltroEstado() {
 		String sel = (String) cmbFiltroEstado.getSelectedItem();
 		return "Todos".equals(sel) ? null : sel;
 	}
 
+	/**
+	 * Devuelve el índice del cliente seleccionado en el combo del formulario.
+	 *
+	 * @return índice del cliente seleccionado
+	 */
 	public int getIndexClienteSeleccionado() {
 		return cmbClientes.getSelectedIndex();
 	}
 
+	/**
+	 * Devuelve el índice de la película seleccionada en el combo del formulario.
+	 *
+	 * @return índice de la película seleccionada
+	 */
 	public int getIndexPeliculaSeleccionada() {
 		return cmbPeliculas.getSelectedIndex();
 	}
 
+	/**
+	 * Devuelve el formato seleccionado en el combo del formulario.
+	 *
+	 * @return formato seleccionado
+	 */
 	public String getFormatoSeleccionado() {
 		return (String) cmbFormatos.getSelectedItem();
 	}
 
+	/**
+	 * Devuelve el número de días indicado en el spinner del formulario.
+	 *
+	 * @return número de días de alquiler
+	 */
 	public int getDiasAlquiler() {
 		return (int) spinnerDias.getValue();
 	}
 
+	/**
+	 * Devuelve el método de pago seleccionado en el combo del formulario.
+	 *
+	 * @return método de pago seleccionado
+	 */
 	public String getMetodoPagoSeleccionado() {
 		return (String) cmbMetodoPago.getSelectedItem();
 	}
 
+	/**
+	 * Registra el controlador como listener de los botones, combos y tabla.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
 	public void setControlador(Controlador controlador) {
 		btnAceptarDevolucion.addActionListener(controlador);
+		btnBloquearCliente.addActionListener(controlador);
 		btnNuevoAlquiler.addActionListener(controlador);
 		btnConfirmarAlquiler.addActionListener(controlador);
 		btnCancelarAlquiler.addActionListener(controlador);
 		cmbFiltroEstado.addActionListener(controlador);
 
-		// Sin programación funcional:
 		tblAlquileres.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -405,15 +484,4 @@ public class PanelGestionAlquileres extends JPanel {
 		});
 	}
 
-	public JButton getBtnAceptarDevolucion() {
-		return btnAceptarDevolucion;
-	}
-
-	public JButton getBtnNuevoAlquiler() {
-		return btnNuevoAlquiler;
-	}
-
-	public JComboBox<String> getCmbFiltroEstado() {
-		return cmbFiltroEstado;
-	}
 }

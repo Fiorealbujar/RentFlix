@@ -1,4 +1,3 @@
-// PanelCatalogo.java
 package view;
 
 import controller.Controlador;
@@ -12,6 +11,16 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Panel del catálogo de películas disponibles para alquilar.
+ * <p>
+ * Muestra las copias físicas disponibles con búsqueda por título y filtro por
+ * formato. Disponible en modo invitado y para el cliente autenticado.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelCatalogo extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -164,10 +173,15 @@ public class PanelCatalogo extends JPanel {
 
 	// ── Métodos para el Controlador ───────────────────────────────────────────
 
+	/**
+	 * Carga las copias disponibles en la tabla cruzando cada copia con su película.
+	 *
+	 * @param peliculas lista de películas del catálogo
+	 * @param copias    lista de copias disponibles
+	 */
 	public void cargarCopias(ArrayList<Pelicula> peliculas, ArrayList<Copia> copias) {
 		modeloTabla.setRowCount(0);
 		for (Copia copia : copias) {
-			// Buscar la película con bucle tradicional
 			Pelicula pelicula = null;
 			for (Pelicula p : peliculas) {
 				if (p.getId() == copia.getIdPelicula()) {
@@ -178,7 +192,6 @@ public class PanelCatalogo extends JPanel {
 			if (pelicula == null) {
 				continue;
 			}
-
 			if (mostrarId) {
 				modeloTabla
 						.addRow(new Object[] { copia.getIdCopia(), pelicula.getNombrePelicula(), pelicula.getDirector(),
@@ -192,19 +205,13 @@ public class PanelCatalogo extends JPanel {
 		}
 	}
 
+	/**
+	 * Habilita o deshabilita el botón "Alquilar película".
+	 *
+	 * @param habilitar {@code true} para habilitar
+	 */
 	public void habilitarAcciones(boolean habilitar) {
 		btnAlquilar.setEnabled(habilitar);
-	}
-
-	public int getIdCopiaSeleccionada() {
-		int fila = tblPeliculas.getSelectedRow();
-		if (fila < 0) {
-			return -1;
-		}
-		if (mostrarId) {
-			return (int) modeloTabla.getValueAt(fila, 0);
-		}
-		return -1;
 	}
 
 	public String getTituloSeleccionado() {
@@ -216,6 +223,11 @@ public class PanelCatalogo extends JPanel {
 		return (String) modeloTabla.getValueAt(fila, col);
 	}
 
+	/**
+	 * Devuelve el formato de la copia de la fila seleccionada.
+	 *
+	 * @return formato seleccionado, o {@code null} si no hay selección
+	 */
 	public String getFormatoSeleccionado() {
 		int fila = tblPeliculas.getSelectedRow();
 		if (fila < 0) {
@@ -225,6 +237,11 @@ public class PanelCatalogo extends JPanel {
 		return (String) modeloTabla.getValueAt(fila, col);
 	}
 
+	/**
+	 * Devuelve el valor del filtro de formato seleccionado.
+	 *
+	 * @return formato seleccionado, o {@code null} si se eligió "Todos"
+	 */
 	public String getFiltroFormato() {
 		String sel = (String) cmbFiltroFormato.getSelectedItem();
 		if ("Todos".equals(sel)) {
@@ -233,37 +250,69 @@ public class PanelCatalogo extends JPanel {
 		return sel;
 	}
 
+	/**
+	 * Devuelve el índice de la fila seleccionada en la tabla.
+	 *
+	 * @return índice de la fila, o {@code -1} si no hay selección
+	 */
 	public int getFilaSeleccionada() {
 		return tblPeliculas.getSelectedRow();
 	}
 
+	/**
+	 * Registra un listener que habilita el botón "Alquilar" al seleccionar una
+	 * fila. Permite que el controlador reaccione a la selección tanto en modo
+	 * invitado como en modo cliente autenticado.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
+	public void setSelectionListener(Controlador controlador) {
+		tblPeliculas.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+			@Override
+			public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) {
+					btnAlquilar.setEnabled(tblPeliculas.getSelectedRow() >= 0);
+				}
+			}
+		});
+	}
+
+	/**
+	 * Registra el controlador como listener de los componentes interactivos.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
 	public void setControlador(Controlador controlador) {
 		btnBuscar.addActionListener(controlador);
 		btnAlquilar.addActionListener(controlador);
 		cmbFiltroFormato.addActionListener(controlador);
 	}
 
+	/**
+	 * Devuelve el campo de texto de búsqueda.
+	 *
+	 * @return campo de búsqueda por título
+	 */
 	public JTextField getTxtBuscar() {
 		return txtBuscar;
 	}
 
+	/**
+	 * Devuelve el botón de búsqueda.
+	 *
+	 * @return botón "Buscar"
+	 */
 	public JButton getBtnBuscar() {
 		return btnBuscar;
 	}
 
-	public JButton getBtnAlquilar() {
-		return btnAlquilar;
-	}
-
+	/**
+	 * Devuelve el combo de filtro por formato.
+	 *
+	 * @return combo desplegable de formato
+	 */
 	public JComboBox<String> getCmbFiltroFormato() {
 		return cmbFiltroFormato;
 	}
 
-	public DefaultTableModel getModelo() {
-		return modeloTabla;
-	}
-
-	public boolean isMostrarId() {
-		return mostrarId;
-	}
 }

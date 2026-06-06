@@ -1,4 +1,3 @@
-// EmpleadoDAO.java
 package dao;
 
 import model.Empleado;
@@ -58,7 +57,7 @@ public class EmpleadoDAO implements IEmpleadoDAO {
 	}
 
 	@Override
-	public int crear(Empleado empleado) {
+	public int crear(Empleado empleado) throws RuntimeException {
 		int res = 0;
 		String query = "INSERT INTO Empleados (nombre_empleado, apellido_empleado, "
 				+ "email_empleado, usuario_empleado, " + "contrasenia_empleado, id_jefe) VALUES (?,?,?,?,?,?)";
@@ -77,9 +76,10 @@ public class EmpleadoDAO implements IEmpleadoDAO {
 			ps.setObject(6, empleado.getIdJefe());
 			res = ps.executeUpdate();
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.getMessage());
 		} catch (SQLException e) {
-			e.printStackTrace();
+			// Propagar para que el controlador pueda detectar el campo duplicado
+			throw new RuntimeException(e.getMessage());
 		} finally {
 			try {
 				if (ps != null)

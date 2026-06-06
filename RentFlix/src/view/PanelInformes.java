@@ -1,4 +1,3 @@
-// PanelInformes.java
 package view;
 
 import controller.Controlador;
@@ -10,6 +9,16 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Panel de informes de ventas para empleado y administrador.
+ * <p>
+ * Muestra cuatro tarjetas con indicadores: total de alquileres, ingresos
+ * totales, alquileres activos y pendientes de devolución, más tabla de detalle.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelInformes extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -24,7 +33,6 @@ public class PanelInformes extends JPanel {
 
 	private DefaultTableModel modeloTabla;
 	private JTable tblDetalle;
-	private JButton btnActualizar;
 
 	public PanelInformes() {
 		setBackground(COLOR_FONDO);
@@ -49,17 +57,7 @@ public class PanelInformes extends JPanel {
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
 		lbl.setForeground(COLOR_DARK);
 
-		btnActualizar = new JButton("🔄  Actualizar");
-		btnActualizar.setActionCommand("ACTUALIZAR_INFORMES");
-		btnActualizar.setFont(new Font("SansSerif", Font.BOLD, 13));
-		btnActualizar.setBackground(COLOR_DARK);
-		btnActualizar.setForeground(Color.WHITE);
-		btnActualizar.setFocusPainted(false);
-		btnActualizar.setBorder(new EmptyBorder(7, 16, 7, 16));
-		btnActualizar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
 		panel.add(lbl, BorderLayout.WEST);
-		panel.add(btnActualizar, BorderLayout.EAST);
 		return panel;
 	}
 
@@ -190,11 +188,4 @@ public class PanelInformes extends JPanel {
 		}
 	}
 
-	public void setControlador(Controlador controlador) {
-		btnActualizar.addActionListener(controlador);
-	}
-
-	public JButton getBtnActualizar() {
-		return btnActualizar;
-	}
 }

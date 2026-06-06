@@ -7,6 +7,17 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Panel de alta de nuevas películas en el catálogo.
+ * <p>
+ * Formulario con título, director, duración, género, clasificación de edad,
+ * formato y número de copias (spinner 1-10). Al guardar, el controlador crea la
+ * película y las N copias con precio automático según el formato.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelAnadirPelicula extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -19,8 +30,8 @@ public class PanelAnadirPelicula extends JPanel {
 	private JTextField txtDuracion;
 	private JComboBox<String> cmbGenero;
 	private JComboBox<String> cmbClasificacion;
-	private JComboBox<String> cmbFormato; // ← ahora es ComboBox
-	private JTextField txtPrecio;
+	private JComboBox<String> cmbFormato;
+	private JSpinner spinnerCopias;
 	private JTextArea txtSinopsis;
 	private JButton btnGuardar;
 	private JButton btnLimpiar;
@@ -69,7 +80,6 @@ public class PanelAnadirPelicula extends JPanel {
 		txtTitulo = buildTextField();
 		txtDirector = buildTextField();
 		txtDuracion = buildTextField();
-		txtPrecio = buildTextField();
 
 		cmbGenero = new JComboBox<>(new String[] { "Acción", "Aventura", "Animación", "Ciencia Ficción", "Comedia",
 				"Drama", "Fantasía", "Musical", "Romance", "Suspense", "Terror", "Thriller" });
@@ -78,9 +88,12 @@ public class PanelAnadirPelicula extends JPanel {
 		cmbClasificacion = new JComboBox<>(new String[] { "TP", "7", "12", "16", "18" });
 		cmbClasificacion.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
-		// ← ComboBox de formato en lugar de TextField
 		cmbFormato = new JComboBox<>(new String[] { "DVD", "Blu-ray", "4K Ultra HD" });
 		cmbFormato.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+		// Spinner para numero de copias: minimo 1, maximo 10, valor inicial 1
+		spinnerCopias = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+		spinnerCopias.setFont(new Font("SansSerif", Font.PLAIN, 13));
 
 		txtSinopsis = new JTextArea(4, 20);
 		txtSinopsis.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -95,7 +108,7 @@ public class PanelAnadirPelicula extends JPanel {
 		// Fila 2
 		agregarFila(panel, gbc, 2, "Clasificación edad *", cmbClasificacion, "Formato copia *", cmbFormato);
 		// Fila 3
-		agregarFila(panel, gbc, 3, "Precio alquiler/día (€) *", txtPrecio, "", new JLabel());
+		agregarFila(panel, gbc, 3, "Nº de copias *", spinnerCopias, "", new JLabel());
 		// Fila 4: sinopsis ocupa todo el ancho
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -186,40 +199,64 @@ public class PanelAnadirPelicula extends JPanel {
 
 	// ── Métodos para el Controlador ───────────────────────────────────────────
 
+	/**
+	 * Limpia todos los campos del formulario y resetea los combos y el spinner.
+	 */
 	public void limpiar() {
 		txtTitulo.setText("");
 		txtDirector.setText("");
 		txtDuracion.setText("");
 		txtSinopsis.setText("");
-		txtPrecio.setText("");
 		cmbGenero.setSelectedIndex(0);
 		cmbClasificacion.setSelectedIndex(0);
 		cmbFormato.setSelectedIndex(0);
+		spinnerCopias.setValue(1);
 		lblMensaje.setText(" ");
 		lblMensaje.setForeground(Color.BLACK);
 	}
 
+	/**
+	 * Muestra un mensaje de resultado bajo el formulario.
+	 *
+	 * @param mensaje texto del mensaje
+	 * @param esError {@code true} para rojo (error), {@code false} para verde
+	 *                (éxito)
+	 */
 	public void mostrarMensaje(String mensaje, boolean esError) {
 		lblMensaje.setText(mensaje);
 		lblMensaje.setForeground(esError ? COLOR_ACENTO : COLOR_ACTIVO);
 	}
 
+	/**
+	 * Comprueba que los campos obligatorios estén rellenos y la duración sea un
+	 * entero válido.
+	 *
+	 * @return {@code true} si los datos son válidos
+	 */
 	public boolean datosValidos() {
 		if (txtTitulo.getText().trim().isEmpty() || txtDirector.getText().trim().isEmpty()
-				|| txtDuracion.getText().trim().isEmpty() || txtPrecio.getText().trim().isEmpty()) {
+				|| txtDuracion.getText().trim().isEmpty()) {
 			mostrarMensaje("Rellena todos los campos obligatorios (*).", true);
 			return false;
 		}
 		try {
-			Integer.parseInt(txtDuracion.getText().trim());
-			Double.parseDouble(txtPrecio.getText().trim());
+			int duracion = Integer.parseInt(txtDuracion.getText().trim());
+			if (duracion <= 0 || duracion > 600) {
+				mostrarMensaje("La duración debe estar entre 1 y 600 minutos.", true);
+				return false;
+			}
 		} catch (NumberFormatException e) {
-			mostrarMensaje("Duración y precio deben ser números.", true);
+			mostrarMensaje("La duración debe ser un número entero.", true);
 			return false;
 		}
 		return true;
 	}
 
+	/**
+	 * Registra el controlador como listener de los botones del formulario.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
 	public void setControlador(Controlador controlador) {
 		btnGuardar.addActionListener(controlador);
 		btnLimpiar.addActionListener(controlador);
@@ -227,43 +264,76 @@ public class PanelAnadirPelicula extends JPanel {
 
 	// ── Getters ───────────────────────────────────────────────────────────────
 
+	/**
+	 * Devuelve el título introducido.
+	 *
+	 * @return título de la película
+	 */
 	public String getTitulo() {
 		return txtTitulo.getText().trim();
 	}
 
+	/**
+	 * Devuelve el director introducido.
+	 *
+	 * @return nombre del director
+	 */
 	public String getDirector() {
 		return txtDirector.getText().trim();
 	}
 
+	/**
+	 * Devuelve la duración introducida en minutos.
+	 *
+	 * @return duración en minutos
+	 */
 	public int getDuracion() {
 		return Integer.parseInt(txtDuracion.getText().trim());
 	}
 
+	/**
+	 * Devuelve el género seleccionado.
+	 *
+	 * @return género cinematográfico
+	 */
 	public String getGenero() {
 		return (String) cmbGenero.getSelectedItem();
 	}
 
+	/**
+	 * Devuelve la sinopsis introducida.
+	 *
+	 * @return sinopsis de la película
+	 */
 	public String getSinopsis() {
 		return txtSinopsis.getText().trim();
 	}
 
+	/**
+	 * Devuelve la clasificación de edad seleccionada.
+	 *
+	 * @return TP, 7, 12, 16 o 18
+	 */
 	public String getClasificacion() {
 		return (String) cmbClasificacion.getSelectedItem();
 	}
 
+	/**
+	 * Devuelve el formato de copia seleccionado.
+	 *
+	 * @return DVD, Blu-ray o 4K Ultra HD
+	 */
 	public String getFormato() {
 		return (String) cmbFormato.getSelectedItem();
 	}
 
-	public double getPrecio() {
-		return Double.parseDouble(txtPrecio.getText().trim());
+	/**
+	 * Devuelve el número de copias indicado en el spinner.
+	 *
+	 * @return número de copias (entre 1 y 10)
+	 */
+	public int getNumCopias() {
+		return (int) spinnerCopias.getValue();
 	}
 
-	public JButton getBtnGuardar() {
-		return btnGuardar;
-	}
-
-	public JButton getBtnLimpiar() {
-		return btnLimpiar;
-	}
 }

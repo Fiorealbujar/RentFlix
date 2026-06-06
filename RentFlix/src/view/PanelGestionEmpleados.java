@@ -13,6 +13,18 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Panel de gestión de empleados, exclusivo del administrador.
+ * <p>
+ * Muestra la tabla de empleados con columnas ID, Nombre, Apellido, Email,
+ * Usuario y Rol (Administrador/Empleado con color). Incluye un formulario
+ * inferior para crear nuevos empleados. Los botones de editar y eliminar no se
+ * habilitan para la fila del administrador activo.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelGestionEmpleados extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -172,7 +184,7 @@ public class PanelGestionEmpleados extends JPanel {
 		campos.add(txtUsuario);
 		campos.add(txtContrasenia);
 
-		JPanel sur = new JPanel(new BorderLayout(10, 0));
+		JPanel sur = new JPanel(new BorderLayout(30, 0));
 		sur.setOpaque(false);
 		sur.setBorder(new EmptyBorder(10, 0, 0, 0));
 
@@ -280,10 +292,48 @@ public class PanelGestionEmpleados extends JPanel {
 		lblMensaje.setForeground(esError ? COLOR_ACENTO : new Color(0x27AE60));
 	}
 
+	/**
+	 * Valida los campos del formulario con las siguientes reglas: - Ningún campo
+	 * puede estar vacío - El email debe contener '@' y '.' - El usuario no puede
+	 * contener espacios - La contraseña debe tener al menos 4 caracteres Muestra el
+	 * mensaje de error correspondiente si alguna validación falla.
+	 *
+	 * @return {@code true} si todos los datos son válidos
+	 */
 	public boolean datosValidos() {
-		return !txtNombre.getText().trim().isEmpty() && !txtApellido.getText().trim().isEmpty()
-				&& !txtEmail.getText().trim().isEmpty() && !txtUsuario.getText().trim().isEmpty()
-				&& txtContrasenia.getPassword().length > 0;
+		StringBuilder errores = new StringBuilder();
+
+		if (txtNombre.getText().trim().isEmpty() || txtApellido.getText().trim().isEmpty()) {
+			errores.append("· Nombre y apellido son obligatorios.\n");
+		}
+
+		String email = txtEmail.getText().trim();
+		if (email.isEmpty()) {
+			errores.append("· El email es obligatorio.\n");
+		} else if (!email.contains("@") || !email.contains(".")) {
+			errores.append("· El email no tiene un formato válido.\n");
+		}
+
+		String usuario = txtUsuario.getText().trim();
+		if (usuario.isEmpty()) {
+			errores.append("· El usuario es obligatorio.\n");
+		} else if (usuario.contains(" ")) {
+			errores.append("· El usuario no puede contener espacios.\n");
+		}
+
+		int longitudContrasenia = txtContrasenia.getPassword().length;
+		if (longitudContrasenia == 0) {
+			errores.append("· La contraseña es obligatoria.\n");
+		} else if (longitudContrasenia < 4) {
+			errores.append("· La contraseña debe tener al menos 4 caracteres.\n");
+		}
+
+		if (errores.length() > 0) {
+			mostrarMensaje(errores.toString().trim(), true);
+			return false;
+		}
+
+		return true;
 	}
 
 	public void setControlador(Controlador controlador) {

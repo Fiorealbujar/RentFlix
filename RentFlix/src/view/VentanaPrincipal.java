@@ -1,8 +1,3 @@
-// ==========================================
-// CLASE: VentanaPrincipal.java — CORREGIDA
-// Un solo botón rojo que cambia de texto
-// según el estado de la sesión.
-// ==========================================
 package view;
 
 import controller.Controlador;
@@ -11,10 +6,17 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Ventana principal de la aplicación RentFlix.
+ * <p>
+ * Contenedor raíz de todos los paneles. Gestiona la barra superior con logo y
+ * botones de navegación cuya visibilidad cambia según el estado de sesión.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class VentanaPrincipal extends JFrame {
-
-	public static final int ANCHO = 1100;
-	public static final int ALTO = 680;
 
 	private JPanel panelContenido;
 	private JButton btnLogin;
@@ -28,11 +30,13 @@ public class VentanaPrincipal extends JFrame {
 	}
 
 	private void configurarVentana() {
-		setSize(ANCHO, ALTO);
-		setMinimumSize(new Dimension(900, 580));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setLocationRelativeTo(null);
-		setLayout(new BorderLayout());
+	    int ancho = 1100;
+	    int alto = 680;
+	    setSize(ancho, alto);
+	    setMinimumSize(new Dimension(900, 580));
+	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    setLocationRelativeTo(null);
+	    setLayout(new BorderLayout());
 	}
 
 	private void construirUI() {
@@ -111,15 +115,4 @@ public class VentanaPrincipal extends JFrame {
 		btnCerrarSesion.addActionListener(controlador);
 	}
 
-	public JButton getBtnLogin() {
-		return btnLogin;
-	}
-
-	public JButton getBtnRegistro() {
-		return btnRegistro;
-	}
-
-	public JButton getBtnCerrarSesion() {
-		return btnCerrarSesion;
-	}
 }

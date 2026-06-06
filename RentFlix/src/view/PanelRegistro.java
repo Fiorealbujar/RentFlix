@@ -7,6 +7,16 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Panel de registro de nuevos clientes en RentFlix.
+ * <p>
+ * Formulario con nombre, apellido, email, usuario y contraseña. Crea la cuenta
+ * con estado {@code activo} y redirige al login.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelRegistro extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -130,10 +140,18 @@ public class PanelRegistro extends JPanel {
 		return btn;
 	}
 
+	/**
+	 * Muestra un mensaje de error bajo el formulario.
+	 *
+	 * @param mensaje texto del error a mostrar
+	 */
 	public void mostrarError(String mensaje) {
 		lblError.setText(mensaje);
 	}
 
+	/**
+	 * Limpia todos los campos del formulario.
+	 */
 	public void limpiar() {
 		txtNombre.setText("");
 		txtApellido.setText("");
@@ -143,42 +161,102 @@ public class PanelRegistro extends JPanel {
 		lblError.setText(" ");
 	}
 
+	/**
+	 * Valida los campos del formulario con las siguientes reglas: - Ningún campo
+	 * puede estar vacío - El email debe contener '@' y '.' - El usuario no puede
+	 * contener espacios - La contraseña debe tener al menos 4 caracteres Muestra el
+	 * mensaje de error correspondiente si alguna validación falla.
+	 *
+	 * @return {@code true} si todos los datos son válidos
+	 */
 	public boolean datosValidos() {
-		return !txtNombre.getText().trim().isEmpty() && !txtApellido.getText().trim().isEmpty()
-				&& !txtEmail.getText().trim().isEmpty() && !txtUsuario.getText().trim().isEmpty()
-				&& txtContrasenia.getPassword().length > 0;
+		StringBuilder errores = new StringBuilder();
+
+		if (txtNombre.getText().trim().isEmpty() || txtApellido.getText().trim().isEmpty()) {
+			errores.append("· Nombre y apellido son obligatorios.\n");
+		}
+
+		String email = txtEmail.getText().trim();
+		if (email.isEmpty()) {
+			errores.append("· El email es obligatorio.\n");
+		} else if (!email.contains("@") || !email.contains(".")) {
+			errores.append("· El email no tiene un formato válido.\n");
+		}
+
+		String usuario = txtUsuario.getText().trim();
+		if (usuario.isEmpty()) {
+			errores.append("· El usuario es obligatorio.\n");
+		} else if (usuario.contains(" ")) {
+			errores.append("· El usuario no puede contener espacios.\n");
+		}
+
+		int longitudContrasenia = txtContrasenia.getPassword().length;
+		if (longitudContrasenia == 0) {
+			errores.append("· La contraseña es obligatoria.\n");
+		} else if (longitudContrasenia < 4) {
+			errores.append("· La contraseña debe tener al menos 4 caracteres.\n");
+		}
+
+		if (errores.length() > 0) {
+			mostrarError("<html>" + errores.toString().replace("\n", "<br>") + "</html>");
+			return false;
+		}
+
+		return true;
 	}
 
+	/**
+	 * Registra el controlador como listener de los botones del formulario.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
 	public void setControlador(Controlador controlador) {
 		btnRegistrar.addActionListener(controlador);
 		btnCancelar.addActionListener(controlador);
 	}
 
+	/**
+	 * Devuelve el nombre introducido.
+	 *
+	 * @return nombre del nuevo cliente
+	 */
 	public String getNombre() {
 		return txtNombre.getText().trim();
 	}
 
+	/**
+	 * Devuelve el apellido introducido.
+	 *
+	 * @return apellido del nuevo cliente
+	 */
 	public String getApellido() {
 		return txtApellido.getText().trim();
 	}
 
+	/**
+	 * Devuelve el email introducido.
+	 *
+	 * @return email del nuevo cliente
+	 */
 	public String getEmail() {
 		return txtEmail.getText().trim();
 	}
 
+	/**
+	 * Devuelve el nombre de usuario introducido.
+	 *
+	 * @return nombre de usuario
+	 */
 	public String getUsuario() {
 		return txtUsuario.getText().trim();
 	}
 
+	/**
+	 * Devuelve la contraseña introducida.
+	 *
+	 * @return contraseña en texto plano
+	 */
 	public String getContrasenia() {
 		return new String(txtContrasenia.getPassword());
-	}
-
-	public JButton getBtnRegistrar() {
-		return btnRegistrar;
-	}
-
-	public JButton getBtnCancelar() {
-		return btnCancelar;
 	}
 }

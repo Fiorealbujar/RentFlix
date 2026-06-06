@@ -1,4 +1,3 @@
-// AlquilerDAO.java
 package dao;
 
 import model.Alquiler;
@@ -6,10 +5,25 @@ import model.Alquiler;
 import java.sql.*;
 import java.util.ArrayList;
 
+/**
+ * Implementación de {@link IAlquilerDAO} para la base de datos SQLite.
+ * <p>
+ * Gestiona todas las operaciones de persistencia sobre la tabla
+ * {@code Alquileres}. Las consultas de listado utilizan JOINs con las tablas
+ * Peliculas, Copias, Clientes y Pagos para enriquecer los objetos
+ * {@link Alquiler} con datos necesarios para las vistas.
+ * </p>
+ *
+ * @author Ana Belén Rueda Reina
+ * @version 1.0
+ */
 public class AlquilerDAO implements IAlquilerDAO {
 
 	private ConexionDB acceso;
 
+	/**
+	 * Constructor que inicializa la conexión a la base de datos.
+	 */
 	public AlquilerDAO() {
 		acceso = new ConexionDB();
 	}
@@ -22,6 +36,14 @@ public class AlquilerDAO implements IAlquilerDAO {
 			+ "JOIN Clientes c    ON c.id_cliente      = a.id_cliente "
 			+ "LEFT JOIN Pagos pg ON pg.id_transaccion = a.id_transaccion ";
 
+	/**
+	 * Mapea una fila del {@link ResultSet} a un objeto {@link Alquiler}. Intenta
+	 * poblar también los campos extra (película, cliente, importe).
+	 *
+	 * @param rs fila del ResultSet
+	 * @return objeto Alquiler mapeado
+	 * @throws SQLException si ocurre un error al leer el ResultSet
+	 */
 	private Alquiler mapear(ResultSet rs) throws SQLException {
 		Alquiler a = new Alquiler(rs.getInt("id_alquiler"), rs.getInt("id_cliente"), rs.getInt("id_copia"),
 				(Integer) rs.getObject("id_empleado"), (Integer) rs.getObject("id_transaccion"),
@@ -36,6 +58,9 @@ public class AlquilerDAO implements IAlquilerDAO {
 		return a;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int crear(Alquiler alquiler) {
 		int res = 0;
@@ -75,6 +100,9 @@ public class AlquilerDAO implements IAlquilerDAO {
 		return res;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ArrayList<Alquiler> listarPorCliente(int idCliente) {
 		ArrayList<Alquiler> lista = new ArrayList<Alquiler>();
@@ -111,6 +139,9 @@ public class AlquilerDAO implements IAlquilerDAO {
 		return lista;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public ArrayList<Alquiler> listarTodos() {
 		ArrayList<Alquiler> lista = new ArrayList<Alquiler>();
@@ -146,6 +177,9 @@ public class AlquilerDAO implements IAlquilerDAO {
 		return lista;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int solicitarDevolucion(int idAlquiler) {
 		int res = 0;
@@ -177,38 +211,73 @@ public class AlquilerDAO implements IAlquilerDAO {
 		return res;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Realiza primero un SELECT para obtener el {@code id_copia} del alquiler, y
+	 * después ejecuta el UPDATE. Devuelve el {@code id_copia} para que el
+	 * controlador pueda restaurar el estado de la copia a {@code disponible}.
+	 * </p>
+	 */
 	@Override
 	public int aceptarDevolucion(int idAlquiler, String fechaDevolucionReal) {
-		int res = 0;
-		String query = "UPDATE Alquileres SET estado_alquiler = 'devuelto', " + "fecha_devolucion_real = ? "
-				+ "WHERE id_alquiler = ? AND estado_alquiler = 'pendiente_devolucion'";
+		int idCopia = -1;
+
+		// Primero obtenemos el id_copia del alquiler
+		String querySelect = "SELECT id_copia FROM Alquileres WHERE id_alquiler = ? "
+				+ "AND estado_alquiler = 'pendiente_devolucion'";
+		String queryUpdate = "UPDATE Alquileres SET estado_alquiler = 'devuelto', "
+				+ "fecha_devolucion_real = ? WHERE id_alquiler = ? " + "AND estado_alquiler = 'pendiente_devolucion'";
 
 		Connection con = null;
-		PreparedStatement ps = null;
+		PreparedStatement psSelect = null;
+		PreparedStatement psUpdate = null;
+		ResultSet rs = null;
 
 		try {
 			con = acceso.getConexion();
-			ps = con.prepareStatement(query);
-			ps.setString(1, fechaDevolucionReal);
-			ps.setInt(2, idAlquiler);
-			res = ps.executeUpdate();
+
+			// Obtener id_copia
+			psSelect = con.prepareStatement(querySelect);
+			psSelect.setInt(1, idAlquiler);
+			rs = psSelect.executeQuery();
+			if (rs.next()) {
+				idCopia = rs.getInt("id_copia");
+			}
+
+			// Si encontramos el alquiler, actualizamos su estado
+			if (idCopia != -1) {
+				psUpdate = con.prepareStatement(queryUpdate);
+				psUpdate.setString(1, fechaDevolucionReal);
+				psUpdate.setInt(2, idAlquiler);
+				if (psUpdate.executeUpdate() == 0) {
+					idCopia = -1; // El UPDATE no afectó filas, devolvemos -1
+				}
+			}
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (ps != null)
-					ps.close();
+				if (rs != null)
+					rs.close();
+				if (psSelect != null)
+					psSelect.close();
+				if (psUpdate != null)
+					psUpdate.close();
 				if (con != null)
 					con.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
-		return res;
+		return idCopia;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int marcarVencidos() {
 		int res = 0;

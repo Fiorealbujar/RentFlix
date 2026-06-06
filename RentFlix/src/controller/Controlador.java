@@ -1,4 +1,3 @@
-// Controlador.java
 package controller;
 
 import dao.*;
@@ -12,6 +11,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+/**
+ * Controlador principal de la aplicación RentFlix.
+ * <p>
+ * Implementa {@link ActionListener} y centraliza toda la lógica de negocio.
+ * Gestiona la sesión activa, coordina las vistas con los DAOs y procesa todos
+ * los eventos de la interfaz gráfica.
+ * </p>
+ *
+ * @author Ana Belén Rueda Reina
+ * @version 1.0
+ */
 public class Controlador implements ActionListener {
 
 	// ── Vistas ────────────────────────────────────────────────────────────────
@@ -95,6 +105,8 @@ public class Controlador implements ActionListener {
 		copiaDAO = new CopiaDAO();
 		pagoDAO = new PagoDAO();
 
+		catInvitado.setSelectionListener(this);
+
 		iniciarModoInvitado();
 	}
 
@@ -139,6 +151,11 @@ public class Controlador implements ActionListener {
 			case "BUSCAR_PELICULA":
 				buscarPelicula(e);
 				break;
+
+			case "BUSCAR_PELICULA_GESTION":
+				buscarPeliculaGestion();
+				break;
+
 			case "ALQUILAR_PELICULA":
 				alquilarDesdeClienteCatalogo();
 				break;
@@ -179,13 +196,8 @@ public class Controlador implements ActionListener {
 			case "EDITAR_PELICULA":
 				editarPelicula();
 				break;
-			case "ELIMINAR_PELICULA":
-				eliminarPelicula();
-				break;
-
-			// ── PanelInformes ─────────────────────────────────────────────
-			case "ACTUALIZAR_INFORMES":
-				cargarInformes();
+			case "DAR_DE_BAJA_PELICULA":
+				darDeBajaPelicula();
 				break;
 
 			// ── PanelGestionEmpleados (solo admin) ────────────────────────
@@ -206,8 +218,16 @@ public class Controlador implements ActionListener {
 			case "EDITAR_CLIENTE":
 				editarCliente();
 				break;
+			case "BLOQUEAR_CLIENTE":
+				bloquearClienteDesdeGestion();
+				break;
 			case "ELIMINAR_CLIENTE":
 				eliminarCliente();
+				break;
+
+			// ── PanelGestionAlquileres — bloquear cliente con alquiler vencido ──
+			case "BLOQUEAR_CLIENTE_ALQUILER":
+				bloquearClienteDesdeAlquiler();
 				break;
 			}
 
@@ -228,6 +248,11 @@ public class Controlador implements ActionListener {
 			// ── PanelMisAlquileres ────────────────────────────────────────
 			case "FILTRAR_MIS_ALQUILERES":
 				filtrarMisAlquileres();
+				break;
+
+			// ── PanelGestionClientes ──────────────────────────────────────
+			case "FILTRAR_CLIENTES":
+				filtrarClientes();
 				break;
 			}
 		}
@@ -269,6 +294,17 @@ public class Controlador implements ActionListener {
 
 	// ── Modo invitado ─────────────────────────────────────────────────────────
 
+	// ── Helper conteo de copias
+	// ─────────────────────────────────────────────────────
+
+	private ArrayList<Integer> obtenerConteosCopias(ArrayList<Pelicula> peliculas) {
+		ArrayList<Integer> conteos = new ArrayList<Integer>();
+		for (Pelicula p : peliculas) {
+			conteos.add(copiaDAO.contarDisponiblesPorPelicula(p.getId()));
+		}
+		return conteos;
+	}
+
 	private void iniciarModoInvitado() {
 		clienteActivo = null;
 		empleadoActivo = null;
@@ -276,7 +312,7 @@ public class Controlador implements ActionListener {
 		ArrayList<Pelicula> peliculas = peliculaDAO.listarTodas();
 		ArrayList<Copia> copias = copiaDAO.listarTodasDisponibles();
 		catInvitado.cargarCopias(peliculas, copias);
-		catInvitado.habilitarAcciones(true);
+		catInvitado.habilitarAcciones(false);
 		ventana.modoInvitado();
 		ventana.cargarPanel(catInvitado);
 	}
@@ -351,7 +387,7 @@ public class Controlador implements ActionListener {
 			return;
 		}
 
-		int fila = (clienteActivo != null) ? catCliente.getFilaSeleccionada() : catInvitado.getFilaSeleccionada();
+		int fila = catCliente.getFilaSeleccionada();
 
 		if (fila < 0) {
 			JOptionPane.showMessageDialog(ventana, "Selecciona una película del catálogo primero.", "Sin selección",
@@ -359,8 +395,8 @@ public class Controlador implements ActionListener {
 			return;
 		}
 
-		String titulo = (String) catCliente.getModelo().getValueAt(fila, 0);
-		String formato = (String) catCliente.getModelo().getValueAt(fila, 5);
+		String titulo = catCliente.getTituloSeleccionado();
+		String formato = catCliente.getFormatoSeleccionado();
 
 		ArrayList<Pelicula> encontradas = peliculaDAO.buscarPorTitulo(titulo);
 		if (encontradas.isEmpty()) {
@@ -543,18 +579,28 @@ public class Controlador implements ActionListener {
 
 	private void procesarRegistro() {
 		if (!panelRegistro.datosValidos()) {
-			panelRegistro.mostrarError("Rellena todos los campos.");
 			return;
 		}
 		Cliente nuevo = new Cliente(0, panelRegistro.getNombre(), panelRegistro.getApellido(), panelRegistro.getEmail(),
 				panelRegistro.getUsuario(), panelRegistro.getContrasenia(), "activo");
-		if (clienteDAO.registrar(nuevo) > 0) {
-			JOptionPane.showMessageDialog(ventana, "¡Cuenta creada! Ya puedes iniciar sesión.", "Registro exitoso",
-					JOptionPane.INFORMATION_MESSAGE);
-			panelRegistro.limpiar();
-			ventana.cargarPanel(panelLogin);
-		} else {
-			panelRegistro.mostrarError("El usuario ya existe o hubo un error.");
+		try {
+			if (clienteDAO.registrar(nuevo) > 0) {
+				JOptionPane.showMessageDialog(ventana, "¡Cuenta creada! Ya puedes iniciar sesión.", "Registro exitoso",
+						JOptionPane.INFORMATION_MESSAGE);
+				panelRegistro.limpiar();
+				ventana.cargarPanel(panelLogin);
+			} else {
+				panelRegistro.mostrarError("No se pudo crear la cuenta. Inténtalo de nuevo.");
+			}
+		} catch (Exception ex) {
+			String mensaje = ex.getMessage() != null ? ex.getMessage().toLowerCase() : "";
+			if (mensaje.contains("email_cliente")) {
+				panelRegistro.mostrarError("Ese email ya está registrado.");
+			} else if (mensaje.contains("nombre_usuario")) {
+				panelRegistro.mostrarError("Ese nombre de usuario ya existe.");
+			} else {
+				panelRegistro.mostrarError("No se pudo crear la cuenta. Inténtalo de nuevo.");
+			}
 		}
 	}
 
@@ -578,7 +624,7 @@ public class Controlador implements ActionListener {
 		alquilerDAO.marcarVencidos();
 		panelEmpleado.setBienvenida(empleadoActivo);
 		gestionAlqEmp.cargarAlquileres(alquilerDAO.listarTodos());
-		gestionPelEmp.cargarPeliculas(peliculaDAO.listarTodas());
+		gestionPelEmp.cargarPeliculas(peliculaDAO.listarTodas(), obtenerConteosCopias(peliculaDAO.listarTodas()));
 		gestionClientesEmp.cargarClientes(clienteDAO.listarTodos());
 		cargarInformesEmpleado();
 		ventana.cargarPanel(panelEmpleado);
@@ -588,7 +634,7 @@ public class Controlador implements ActionListener {
 		alquilerDAO.marcarVencidos();
 		panelAdmin.setBienvenida(empleadoActivo);
 		gestionAlqAdm.cargarAlquileres(alquilerDAO.listarTodos());
-		gestionPelAdm.cargarPeliculas(peliculaDAO.listarTodas());
+		gestionPelAdm.cargarPeliculas(peliculaDAO.listarTodas(), obtenerConteosCopias(peliculaDAO.listarTodas()));
 		gestionClientesAdm.cargarClientes(clienteDAO.listarTodos());
 		gestionEmpleados.cargarEmpleados(empleadoDAO.listarTodos());
 		cargarInformesAdmin();
@@ -625,10 +671,18 @@ public class Controlador implements ActionListener {
 					JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-		if (alquilerDAO.aceptarDevolucion(id, java.time.LocalDate.now().toString()) > 0) {
+		// aceptarDevolucion devuelve el id_copia si tuvo exito, o -1 si fallo
+		int idCopia = alquilerDAO.aceptarDevolucion(id, java.time.LocalDate.now().toString());
+		if (idCopia > 0) {
+			// La copia vuelve a estar disponible para nuevos alquileres
+			copiaDAO.actualizarEstado(idCopia, "disponible");
 			JOptionPane.showMessageDialog(ventana, "Devolución aceptada.", "Devolución procesada",
 					JOptionPane.INFORMATION_MESSAGE);
 			panel.cargarAlquileres(alquilerDAO.listarTodos());
+
+			getPanelGestionPelActivo().cargarPeliculas(peliculaDAO.listarTodas(),
+					obtenerConteosCopias(peliculaDAO.listarTodas()));
+
 			if (esAdmin) {
 				cargarInformesAdmin();
 			} else {
@@ -682,11 +736,27 @@ public class Controlador implements ActionListener {
 			return;
 		}
 		Pelicula nueva = new Pelicula(0, panel.getTitulo(), panel.getDirector(), panel.getDuracion(), panel.getGenero(),
-				panel.getSinopsis(), panel.getClasificacion());
-		if (peliculaDAO.agregar(nueva) > 0) {
-			panel.mostrarMensaje("¡Película añadida!", false);
+				panel.getSinopsis(), panel.getClasificacion(), "activa");
+		int idPelicula = peliculaDAO.agregar(nueva);
+		if (idPelicula > 0) {
+			// Asignar precio segun el formato elegido
+			double precio;
+			if (panel.getFormato().equals("Blu-ray")) {
+				precio = 5.00;
+			} else if (panel.getFormato().equals("4K Ultra HD")) {
+				precio = 7.50;
+			} else {
+				precio = 2.50; // DVD
+			}
+			// Crear N copias segun el numero indicado en el spinner
+			int numCopias = panel.getNumCopias();
+			for (int i = 0; i < numCopias; i++) {
+				copiaDAO.crear(new Copia(0, idPelicula, panel.getFormato(), "disponible", precio));
+			}
+			panel.mostrarMensaje("¡Película añadida con " + numCopias + " copia(s)!", false);
 			panel.limpiar();
-			getPanelGestionPelActivo().cargarPeliculas(peliculaDAO.listarTodas());
+			getPanelGestionPelActivo().cargarPeliculas(peliculaDAO.listarTodas(),
+					obtenerConteosCopias(peliculaDAO.listarTodas()));
 		} else {
 			panel.mostrarMensaje("Error al guardar.", true);
 		}
@@ -733,61 +803,107 @@ public class Controlador implements ActionListener {
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
 		if (res == JOptionPane.OK_OPTION) {
+			StringBuilder errores = new StringBuilder();
+			String nuevoTitulo = txtTitulo.getText().trim();
+			String nuevoDirector = txtDirector.getText().trim();
+			if (nuevoTitulo.isEmpty()) {
+				errores.append("· El título es obligatorio.\n");
+			}
+			if (nuevoDirector.isEmpty()) {
+				errores.append("· El director es obligatorio.\n");
+			}
+			int duracion = 0;
 			try {
-				p.setNombrePelicula(txtTitulo.getText().trim());
-				p.setDirector(txtDirector.getText().trim());
-				p.setDuracion(Integer.parseInt(txtDuracion.getText().trim()));
+				duracion = Integer.parseInt(txtDuracion.getText().trim());
+				if (duracion <= 0 || duracion > 600) {
+					errores.append("· La duración debe estar entre 1 y 600 minutos.\n");
+				}
+			} catch (NumberFormatException ex) {
+				errores.append("· La duración debe ser un número entero.\n");
+			}
+			if (errores.length() > 0) {
+				JOptionPane.showMessageDialog(ventana, errores.toString().trim(), "Datos incorrectos",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			try {
+				p.setNombrePelicula(nuevoTitulo);
+				p.setDirector(nuevoDirector);
+				p.setDuracion(duracion);
 				p.setGenero((String) cmbGenero.getSelectedItem());
 				p.setClasificacionEdad((String) cmbClasif.getSelectedItem());
 				p.setSinopsis(txtSinopsis.getText().trim());
 				if (peliculaDAO.actualizar(p) > 0) {
 					JOptionPane.showMessageDialog(ventana, "Película actualizada.", "Éxito",
 							JOptionPane.INFORMATION_MESSAGE);
-					getPanelGestionPelActivo().cargarPeliculas(peliculaDAO.listarTodas());
+					getPanelGestionPelActivo().cargarPeliculas(peliculaDAO.listarTodas(),
+							obtenerConteosCopias(peliculaDAO.listarTodas()));
+					getPanelGestionActivo().cargarAlquileres(alquilerDAO.listarTodos());
 				}
-			} catch (NumberFormatException ex) {
-				JOptionPane.showMessageDialog(ventana, "La duración debe ser un número entero.", "Error",
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(ventana, "Error al actualizar la película.", "Error",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}
 
-	private void eliminarPelicula() {
-		int id = getPanelGestionPelActivo().getIdPeliculaSeleccionada();
-		if (id == -1) {
-			JOptionPane.showMessageDialog(ventana, "Selecciona una película.", "Sin selección",
-					JOptionPane.WARNING_MESSAGE);
-			return;
-		}
-		int conf = JOptionPane.showConfirmDialog(ventana, "¿Seguro? Esta acción no se puede deshacer.",
-				"Confirmar eliminación", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-		if (conf == JOptionPane.YES_OPTION) {
-			if (peliculaDAO.eliminar(id) > 0) {
-				JOptionPane.showMessageDialog(ventana, "Película eliminada.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-				getPanelGestionPelActivo().cargarPeliculas(peliculaDAO.listarTodas());
-			} else {
-				JOptionPane.showMessageDialog(ventana, "No se pudo eliminar. Puede tener alquileres asociados.",
-						"Error", JOptionPane.ERROR_MESSAGE);
-			}
-		}
+	private void darDeBajaPelicula() {
+	    int id = getPanelGestionPelActivo().getIdPeliculaSeleccionada();
+	    if (id == -1) {
+	        JOptionPane.showMessageDialog(ventana, "Selecciona una película.", "Sin selección",
+	                JOptionPane.WARNING_MESSAGE);
+	        return;
+	    }
+	    // Comprobar primero si tiene copias alquiladas antes de preguntar
+	    if (copiaDAO.contarAlquiladasPorPelicula(id) > 0) {
+	        JOptionPane.showMessageDialog(ventana,
+	                "No se puede dar de baja. La película tiene copias actualmente alquiladas.", "Error",
+	                JOptionPane.ERROR_MESSAGE);
+	        return;
+	    }
+	    int conf = JOptionPane.showConfirmDialog(ventana,
+	            "¿Seguro que quieres dar de baja esta película?\n"
+	                    + "Dejará de aparecer en el catálogo pero se conservará en el historial.",
+	            "Confirmar baja", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+	    if (conf == JOptionPane.YES_OPTION) {
+	        if (peliculaDAO.darDeBaja(id) > 0) {
+	            JOptionPane.showMessageDialog(ventana, "Película dada de baja correctamente.", "Éxito",
+	                    JOptionPane.INFORMATION_MESSAGE);
+	            getPanelGestionPelActivo().cargarPeliculas(peliculaDAO.listarTodas(),
+	                    obtenerConteosCopias(peliculaDAO.listarTodas()));
+	        } else {
+	            JOptionPane.showMessageDialog(ventana, "Error al dar de baja la película.", "Error",
+	                    JOptionPane.ERROR_MESSAGE);
+	        }
+	    }
 	}
 
 	// ── Empleados (solo Admin) ────────────────────────────────────────────────
 
 	private void crearEmpleado() {
 		if (!gestionEmpleados.datosValidos()) {
-			gestionEmpleados.mostrarMensaje("Rellena todos los campos.", true);
 			return;
 		}
 		Empleado nuevo = new Empleado(0, gestionEmpleados.getNombre(), gestionEmpleados.getApellido(),
 				gestionEmpleados.getEmail(), gestionEmpleados.getUsuario(), gestionEmpleados.getContrasenia(),
 				empleadoActivo.getIdEmpleado());
-		if (empleadoDAO.crear(nuevo) > 0) {
-			gestionEmpleados.mostrarMensaje("Empleado creado.", false);
-			gestionEmpleados.limpiar();
-			gestionEmpleados.cargarEmpleados(empleadoDAO.listarTodos());
-		} else {
-			gestionEmpleados.mostrarMensaje("Error. El usuario puede ya existir.", true);
+		try {
+			if (empleadoDAO.crear(nuevo) > 0) {
+				gestionEmpleados.mostrarMensaje("Empleado creado correctamente.", false);
+				gestionEmpleados.limpiar();
+				gestionEmpleados.cargarEmpleados(empleadoDAO.listarTodos());
+			} else {
+				gestionEmpleados.mostrarMensaje("No se pudo crear el empleado. Inténtalo de nuevo.", true);
+			}
+		} catch (Exception ex) {
+			String mensaje = ex.getMessage() != null ? ex.getMessage().toLowerCase() : "";
+			if (mensaje.contains("email_empleado")) {
+				gestionEmpleados.mostrarMensaje("Ese email ya está registrado.", true);
+			} else if (mensaje.contains("usuario_empleado")) {
+				gestionEmpleados.mostrarMensaje("Ese nombre de usuario ya existe.", true);
+			} else {
+				gestionEmpleados.mostrarMensaje("No se pudo crear el empleado. Inténtalo de nuevo.", true);
+			}
 		}
 	}
 
@@ -819,17 +935,37 @@ public class Controlador implements ActionListener {
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
 		if (res == JOptionPane.OK_OPTION) {
+			String nuevoEmail = txtEmail.getText().trim();
+			String nuevoUsuario = txtUsuario.getText().trim();
+
+			StringBuilder errores = new StringBuilder();
+			if (nuevoEmail.isEmpty()) {
+				errores.append("· El email es obligatorio.\n");
+			} else if (!nuevoEmail.contains("@") || !nuevoEmail.contains(".")) {
+				errores.append("· El email no tiene un formato válido.\n");
+			}
+			if (nuevoUsuario.isEmpty()) {
+				errores.append("· El usuario es obligatorio.\n");
+			} else if (nuevoUsuario.contains(" ")) {
+				errores.append("· El usuario no puede contener espacios.\n");
+			}
+			if (errores.length() > 0) {
+				JOptionPane.showMessageDialog(ventana, errores.toString().trim(), "Datos incorrectos",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
 			emp.setNombreEmpleado(txtNombre.getText().trim());
 			emp.setApellidoEmpleado(txtApellido.getText().trim());
-			emp.setEmailEmpleado(txtEmail.getText().trim());
-			emp.setUsuarioEmpleado(txtUsuario.getText().trim());
+			emp.setEmailEmpleado(nuevoEmail);
+			emp.setUsuarioEmpleado(nuevoUsuario);
 
 			if (empleadoDAO.actualizar(emp) > 0) {
 				JOptionPane.showMessageDialog(ventana, "Empleado actualizado. ✅", "Éxito",
 						JOptionPane.INFORMATION_MESSAGE);
 				gestionEmpleados.cargarEmpleados(empleadoDAO.listarTodos());
 			} else {
-				JOptionPane.showMessageDialog(ventana, "Error al actualizar. El usuario puede ya existir.", "Error",
+				JOptionPane.showMessageDialog(ventana, "No se pudo actualizar. El usuario o email ya existe.", "Error",
 						JOptionPane.ERROR_MESSAGE);
 			}
 		}
@@ -894,10 +1030,35 @@ public class Controlador implements ActionListener {
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
 		if (res == JOptionPane.OK_OPTION) {
-			c.setNombreCliente(txtNombre.getText().trim());
-			c.setApellidoCliente(txtApellido.getText().trim());
-			c.setEmailCliente(txtEmail.getText().trim());
-			c.setNombreUsuario(txtUsuario.getText().trim());
+			String nuevoNombre = txtNombre.getText().trim();
+			String nuevoApellido = txtApellido.getText().trim();
+			String nuevoEmail = txtEmail.getText().trim();
+			String nuevoUsuario = txtUsuario.getText().trim();
+
+			StringBuilder errores = new StringBuilder();
+			if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty()) {
+				errores.append("· Nombre y apellido son obligatorios.\n");
+			}
+			if (nuevoEmail.isEmpty()) {
+				errores.append("· El email es obligatorio.\n");
+			} else if (!nuevoEmail.contains("@") || !nuevoEmail.contains(".")) {
+				errores.append("· El email no tiene un formato válido.\n");
+			}
+			if (nuevoUsuario.isEmpty()) {
+				errores.append("· El usuario es obligatorio.\n");
+			} else if (nuevoUsuario.contains(" ")) {
+				errores.append("· El usuario no puede contener espacios.\n");
+			}
+			if (errores.length() > 0) {
+				JOptionPane.showMessageDialog(ventana, errores.toString().trim(), "Datos incorrectos",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+
+			c.setNombreCliente(nuevoNombre);
+			c.setApellidoCliente(nuevoApellido);
+			c.setEmailCliente(nuevoEmail);
+			c.setNombreUsuario(nuevoUsuario);
 			c.setEstado((String) cmbEstado.getSelectedItem());
 
 			if (clienteDAO.actualizar(c) > 0) {
@@ -929,16 +1090,6 @@ public class Controlador implements ActionListener {
 				JOptionPane.showMessageDialog(ventana, "No se pudo eliminar. Puede tener alquileres asociados.",
 						"Error", JOptionPane.ERROR_MESSAGE);
 			}
-		}
-	}
-
-	// ── Informes ──────────────────────────────────────────────────────────────
-
-	private void cargarInformes() {
-		if (esAdmin) {
-			cargarInformesAdmin();
-		} else {
-			cargarInformesEmpleado();
 		}
 	}
 
@@ -1016,9 +1167,24 @@ public class Controlador implements ActionListener {
 		String nuevoEmail = txtEmail.getText().trim();
 		String nuevoUsuario = txtUsuario.getText().trim();
 
-		if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty() || nuevoEmail.isEmpty() || nuevoUsuario.isEmpty()) {
-			JOptionPane.showMessageDialog(ventana, "Nombre, apellido, email y usuario son obligatorios.",
-					"Campos vacíos", JOptionPane.WARNING_MESSAGE);
+		StringBuilder errores = new StringBuilder();
+
+		if (nuevoNombre.isEmpty() || nuevoApellido.isEmpty()) {
+			errores.append("· Nombre y apellido son obligatorios.\n");
+		}
+		if (nuevoEmail.isEmpty()) {
+			errores.append("· El email es obligatorio.\n");
+		} else if (!nuevoEmail.contains("@") || !nuevoEmail.contains(".")) {
+			errores.append("· El email no tiene un formato válido.\n");
+		}
+		if (nuevoUsuario.isEmpty()) {
+			errores.append("· El usuario es obligatorio.\n");
+		} else if (nuevoUsuario.contains(" ")) {
+			errores.append("· El usuario no puede contener espacios.\n");
+		}
+		if (errores.length() > 0) {
+			JOptionPane.showMessageDialog(ventana, errores.toString().trim(), "Datos incorrectos",
+					JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 
@@ -1039,6 +1205,11 @@ public class Controlador implements ActionListener {
 						JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			if (contraNueva.length() < 4) {
+				JOptionPane.showMessageDialog(ventana, "La contraseña debe tener al menos 4 caracteres.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+				return;
+			}
 			if (!contraNueva.equals(contraRepetir)) {
 				JOptionPane.showMessageDialog(ventana, "Las contraseñas nuevas no coinciden.", "Error",
 						JOptionPane.ERROR_MESSAGE);
@@ -1052,19 +1223,112 @@ public class Controlador implements ActionListener {
 		clienteActivo.setEmailCliente(nuevoEmail);
 		clienteActivo.setNombreUsuario(nuevoUsuario);
 
-		if (clienteDAO.actualizarDatos(clienteActivo, contraFinal) > 0) {
-			clienteActivo.setContraseniaCliente(contraFinal);
-			JOptionPane.showMessageDialog(ventana, "Datos actualizados correctamente. ✅", "Éxito",
-					JOptionPane.INFORMATION_MESSAGE);
-			panelMiCuenta.cargarDatos(clienteActivo);
-			panelCliente.setBienvenida(clienteActivo);
-		} else {
-			JOptionPane.showMessageDialog(ventana, "Error al guardar los cambios. El usuario puede ya existir.",
-					"Error", JOptionPane.ERROR_MESSAGE);
+		try {
+			if (clienteDAO.actualizarDatos(clienteActivo, contraFinal) > 0) {
+				clienteActivo.setContraseniaCliente(contraFinal);
+				JOptionPane.showMessageDialog(ventana, "Datos actualizados correctamente. ✅", "Éxito",
+						JOptionPane.INFORMATION_MESSAGE);
+				panelMiCuenta.cargarDatos(clienteActivo);
+				panelCliente.setBienvenida(clienteActivo);
+			} else {
+				JOptionPane.showMessageDialog(ventana, "No se pudieron guardar los cambios.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		} catch (Exception ex) {
+			String mensaje = ex.getMessage() != null ? ex.getMessage().toLowerCase() : "";
+			if (mensaje.contains("email_cliente")) {
+				JOptionPane.showMessageDialog(ventana, "Ese email ya está registrado.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+			} else if (mensaje.contains("nombre_usuario")) {
+				JOptionPane.showMessageDialog(ventana, "Ese nombre de usuario ya existe.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(ventana, "Error al guardar los cambios.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
-	// ── Cerrar sesión ─────────────────────────────────────────────────────────
+	// ── Bloquear / desbloquear cliente ──────────────────────────────────────────
+
+	private void bloquearClienteDesdeGestion() {
+		Cliente cliente = getPanelGestionClientesActivo().getClienteSeleccionado();
+		if (cliente == null) {
+			JOptionPane.showMessageDialog(ventana, "Selecciona un cliente.", "Sin selección",
+					JOptionPane.WARNING_MESSAGE);
+			return;
+		}
+		// Alternar entre activo y bloqueado
+		String nuevoEstado = "bloqueado".equalsIgnoreCase(cliente.getEstado()) ? "activo" : "bloqueado";
+		String accion = "activo".equals(nuevoEstado) ? "desbloquear" : "bloquear";
+
+		int conf = JOptionPane.showConfirmDialog(ventana,
+				"¿Seguro que quieres " + accion + " al cliente " + cliente.getNombreCompleto() + "?", "Confirmar",
+				JOptionPane.YES_NO_OPTION);
+
+		if (conf == JOptionPane.YES_OPTION) {
+			cliente.setEstado(nuevoEstado);
+			if (clienteDAO.actualizar(cliente) > 0) {
+				String msg = "activo".equals(nuevoEstado) ? "Cliente desbloqueado." : "Cliente bloqueado.";
+				JOptionPane.showMessageDialog(ventana, msg, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+				getPanelGestionClientesActivo().cargarClientes(clienteDAO.listarTodos());
+			} else {
+				JOptionPane.showMessageDialog(ventana, "Error al actualizar el estado del cliente.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	private void bloquearClienteDesdeAlquiler() {
+		PanelGestionAlquileres panel = getPanelGestionActivo();
+		int idAlquiler = panel.getIdAlquilerSeleccionado();
+		if (idAlquiler == -1) {
+			return;
+		}
+		String nombreCliente = panel.getNombreClienteSeleccionado();
+
+		// Buscar el cliente
+		ArrayList<Cliente> clientes = clienteDAO.listarTodos();
+		Cliente cliente = null;
+		for (Cliente cli : clientes) {
+			if (cli.getNombreCompleto().equals(nombreCliente)) {
+				cliente = cli;
+				break;
+			}
+		}
+		if (cliente == null) {
+			JOptionPane.showMessageDialog(ventana, "No se pudo encontrar al cliente.", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Comprobar si ya está bloqueado
+		if ("bloqueado".equalsIgnoreCase(cliente.getEstado())) {
+			JOptionPane.showMessageDialog(ventana, "El cliente " + nombreCliente + " ya está bloqueado.",
+					"Cliente ya bloqueado", JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+
+		int conf = JOptionPane.showConfirmDialog(ventana,
+				"¿Seguro que quieres bloquear al cliente " + nombreCliente + "?\n" + "Tiene un alquiler vencido.",
+				"Bloquear cliente", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+
+		if (conf == JOptionPane.YES_OPTION) {
+			cliente.setEstado("bloqueado");
+			if (clienteDAO.actualizar(cliente) > 0) {
+				JOptionPane.showMessageDialog(ventana, "Cliente bloqueado correctamente.", "Éxito",
+						JOptionPane.INFORMATION_MESSAGE);
+				panel.cargarAlquileres(alquilerDAO.listarTodos());
+				getPanelGestionClientesActivo().cargarClientes(clienteDAO.listarTodos());
+			} else {
+				JOptionPane.showMessageDialog(ventana, "Error al bloquear el cliente.", "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	// ── Cerrar sesión
+	// ─────────────────────────────────────────────────────────────
 
 	private void cerrarSesion() {
 		int conf = JOptionPane.showConfirmDialog(ventana, "¿Seguro que quieres cerrar sesión?", "Cerrar sesión",
@@ -1074,11 +1338,39 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	public Cliente getClienteActivo() {
-		return clienteActivo;
+	// ── Filtrar clientes
+	// ──────────────────────────────────────────────────────────
+
+	private void filtrarClientes() {
+		String filtro = getPanelGestionClientesActivo().getFiltroEstado();
+		ArrayList<Cliente> todos = clienteDAO.listarTodos();
+
+		if (filtro == null) {
+			getPanelGestionClientesActivo().cargarClientes(todos);
+			return;
+		}
+
+		ArrayList<Cliente> filtrados = new ArrayList<Cliente>();
+		for (Cliente cli : todos) {
+			if (filtro.equalsIgnoreCase(cli.getEstado())) {
+				filtrados.add(cli);
+			}
+		}
+		getPanelGestionClientesActivo().cargarClientes(filtrados);
 	}
 
-	public Empleado getEmpleadoActivo() {
-		return empleadoActivo;
+	// ── Buscar película en gestión
+	// ────────────────────────────────────────────────
+
+	private void buscarPeliculaGestion() {
+		String termino = getPanelGestionPelActivo().getTxtBuscar().getText().trim();
+		ArrayList<Pelicula> peliculas;
+		if (termino.isEmpty()) {
+			peliculas = peliculaDAO.listarTodas();
+		} else {
+			peliculas = peliculaDAO.buscarPorTitulo(termino);
+		}
+		getPanelGestionPelActivo().cargarPeliculas(peliculas, obtenerConteosCopias(peliculas));
 	}
+
 }

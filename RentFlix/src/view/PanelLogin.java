@@ -1,4 +1,3 @@
-// PanelLogin.java
 package view;
 
 import controller.Controlador;
@@ -7,6 +6,16 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Panel de inicio de sesión de RentFlix.
+ * <p>
+ * Formulario con selector de tipo de usuario (combo "Cliente" o "Empleado /
+ * Administrador"), campo de usuario, contraseña y botones.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
 public class PanelLogin extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -143,14 +152,6 @@ public class PanelLogin extends JPanel {
 
 	public String getContrasenia() {
 		return new String(txtContrasenia.getPassword());
-	}
-
-	public JButton getBtnEntrar() {
-		return btnEntrar;
-	}
-
-	public JButton getBtnCancelar() {
-		return btnCancelar;
 	}
 
 	public void setControlador(Controlador controlador) {
