@@ -66,7 +66,7 @@ CREATE TABLE Copias (
     estado          TEXT NOT NULL DEFAULT 'disponible',
     precio_alquiler REAL NOT NULL,
     CONSTRAINT ck_formato CHECK (formato IN ('DVD', 'Blu-ray', '4K Ultra HD')),
-    CONSTRAINT ck_estado   CHECK (estado IN ('disponible', 'alquilada', 'dañada')),
+    CONSTRAINT ck_estado   CHECK (estado IN ('disponible', 'alquilada')),
     CONSTRAINT fk_id_pel   FOREIGN KEY (id_pelicula) REFERENCES Peliculas(id_pelicula)
 );
 
