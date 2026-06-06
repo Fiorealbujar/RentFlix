@@ -10,10 +10,9 @@ package model;
  * <p>
  * Mapea la tabla {@code Copias} de la base de datos SQLite. Una misma película
  * puede tener múltiples copias en distintos formatos (DVD, Blu-ray, 4K Ultra
- * HD). El campo {@code estado} refleja la disponibilidad actual de la copia:
- * {@code disponible}, {@code alquilada} o {@code dañada}. El precio de alquiler
- * reside en esta entidad (no en Peliculas) para permitir precios diferenciados
- * por formato.
+ * HD). El campo {@code estado} refleja la disponibilidad actual de la copia: {@code disponible} 
+ * cuando está libre para alquilar, o {@code alquilada} cuando tiene un alquiler activo.
+ * El precio de alquiler reside en esta entidad (no en Peliculas) para permitir precios diferenciados por formato.
  * </p>
  *
  * @author Gabriel Fernández Cañadas
@@ -24,7 +23,7 @@ public class Copia {
 	private int idCopia;
 	private int idPelicula; // FK → Peliculas
 	private String formato; // "DVD", "Blu-ray", "4K Ultra HD"
-	private String estado; // "disponible", "alquilada", "dañada"
+	private String estado; // "disponible", "alquilada"
 	private double precioAlquiler;
 
 	/**
@@ -34,13 +33,12 @@ public class Copia {
 	 * @param idPelicula     identificador de la película a la que pertenece (FK)
 	 * @param formato        formato físico: {@code DVD}, {@code Blu-ray} o
 	 *                       {@code 4K Ultra HD}
-	 * @param estado         estado actual: {@code disponible}, {@code alquilada} o
-	 *                       {@code dañada}
+	 * @param estado         estado actual: {@code disponible} o {@code alquilada} 
 	 * @param precioAlquiler precio por día de alquiler en euros
 	 */
 	public Copia(int idCopia, int idPelicula, String formato, String estado, double precioAlquiler) {
 		this.idCopia = idCopia;
-		this.idPelicula = idPelicula; // ← línea que faltaba
+		this.idPelicula = idPelicula;
 		this.formato = formato;
 		this.estado = estado;
 		this.precioAlquiler = precioAlquiler;
@@ -76,7 +74,7 @@ public class Copia {
 	/**
 	 * Devuelve el estado actual de la copia.
 	 *
-	 * @return {@code disponible}, {@code alquilada} o {@code dañada}
+	 * @return {@code disponible} o {@code alquilada}
 	 */
 	public String getEstado() {
 		return estado;
