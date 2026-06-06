@@ -11,7 +11,11 @@ CREATE TABLE Peliculas (
     genero             TEXT NOT NULL,
     sinopsis           TEXT,
     clasificacion_edad TEXT NOT NULL,
-    CONSTRAINT ck_clas_edad CHECK (clasificacion_edad IN ('TP', '7', '12', '16', '18'))
+    estado             TEXT NOT NULL DEFAULT 'activa',
+    -- 'activa'   → película disponible para alquilar
+    -- 'inactiva' → película dada de baja, no aparece en el catálogo
+    CONSTRAINT ck_clas_edad CHECK (clasificacion_edad IN ('TP', '7', '12', '16', '18')),
+    CONSTRAINT ck_estado_pel CHECK (estado IN ('activa', 'inactiva'))
 );
 
 CREATE TABLE Actores (
