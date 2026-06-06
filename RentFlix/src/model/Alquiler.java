@@ -4,26 +4,96 @@
 // ==========================================
 package model;
 
+/**
+ * Representa un alquiler de una copia física de película por parte de un
+ * cliente.
+ * <p>
+ * Mapea la tabla {@code Alquileres} de la base de datos SQLite. El estado del
+ * alquiler puede ser {@code activo}, {@code pendiente_devolucion},
+ * {@code devuelto} o {@code vencido}. El campo {@code idEmpleado} es nullable:
+ * si es {@code null}, el alquiler fue registrado directamente por el cliente.
+ * Los campos {@code nombrePelicula}, {@code nombreCliente} y {@code montoCobro}
+ * no pertenecen a la tabla; se rellenan mediante JOINs en la capa DAO para
+ * facilitar la visualización en las vistas.
+ * </p>
+ *
+ * @author Gabriel Fernández Cañadas
+ * @version 1.0
+ */
 public class Alquiler {
 
+	/** Identificador único del alquiler. */
 	private int idAlquiler;
+	/** Identificador del cliente que realizó el alquiler. */
 	private int idCliente;
+	/** Identificador de la copia física alquilada. */
 	private int idCopia;
-	private Integer idEmpleado; // puede ser null (alquiler por el propio cliente)
-	private Integer idTransaccion; // puede ser null hasta que se pague
+	/**
+	 * Identificador del empleado que registró el alquiler, o {@code null} si lo
+	 * registró el propio cliente.
+	 */
+	private Integer idEmpleado;
+	/**
+	 * Identificador de la transacción de pago asociada, o {@code null} si aún no se
+	 * ha procesado.
+	 */
+	private Integer idTransaccion;
+	/** Fecha de inicio del alquiler en formato {@code yyyy-MM-dd}. */
 	private String fechaAlquiler;
+	/**
+	 * Fecha de devolución pactada al registrar el alquiler, en formato
+	 * {@code yyyy-MM-dd}.
+	 */
 	private String fechaDevolucionPrevista;
-	private String fechaDevolucionReal; // null si aún no se devolvió
-	private String estadoAlquiler; // "activo", "pendiente_devolucion", "devuelto", "vencido"
+	/**
+	 * Fecha real de devolución de la copia, o {@code null} si el alquiler sigue
+	 * activo.
+	 */
+	private String fechaDevolucionReal;
+	/**
+	 * Estado actual del alquiler: {@code activo}, {@code pendiente_devolucion},
+	 * {@code devuelto} o {@code vencido}.
+	 */
+	private String estadoAlquiler;
 
 	// Campos extra para mostrar en la vista (resultado de JOINs)
+	/**
+	 * Título de la película asociada, obtenido mediante JOIN en la capa DAO (no
+	 * pertenece a la tabla Alquileres).
+	 */
 	private String nombrePelicula;
+	/**
+	 * Nombre completo del cliente asociado, obtenido mediante JOIN en la capa DAO
+	 * (no pertenece a la tabla Alquileres).
+	 */
 	private String nombreCliente;
+	/**
+	 * Importe cobrado en este alquiler, obtenido mediante JOIN con la tabla Pagos.
+	 */
 	private double montoCobro;
 
-	public Alquiler() {
-	}
-
+	/**
+	 * Constructor completo con todos los campos persistidos en la base de datos.
+	 *
+	 * @param idAlquiler              identificador único del alquiler
+	 * @param idCliente               identificador del cliente que realiza el
+	 *                                alquiler
+	 * @param idCopia                 identificador de la copia física alquilada
+	 * @param idEmpleado              identificador del empleado que registra la
+	 *                                operación, o {@code null} si lo registró el
+	 *                                propio cliente
+	 * @param idTransaccion           identificador del pago asociado, o
+	 *                                {@code null} si aún no se ha procesado
+	 * @param fechaAlquiler           fecha de inicio del alquiler en formato
+	 *                                {@code yyyy-MM-dd}
+	 * @param fechaDevolucionPrevista fecha de devolución pactada en formato
+	 *                                {@code yyyy-MM-dd}
+	 * @param fechaDevolucionReal     fecha real de devolución, o {@code null} si el
+	 *                                alquiler sigue activo
+	 * @param estadoAlquiler          estado actual: {@code activo},
+	 *                                {@code pendiente_devolucion}, {@code devuelto}
+	 *                                o {@code vencido}
+	 */
 	public Alquiler(int idAlquiler, int idCliente, int idCopia, Integer idEmpleado, Integer idTransaccion,
 			String fechaAlquiler, String fechaDevolucionPrevista, String fechaDevolucionReal, String estadoAlquiler) {
 		this.idAlquiler = idAlquiler;
@@ -37,106 +107,147 @@ public class Alquiler {
 		this.estadoAlquiler = estadoAlquiler;
 	}
 
+	/**
+	 * Devuelve el identificador único del alquiler.
+	 *
+	 * @return id del alquiler
+	 */
 	public int getIdAlquiler() {
 		return idAlquiler;
 	}
 
-	public void setIdAlquiler(int idAlquiler) {
-		this.idAlquiler = idAlquiler;
-	}
-
+	/**
+	 * Devuelve el identificador del cliente asociado al alquiler.
+	 *
+	 * @return id del cliente
+	 */
 	public int getIdCliente() {
 		return idCliente;
 	}
 
-	public void setIdCliente(int idCliente) {
-		this.idCliente = idCliente;
-	}
-
+	/**
+	 * Devuelve el identificador de la copia física alquilada.
+	 *
+	 * @return id de la copia
+	 */
 	public int getIdCopia() {
 		return idCopia;
 	}
 
-	public void setIdCopia(int idCopia) {
-		this.idCopia = idCopia;
-	}
-
+	/**
+	 * Devuelve el identificador del empleado que registró el alquiler. Si el
+	 * alquiler fue registrado por el propio cliente, devuelve {@code null}.
+	 *
+	 * @return id del empleado, o {@code null}
+	 */
 	public Integer getIdEmpleado() {
 		return idEmpleado;
 	}
 
-	public void setIdEmpleado(Integer idEmpleado) {
-		this.idEmpleado = idEmpleado;
-	}
-
+	/**
+	 * Devuelve el identificador de la transacción de pago asociada.
+	 *
+	 * @return id de la transacción, o {@code null} si aún no se ha procesado
+	 */
 	public Integer getIdTransaccion() {
 		return idTransaccion;
 	}
 
-	public void setIdTransaccion(Integer idTransaccion) {
-		this.idTransaccion = idTransaccion;
-	}
-
+	/**
+	 * Devuelve la fecha de inicio del alquiler.
+	 *
+	 * @return fecha en formato {@code yyyy-MM-dd}
+	 */
 	public String getFechaAlquiler() {
 		return fechaAlquiler;
 	}
 
-	public void setFechaAlquiler(String fechaAlquiler) {
-		this.fechaAlquiler = fechaAlquiler;
-	}
-
+	/**
+	 * Devuelve la fecha de devolución pactada al registrar el alquiler.
+	 *
+	 * @return fecha prevista en formato {@code yyyy-MM-dd}
+	 */
 	public String getFechaDevolucionPrevista() {
 		return fechaDevolucionPrevista;
 	}
 
-	public void setFechaDevolucionPrevista(String fechaDevolucionPrevista) {
-		this.fechaDevolucionPrevista = fechaDevolucionPrevista;
-	}
-
+	/**
+	 * Devuelve la fecha real en que se devolvió la copia.
+	 *
+	 * @return fecha real en formato {@code yyyy-MM-dd}, o {@code null} si no se ha
+	 *         devuelto
+	 */
 	public String getFechaDevolucionReal() {
 		return fechaDevolucionReal;
 	}
 
-	public void setFechaDevolucionReal(String fechaDevolucionReal) {
-		this.fechaDevolucionReal = fechaDevolucionReal;
-	}
-
+	/**
+	 * Devuelve el estado actual del alquiler.
+	 *
+	 * @return {@code activo}, {@code pendiente_devolucion}, {@code devuelto} o
+	 *         {@code vencido}
+	 */
 	public String getEstadoAlquiler() {
 		return estadoAlquiler;
 	}
 
-	public void setEstadoAlquiler(String estadoAlquiler) {
-		this.estadoAlquiler = estadoAlquiler;
-	}
-
 	// Getters y setters de campos extra (JOINs)
+
+	/**
+	 * Devuelve el título de la película asociada a este alquiler. Este campo se
+	 * rellena mediante JOIN en la capa DAO, no pertenece a la tabla Alquileres.
+	 *
+	 * @return nombre de la película
+	 */
 	public String getNombrePelicula() {
 		return nombrePelicula;
 	}
 
+	/**
+	 * Establece el título de la película (campo de JOIN).
+	 *
+	 * @param nombrePelicula nombre de la película
+	 */
 	public void setNombrePelicula(String nombrePelicula) {
 		this.nombrePelicula = nombrePelicula;
 	}
 
+	/**
+	 * Devuelve el nombre completo del cliente asociado a este alquiler. Este campo
+	 * se rellena mediante JOIN en la capa DAO, no pertenece a la tabla Alquileres.
+	 *
+	 * @return nombre completo del cliente
+	 */
 	public String getNombreCliente() {
 		return nombreCliente;
 	}
 
+	/**
+	 * Establece el nombre completo del cliente (campo de JOIN).
+	 *
+	 * @param nombreCliente nombre completo del cliente
+	 */
 	public void setNombreCliente(String nombreCliente) {
 		this.nombreCliente = nombreCliente;
 	}
 
+	/**
+	 * Devuelve el importe cobrado en este alquiler. Este campo se rellena mediante
+	 * JOIN con la tabla Pagos en la capa DAO.
+	 *
+	 * @return importe cobrado en euros
+	 */
 	public double getMontoCobro() {
 		return montoCobro;
 	}
 
+	/**
+	 * Establece el importe cobrado (campo de JOIN).
+	 *
+	 * @param montoCobro importe en euros
+	 */
 	public void setMontoCobro(double montoCobro) {
 		this.montoCobro = montoCobro;
 	}
 
-	@Override
-	public String toString() {
-		return "Alquiler #" + idAlquiler + " | " + estadoAlquiler + " | Desde: " + fechaAlquiler + " | Hasta: "
-				+ fechaDevolucionPrevista;
-	}
 }
