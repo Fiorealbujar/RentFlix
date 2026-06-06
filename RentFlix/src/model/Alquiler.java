@@ -160,7 +160,7 @@ public class Alquiler {
 
 	/**
 	 * Devuelve el título de la película asociada a este alquiler. Este campo se
-	 * populan mediante JOIN en la capa DAO, no pertenece a la tabla Alquileres.
+	 * rellena mediante JOIN en la capa DAO, no pertenece a la tabla Alquileres.
 	 *
 	 * @return nombre de la película
 	 */
@@ -179,7 +179,7 @@ public class Alquiler {
 
 	/**
 	 * Devuelve el nombre completo del cliente asociado a este alquiler. Este campo
-	 * se popula mediante JOIN en la capa DAO, no pertenece a la tabla Alquileres.
+	 * se rellena mediante JOIN en la capa DAO, no pertenece a la tabla Alquileres.
 	 *
 	 * @return nombre completo del cliente
 	 */
@@ -197,7 +197,7 @@ public class Alquiler {
 	}
 
 	/**
-	 * Devuelve el importe cobrado en este alquiler. Este campo se popula mediante
+	 * Devuelve el importe cobrado en este alquiler. Este campo se rellena mediante
 	 * JOIN con la tabla Pagos en la capa DAO.
 	 *
 	 * @return importe cobrado en euros

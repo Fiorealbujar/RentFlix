@@ -31,12 +31,19 @@ public class PanelRegistro extends JPanel {
 	private JButton btnCancelar;
 	private JLabel lblError;
 
+	/**
+	 * Constructor que inicializa el panel y construye el formulario de registro.
+	 */
 	public PanelRegistro() {
 		setBackground(COLOR_FONDO);
 		setLayout(new GridBagLayout());
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y construye la tarjeta central con el formulario de registro.
+	 */
+	
 	private void initComponents() {
 		JPanel tarjeta = new JPanel();
 		tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
@@ -109,6 +116,13 @@ public class PanelRegistro extends JPanel {
 		add(tarjeta);
 	}
 
+	/**
+	 * Construye un campo de texto con placeholder para el formulario.
+	 *
+	 * @param placeholder texto de ayuda que se muestra cuando el campo está vacío
+	 * @return campo de texto configurado
+	 */
+	
 	private JTextField buildCampo(String placeholder) {
 		JTextField campo = new JTextField();
 		campo.putClientProperty("JTextField.placeholderText", placeholder);
@@ -118,6 +132,13 @@ public class PanelRegistro extends JPanel {
 		return campo;
 	}
 
+	/**
+	 * Construye una etiqueta con el estilo del formulario.
+	 *
+	 * @param texto texto de la etiqueta
+	 * @return etiqueta configurada
+	 */
+	
 	private JLabel buildLabel(String texto) {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -127,6 +148,15 @@ public class PanelRegistro extends JPanel {
 		return lbl;
 	}
 
+	/**
+	 * Construye un botón con el estilo estándar del formulario de registro.
+	 *
+	 * @param texto  texto del botón
+	 * @param fondo  color de fondo
+	 * @param letra  color del texto
+	 * @return botón configurado
+	 */
+	
 	private JButton buildBoton(String texto, Color fondo, Color letra) {
 		JButton btn = new JButton(texto);
 		btn.setFont(new Font("SansSerif", Font.BOLD, 14));

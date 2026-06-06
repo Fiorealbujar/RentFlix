@@ -33,6 +33,17 @@ public class PanelEmpleado extends JPanel {
 	private PanelInformes panelInformes;
 	private PanelGestionClientes panelGestionClientes;
 
+	/**
+	 * Constructor que recibe los subpaneles ya instanciados y los asigna
+	 * a las pestañas correspondientes.
+	 *
+	 * @param panelGestionAlquileres panel de gestión de alquileres
+	 * @param panelAnadirPelicula    panel de alta de películas
+	 * @param panelGestionPeliculas  panel de gestión de películas
+	 * @param panelInformes          panel de informes de ventas
+	 * @param panelGestionClientes   panel de gestión de clientes
+	 */
+	
 	public PanelEmpleado(PanelGestionAlquileres panelGestionAlquileres, PanelAnadirPelicula panelAnadirPelicula,
 			PanelGestionPeliculas panelGestionPeliculas, PanelInformes panelInformes,
 			PanelGestionClientes panelGestionClientes) {
@@ -47,11 +58,21 @@ public class PanelEmpleado extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildHeader(), BorderLayout.NORTH);
 		add(buildTabs(), BorderLayout.CENTER);
 	}
 
+	/**
+	 * Construye la cabecera con el saludo de bienvenida y el badge de empleado.
+	 *
+	 * @return panel de cabecera configurado
+	 */
+	
 	private JPanel buildHeader() {
 		JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
 		header.setBackground(COLOR_DARK);
@@ -72,6 +93,12 @@ public class PanelEmpleado extends JPanel {
 		return header;
 	}
 
+	/**
+	 * Construye el contenedor de pestañas con todos los subpaneles del empleado.
+	 *
+	 * @return panel de pestañas configurado
+	 */
+	
 	private JTabbedPane buildTabs() {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -83,6 +110,12 @@ public class PanelEmpleado extends JPanel {
 		return tabbedPane;
 	}
 
+	/**
+	 * Actualiza el texto de bienvenida con el nombre completo del empleado.
+	 *
+	 * @param emp empleado en sesión
+	 */
+	
 	public void setBienvenida(Empleado emp) {
 		lblBienvenida.setText("👋 Hola, " + emp.getNombreCompleto());
 	}

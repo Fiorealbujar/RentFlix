@@ -37,6 +37,10 @@ public class PanelGestionClientes extends JPanel {
 	private JButton btnBloquearCliente;
 	private JComboBox<String> cmbFiltroEstado;
 
+	/**
+	 * Constructor que inicializa el panel y construye sus componentes visuales.
+	 */
+	
 	public PanelGestionClientes() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout(0, 12));
@@ -44,11 +48,21 @@ public class PanelGestionClientes extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
 	}
 
+	/**
+	 * Construye la etiqueta de título del panel.
+	 *
+	 * @return etiqueta de título configurada
+	 */
+	
 	private JLabel buildTitulo() {
 		JLabel lbl = new JLabel("‍💼 Gestión de clientes");
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 20));
@@ -57,7 +71,12 @@ public class PanelGestionClientes extends JPanel {
 		return lbl;
 	}
 
-	// Construye el título + el combo
+	/**
+	 * Construye el panel superior con el título y el combo de filtro por estado.
+	 *
+	 * @return panel superior configurado
+	 */
+	
 	private JPanel buildSuperior() {
 		JPanel panel = new JPanel(new BorderLayout(12, 0));
 		panel.setOpaque(false);
@@ -80,8 +99,12 @@ public class PanelGestionClientes extends JPanel {
 		return panel;
 	}
 
-	// ── Tabla + botones ──────────────────────────────────────────────────────
-
+	/**
+	 * Construye la tabla de clientes con sus columnas, renderers y botones de acción.
+	 *
+	 * @return panel con la tabla y los botones configurados
+	 */
+	
 	private JPanel buildTabla() {
 		JPanel panel = new JPanel(new BorderLayout(0, 8));
 		panel.setOpaque(false);
@@ -186,8 +209,6 @@ public class PanelGestionClientes extends JPanel {
 		panel.add(filaBotones, BorderLayout.SOUTH);
 		return panel;
 	}
-
-	// ── Métodos para el Controlador ──────────────────────────────────────────
 
 	/**
 	 * Carga la lista de clientes en la tabla.

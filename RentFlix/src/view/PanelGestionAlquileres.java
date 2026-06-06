@@ -51,6 +51,10 @@ public class PanelGestionAlquileres extends JPanel {
 	private JButton btnConfirmarAlquiler;
 	private JButton btnCancelarAlquiler;
 
+	/**
+	 * Constructor que inicializa el panel y construye sus componentes visuales.
+	 */
+	
 	public PanelGestionAlquileres() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout());
@@ -58,14 +62,22 @@ public class PanelGestionAlquileres extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
 		add(buildSur(), BorderLayout.SOUTH);
 	}
 
-	// ── Superior ────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel superior con el título y el combo de filtro por estado.
+	 *
+	 * @return panel superior configurado
+	 */
+	
 	private JPanel buildSuperior() {
 		JPanel panel = new JPanel(new BorderLayout(12, 0));
 		panel.setOpaque(false);
@@ -95,10 +107,16 @@ public class PanelGestionAlquileres extends JPanel {
 		return panel;
 	}
 
-	// ── Tabla ───────────────────────────────────────────────────────────────
 
+	/**
+	 * Construye la tabla de alquileres con sus columnas y renderers. Aplica
+	 * colores por estado en la columna Estado y resalta la fila completa en
+	 * rojo cuando el alquiler está en estado {@code pendiente_devolucion}.
+	 *
+	 * @return scroll pane con la tabla configurada
+	 */
+	
 	private JScrollPane buildTabla() {
-		// Columna Formato eliminada: el dato no está disponible en el objeto Alquiler
 		String[] columnas = { "#", "Cliente", "Película", "F. Alquiler", "F. Dev. Prev.", "Estado", "Importe" };
 
 		modeloTabla = new DefaultTableModel(columnas, 0) {
@@ -199,8 +217,18 @@ public class PanelGestionAlquileres extends JPanel {
 		scroll.setBorder(BorderFactory.createLineBorder(new Color(0xDDDDDD)));
 		return scroll;
 	}
-
-	// Aplica color de fondo a la fila completa cuando el estado es pendiente_devolucion
+	
+	/**
+	 * Aplica color de fondo rojizo a toda la fila cuando el alquiler está en
+	 * estado {@code pendiente_devolucion}. Para el resto de estados restaura
+	 * el color por defecto de la tabla.
+	 *
+	 * @param table      tabla sobre la que se aplica el renderer
+	 * @param c          componente de celda a colorear
+	 * @param row        índice de la fila
+	 * @param isSelected {@code true} si la fila está seleccionada
+	 */
+	
 	private void aplicarColorFila(JTable table, Component c, int row, boolean isSelected) {
 		if (!isSelected) {
 			String estado = String.valueOf(table.getModel().getValueAt(row, 5)).toLowerCase();
@@ -214,8 +242,13 @@ public class PanelGestionAlquileres extends JPanel {
 		}
 	}
 
-	// ── Sur: botones + form nuevo alquiler ───────────────────────────────────
-
+	/**
+	 * Construye el panel inferior con los botones de acción y el formulario
+	 * de nuevo alquiler (inicialmente oculto).
+	 *
+	 * @return panel sur configurado
+	 */
+	
 	private JPanel buildSur() {
 		JPanel sur = new JPanel(new BorderLayout(0, 8));
 		sur.setOpaque(false);
@@ -246,6 +279,13 @@ public class PanelGestionAlquileres extends JPanel {
 		return sur;
 	}
 
+	/**
+	 * Construye el formulario de nuevo alquiler con los combos de cliente,
+	 * película, formato, días y método de pago.
+	 *
+	 * @return panel del formulario configurado
+	 */
+	
 	private JPanel buildFormAlquiler() {
 		JPanel panel = new JPanel(new BorderLayout(0, 8));
 		panel.setBackground(Color.WHITE);
@@ -288,6 +328,15 @@ public class PanelGestionAlquileres extends JPanel {
 		return panel;
 	}
 
+	/**
+	 * Construye un campo del formulario con su etiqueta superior y el componente
+	 * de entrada inferior.
+	 *
+	 * @param label etiqueta descriptiva del campo
+	 * @param comp  componente de entrada (combo, spinner, etc.)
+	 * @return panel con la etiqueta y el componente configurados
+	 */
+	
 	private JPanel buildLabeledField(String label, JComponent comp) {
 		JPanel p = new JPanel(new BorderLayout(0, 4));
 		p.setOpaque(false);
@@ -300,6 +349,16 @@ public class PanelGestionAlquileres extends JPanel {
 		return p;
 	}
 
+	/**
+	 * Construye un botón con el estilo estándar del panel de gestión de alquileres.
+	 *
+	 * @param texto  texto del botón
+	 * @param fondo  color de fondo
+	 * @param letra  color del texto
+	 * @param cmd    action command asociado al botón
+	 * @return botón configurado
+	 */
+	
 	private JButton buildBoton(String texto, Color fondo, Color letra, String cmd) {
 		JButton btn = new JButton(texto);
 		btn.setActionCommand(cmd);
@@ -311,8 +370,6 @@ public class PanelGestionAlquileres extends JPanel {
 		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		return btn;
 	}
-
-	// ── Métodos para el Controlador ─────────────────────────────────────────
 
 	/**
 	 * Carga la lista de alquileres en la tabla.

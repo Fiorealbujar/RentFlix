@@ -36,6 +36,14 @@ public class PanelCatalogo extends JPanel {
 
 	private final boolean mostrarId;
 
+	/**
+	 * Constructor que inicializa el catálogo en el modo indicado.
+	 *
+	 * @param mostrarId {@code true} para mostrar la columna ID de copia (modo
+	 *                  empleado), {@code false} para ocultarla (modo cliente e
+	 *                  invitado)
+	 */
+
 	public PanelCatalogo(boolean mostrarId) {
 		this.mostrarId = mostrarId;
 		setBackground(COLOR_FONDO);
@@ -44,14 +52,22 @@ public class PanelCatalogo extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
 		add(buildAcciones(), BorderLayout.SOUTH);
 	}
 
-	// ── Superior ─────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel superior con el título, el filtro de formato y la búsqueda.
+	 *
+	 * @return panel superior configurado
+	 */
+	
 	private JPanel buildSuperior() {
 		JPanel panel = new JPanel(new BorderLayout(12, 0));
 		panel.setOpaque(false);
@@ -93,8 +109,12 @@ public class PanelCatalogo extends JPanel {
 		return panel;
 	}
 
-	// ── Tabla ─────────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye la tabla del catálogo con sus columnas y renderers.
+	 *
+	 * @return scroll pane con la tabla configurada
+	 */
+	
 	private JScrollPane buildTabla() {
 		String[] columnasSinId = { "Título", "Director", "Género", "Duración", "Clasificación", "Formato",
 				"Precio/día" };
@@ -142,6 +162,12 @@ public class PanelCatalogo extends JPanel {
 		return scroll;
 	}
 
+	/**
+	 * Aplica alineación centrada a las columnas indicadas.
+	 *
+	 * @param cols índices de las columnas a centrar
+	 */
+	
 	private void centrar(int[] cols) {
 		DefaultTableCellRenderer c = new DefaultTableCellRenderer();
 		c.setHorizontalAlignment(SwingConstants.CENTER);
@@ -150,8 +176,12 @@ public class PanelCatalogo extends JPanel {
 		}
 	}
 
-	// ── Acciones ──────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel inferior con el botón "Alquilar película".
+	 *
+	 * @return panel de acciones configurado
+	 */
+	
 	private JPanel buildAcciones() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
 		panel.setOpaque(false);
@@ -170,8 +200,6 @@ public class PanelCatalogo extends JPanel {
 		panel.add(btnAlquilar);
 		return panel;
 	}
-
-	// ── Métodos para el Controlador ───────────────────────────────────────────
 
 	/**
 	 * Carga las copias disponibles en la tabla cruzando cada copia con su película.
@@ -213,6 +241,12 @@ public class PanelCatalogo extends JPanel {
 	public void habilitarAcciones(boolean habilitar) {
 		btnAlquilar.setEnabled(habilitar);
 	}
+
+	/**
+	 * Devuelve el título de la película de la fila seleccionada.
+	 *
+	 * @return título de la película, o {@code null} si no hay selección
+	 */
 
 	public String getTituloSeleccionado() {
 		int fila = tblPeliculas.getSelectedRow();

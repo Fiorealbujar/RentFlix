@@ -17,6 +17,18 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Panel de gestión del catálogo de películas para empleado y administrador.
+ * <p>
+ * Muestra la tabla de películas activas con columnas ID, Título, Director,
+ * Género, Duración, Clasificación, Nº copias disponibles y Sinopsis. Permite
+ * buscar por título, editar los datos de una película y darla de baja.
+ * </p>
+ *
+ * @author Fiorella Ruth Albújar Albino
+ * @version 1.0
+ */
+
 public class PanelGestionPeliculas extends JPanel {
 
 	private static final Color COLOR_FONDO = new Color(0xF5F5F5);
@@ -29,6 +41,10 @@ public class PanelGestionPeliculas extends JPanel {
 	private JTextField txtBuscar;
 	private JButton btnBuscar;
 
+	/**
+	 * Constructor que inicializa el panel y construye sus componentes visuales.
+	 */
+	
 	public PanelGestionPeliculas() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout());
@@ -36,14 +52,22 @@ public class PanelGestionPeliculas extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
 		add(buildAcciones(), BorderLayout.SOUTH);
 	}
 
-	// ── Superior ────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel superior con el título y el buscador por título.
+	 *
+	 * @return panel superior configurado
+	 */
+	
 	private JPanel buildSuperior() {
 		JPanel panel = new JPanel(new BorderLayout(12, 0));
 		panel.setOpaque(false);
@@ -84,8 +108,12 @@ public class PanelGestionPeliculas extends JPanel {
 		return panel;
 	}
 
-	// ── Tabla ───────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye la tabla de películas con sus columnas y renderers.
+	 *
+	 * @return scroll pane con la tabla configurada
+	 */
+	
 	private JScrollPane buildTabla() {
 		String[] columnas = { "ID", "Título", "Director", "Género", "Duración", "Clasificación", "Nº copias",
 				"Sinopsis" };
@@ -143,8 +171,12 @@ public class PanelGestionPeliculas extends JPanel {
 		return scroll;
 	}
 
-	// ── Acciones ────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel inferior con los botones de editar y dar de baja.
+	 *
+	 * @return panel de acciones configurado
+	 */
+	
 	private JPanel buildAcciones() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
 		panel.setOpaque(false);
@@ -161,6 +193,16 @@ public class PanelGestionPeliculas extends JPanel {
 		return panel;
 	}
 
+	/**
+	 * Construye un botón con el estilo estándar del panel.
+	 *
+	 * @param texto  texto del botón
+	 * @param fondo  color de fondo
+	 * @param letra  color del texto
+	 * @param cmd    action command del botón
+	 * @return botón configurado
+	 */
+	
 	private JButton buildBoton(String texto, Color fondo, Color letra, String cmd) {
 		JButton btn = new JButton(texto);
 		btn.setActionCommand(cmd);
@@ -172,8 +214,6 @@ public class PanelGestionPeliculas extends JPanel {
 		btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		return btn;
 	}
-
-	// ── Métodos públicos para el Controlador ────────────────────────────────
 
 	/**
 	 * Carga la lista de películas en la tabla junto con el número de copias
@@ -193,13 +233,22 @@ public class PanelGestionPeliculas extends JPanel {
 		actualizarBotones();
 	}
 
+	/**
+	 * Habilita o deshabilita los botones de editar y dar de baja según si hay
+	 * fila seleccionada en la tabla.
+	 */
+	
 	public void actualizarBotones() {
 		boolean haySeleccion = tblPeliculas.getSelectedRow() >= 0;
 		btnEditar.setEnabled(haySeleccion);
 		btnDarDeBaja.setEnabled(haySeleccion);
 	}
 
-	// Devuelve el ID de la película seleccionada
+	/**
+	 * Devuelve el id de la película de la fila seleccionada.
+	 *
+	 * @return id de la película, o {@code -1} si no hay selección
+	 */
 	public int getIdPeliculaSeleccionada() {
 		int fila = tblPeliculas.getSelectedRow();
 		if (fila < 0)
@@ -207,7 +256,14 @@ public class PanelGestionPeliculas extends JPanel {
 		return (int) modeloTabla.getValueAt(fila, 0);
 	}
 
-	// Devuelve todos los datos de la fila seleccionada como objeto Pelicula
+	/**
+	 * Devuelve un objeto {@link model.Pelicula} con los datos de la fila
+	 * seleccionada. El estado se establece como {@code activa} ya que la tabla
+	 * solo muestra películas activas.
+	 *
+	 * @return película seleccionada, o {@code null} si no hay selección
+	 */
+	
 	public Pelicula getPeliculaSeleccionada() {
 	    int fila = tblPeliculas.getSelectedRow();
 	    if (fila < 0)
@@ -227,6 +283,12 @@ public class PanelGestionPeliculas extends JPanel {
 	    );
 	}
 
+	/**
+	 * Registra el controlador como listener de los botones y la tabla.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
+	
 	public void setControlador(Controlador controlador) {
 		btnEditar.addActionListener(controlador);
 		btnDarDeBaja.addActionListener(controlador);
@@ -242,6 +304,12 @@ public class PanelGestionPeliculas extends JPanel {
 		});
 	}
 
+	/**
+	 * Devuelve el campo de texto de búsqueda por título.
+	 *
+	 * @return campo de búsqueda
+	 */
+	
 	public JTextField getTxtBuscar() {
 		return txtBuscar;
 	}

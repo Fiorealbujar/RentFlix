@@ -18,15 +18,32 @@ public class CopiaDAO implements ICopiaDAO {
 
 	private ConexionDB acceso;
 
+	/**
+	 * Constructor que inicializa la conexión a la base de datos.
+	 */
+	
 	public CopiaDAO() {
 		acceso = new ConexionDB();
 	}
 
+	/**
+	 * Mapea una fila del {@link ResultSet} a un objeto {@link Copia}.
+	 *
+	 * @param rs fila del ResultSet
+	 * @return objeto Copia con todos sus campos rellenos
+	 * @throws SQLException si ocurre un error al leer el ResultSet
+	 */
+	
 	private Copia mapear(ResultSet rs) throws SQLException {
 		return new Copia(rs.getInt("id_copia"), rs.getInt("id_pelicula"), rs.getString("formato"),
 				rs.getString("estado"), rs.getDouble("precio_alquiler"));
 	}
-
+	
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	
 	@Override
 	public ArrayList<Copia> listarTodasDisponibles() {
 		ArrayList<Copia> lista = new ArrayList<Copia>();
@@ -62,6 +79,10 @@ public class CopiaDAO implements ICopiaDAO {
 		return lista;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	
 	@Override
 	public ArrayList<Copia> listarDisponiblesPorPelicula(int idPelicula) {
 		ArrayList<Copia> lista = new ArrayList<Copia>();
@@ -97,7 +118,11 @@ public class CopiaDAO implements ICopiaDAO {
 		}
 		return lista;
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	
 	@Override
 	public ArrayList<Copia> listarDisponiblesPorFormato(String formato) {
 		ArrayList<Copia> lista = new ArrayList<Copia>();
@@ -135,7 +160,10 @@ public class CopiaDAO implements ICopiaDAO {
 		return lista;
 	}
 
-	// Inserta una nueva copia en la tabla Copias
+	/**
+	 * {@inheritDoc}
+	 */
+	
 	@Override
 	public int crear(Copia copia) {
 		int res = 0;
@@ -169,6 +197,9 @@ public class CopiaDAO implements ICopiaDAO {
 		return res;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int actualizarEstado(int idCopia, String nuevoEstado) {
 		int res = 0;
@@ -200,6 +231,10 @@ public class CopiaDAO implements ICopiaDAO {
 		return res;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	
 	@Override
 	public int contarDisponiblesPorPelicula(int idPelicula) {
 		int total = 0;
@@ -236,6 +271,10 @@ public class CopiaDAO implements ICopiaDAO {
 		return total;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	
 	@Override
 	public int contarAlquiladasPorPelicula(int idPelicula) {
 		int total = 0;

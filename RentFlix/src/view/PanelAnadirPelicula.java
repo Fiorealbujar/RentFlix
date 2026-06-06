@@ -1,4 +1,3 @@
-// PanelAnadirPelicula.java
 package view;
 
 import controller.Controlador;
@@ -37,6 +36,10 @@ public class PanelAnadirPelicula extends JPanel {
 	private JButton btnLimpiar;
 	private JLabel lblMensaje;
 
+	/**
+	 * Constructor que inicializa el panel y construye el formulario de alta.
+	 */
+	
 	public PanelAnadirPelicula() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout());
@@ -44,14 +47,22 @@ public class PanelAnadirPelicula extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildTitulo(), BorderLayout.NORTH);
 		add(buildFormulario(), BorderLayout.CENTER);
 		add(buildAcciones(), BorderLayout.SOUTH);
 	}
 
-	// ── Título ───────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel con el título del formulario.
+	 *
+	 * @return panel de título configurado
+	 */
+	
 	private JPanel buildTitulo() {
 		JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		panel.setOpaque(false);
@@ -64,8 +75,12 @@ public class PanelAnadirPelicula extends JPanel {
 		return panel;
 	}
 
-	// ── Formulario ───────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el formulario con todos los campos de entrada de datos.
+	 *
+	 * @return panel del formulario configurado
+	 */
+	
 	private JPanel buildFormulario() {
 		JPanel panel = new JPanel(new GridBagLayout());
 		panel.setBackground(Color.WHITE);
@@ -123,6 +138,18 @@ public class PanelAnadirPelicula extends JPanel {
 		return panel;
 	}
 
+	/**
+	 * Añade una fila de dos campos con sus etiquetas al panel del formulario.
+	 *
+	 * @param panel  panel destino
+	 * @param gbc    restricciones de layout
+	 * @param fila   índice de fila en el GridBagLayout
+	 * @param label1 etiqueta del primer campo
+	 * @param comp1  primer componente de entrada
+	 * @param label2 etiqueta del segundo campo
+	 * @param comp2  segundo componente de entrada
+	 */
+	
 	private void agregarFila(JPanel panel, GridBagConstraints gbc, int fila, String label1, JComponent comp1,
 			String label2, JComponent comp2) {
 		gbc.gridy = fila;
@@ -144,6 +171,12 @@ public class PanelAnadirPelicula extends JPanel {
 		panel.add(comp2, gbc);
 	}
 
+	/**
+	 * Construye un campo de texto estándar con la fuente del formulario.
+	 *
+	 * @return campo de texto configurado
+	 */
+	
 	private JTextField buildTextField() {
 		JTextField campo = new JTextField();
 		campo.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -151,6 +184,13 @@ public class PanelAnadirPelicula extends JPanel {
 		return campo;
 	}
 
+	/**
+	 * Construye una etiqueta con el estilo de los campos obligatorios.
+	 *
+	 * @param texto texto de la etiqueta
+	 * @return etiqueta configurada
+	 */
+	
 	private JLabel buildLabel(String texto) {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -158,8 +198,12 @@ public class PanelAnadirPelicula extends JPanel {
 		return lbl;
 	}
 
-	// ── Acciones ──────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel inferior con los botones de guardar y limpiar.
+	 *
+	 * @return panel de acciones configurado
+	 */
+	
 	private JPanel buildAcciones() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setOpaque(false);
@@ -196,8 +240,6 @@ public class PanelAnadirPelicula extends JPanel {
 		panel.add(botones, BorderLayout.EAST);
 		return panel;
 	}
-
-	// ── Métodos para el Controlador ───────────────────────────────────────────
 
 	/**
 	 * Limpia todos los campos del formulario y resetea los combos y el spinner.
@@ -261,8 +303,6 @@ public class PanelAnadirPelicula extends JPanel {
 		btnGuardar.addActionListener(controlador);
 		btnLimpiar.addActionListener(controlador);
 	}
-
-	// ── Getters ───────────────────────────────────────────────────────────────
 
 	/**
 	 * Devuelve el título introducido.

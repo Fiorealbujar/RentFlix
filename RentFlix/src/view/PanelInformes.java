@@ -34,6 +34,10 @@ public class PanelInformes extends JPanel {
 	private DefaultTableModel modeloTabla;
 	private JTable tblDetalle;
 
+	/**
+	 * Constructor que inicializa el panel y construye sus componentes visuales.
+	 */
+	
 	public PanelInformes() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout(0, 16));
@@ -41,13 +45,21 @@ public class PanelInformes extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildTitulo(), BorderLayout.NORTH);
 		add(buildCuerpo(), BorderLayout.CENTER);
 	}
 
-	// ── Título ───────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel con el título del panel de informes.
+	 *
+	 * @return panel de título configurado
+	 */
+	
 	private JPanel buildTitulo() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setOpaque(false);
@@ -61,8 +73,12 @@ public class PanelInformes extends JPanel {
 		return panel;
 	}
 
-	// ── Cuerpo ───────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el cuerpo del panel con las tarjetas de indicadores y la tabla de detalle.
+	 *
+	 * @return panel de cuerpo configurado
+	 */
+	
 	private JPanel buildCuerpo() {
 		JPanel panel = new JPanel(new BorderLayout(0, 16));
 		panel.setOpaque(false);
@@ -71,8 +87,12 @@ public class PanelInformes extends JPanel {
 		return panel;
 	}
 
-	// ── Tarjetas ─────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel con las cuatro tarjetas de indicadores resumidos.
+	 *
+	 * @return panel de tarjetas configurado
+	 */
+	
 	private JPanel buildTarjetas() {
 		JPanel panel = new JPanel(new GridLayout(1, 4, 12, 0));
 		panel.setOpaque(false);
@@ -92,6 +112,17 @@ public class PanelInformes extends JPanel {
 		return panel;
 	}
 
+	/**
+	 * Construye una tarjeta individual de indicador con icono, título y valor.
+	 *
+	 * @param titulo     texto descriptivo de la tarjeta
+	 * @param lblValor   etiqueta donde se mostrará el valor numérico
+	 * @param icono      emoji o símbolo de la tarjeta
+	 * @param colorValor color del valor numérico
+	 * @param colorFondo color de fondo del icono
+	 * @return tarjeta configurada
+	 */
+	
 	private JPanel buildTarjeta(String titulo, JLabel lblValor, String icono, Color colorValor, Color colorFondo) {
 		JPanel tarjeta = new JPanel(new BorderLayout());
 		tarjeta.setBackground(Color.WHITE);
@@ -125,8 +156,12 @@ public class PanelInformes extends JPanel {
 		return tarjeta;
 	}
 
-	// ── Tabla detalle ────────────────────────────────────────────────────────
-
+	/**
+	 * Construye la tabla de detalle con todos los alquileres del sistema.
+	 *
+	 * @return scroll pane con la tabla configurada
+	 */
+	
 	private JScrollPane buildTabla() {
 		String[] columnas = { "#", "Cliente", "Película", "F. Alquiler", "F. Dev. Prev.", "Estado", "Importe" };
 
@@ -157,10 +192,16 @@ public class PanelInformes extends JPanel {
 		return scroll;
 	}
 
-	// ── Métodos para el Controlador ──────────────────────────────────────────
-
+	/**
+	 * Carga los datos de alquileres en las tarjetas de indicadores y en la tabla
+	 * de detalle. Calcula el total de alquileres, alquileres activos y pendientes
+	 * de devolución mediante iteración sobre la lista recibida.
+	 *
+	 * @param alquileres    lista completa de alquileres del sistema
+	 * @param totalIngresos importe total acumulado de todos los alquileres
+	 */
+	
 	public void cargarInformes(ArrayList<Alquiler> alquileres, double totalIngresos) {
-		// Contar con bucles en lugar de streams
 		int totalAlq = alquileres.size();
 		int activos = 0;
 		int pendientes = 0;

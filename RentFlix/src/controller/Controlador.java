@@ -24,7 +24,7 @@ import java.util.ArrayList;
  */
 public class Controlador implements ActionListener {
 
-	// ── Vistas ────────────────────────────────────────────────────────────────
+	//Vistas compartidas
 	private VentanaPrincipal ventana;
 	private PanelCatalogo catInvitado;
 	private PanelCatalogo catCliente;
@@ -34,7 +34,7 @@ public class Controlador implements ActionListener {
 	private PanelMisAlquileres misAlquileres;
 	private PanelMiCuenta panelMiCuenta;
 
-	// Paneles exclusivos del empleado
+	//Paneles exclusivos del empleado
 	private PanelEmpleado panelEmpleado;
 	private PanelGestionAlquileres gestionAlqEmp;
 	private PanelAnadirPelicula anadirPelEmp;
@@ -42,7 +42,7 @@ public class Controlador implements ActionListener {
 	private PanelInformes informesEmp;
 	private PanelGestionClientes gestionClientesEmp;
 
-	// Paneles exclusivos del admin
+	//Paneles exclusivos del administrador
 	private PanelAdmin panelAdmin;
 	private PanelGestionAlquileres gestionAlqAdm;
 	private PanelAnadirPelicula anadirPelAdm;
@@ -51,7 +51,7 @@ public class Controlador implements ActionListener {
 	private PanelGestionClientes gestionClientesAdm;
 	private PanelGestionEmpleados gestionEmpleados;
 
-	// ── DAOs ──────────────────────────────────────────────────────────────────
+	//DAOs
 	private IPeliculaDAO peliculaDAO;
 	private IClienteDAO clienteDAO;
 	private IEmpleadoDAO empleadoDAO;
@@ -59,14 +59,41 @@ public class Controlador implements ActionListener {
 	private ICopiaDAO copiaDAO;
 	private IPagoDAO pagoDAO;
 
-	// ── Sesión ────────────────────────────────────────────────────────────────
+	//Estado de sesión
 	private Cliente clienteActivo = null;
 	private Empleado empleadoActivo = null;
-
 	private ArrayList<Cliente> listaClientesCache;
 	private ArrayList<Pelicula> listaPeliculasCache;
 	private boolean esAdmin = false;
 
+	
+	/**
+	 * Constructor que recibe todas las vistas, instancia los DAOs y lanza
+	 * la aplicación en modo invitado.
+	 *
+	 * @param ventana            ventana principal de la aplicación
+	 * @param catInvitado        catálogo de películas en modo invitado
+	 * @param catCliente         catálogo de películas del cliente autenticado
+	 * @param panelLogin         panel de inicio de sesión
+	 * @param panelRegistro      panel de registro de nuevos clientes
+	 * @param panelCliente       panel principal del cliente
+	 * @param misAlquileres      panel de historial de alquileres del cliente
+	 * @param panelMiCuenta      panel de datos personales del cliente
+	 * @param panelEmpleado      panel principal del empleado
+	 * @param gestionAlqEmp      panel de gestión de alquileres del empleado
+	 * @param anadirPelEmp       panel de alta de películas del empleado
+	 * @param gestionPelEmp      panel de gestión de películas del empleado
+	 * @param informesEmp        panel de informes del empleado
+	 * @param gestionClientesEmp panel de gestión de clientes del empleado
+	 * @param panelAdmin         panel principal del administrador
+	 * @param gestionAlqAdm      panel de gestión de alquileres del administrador
+	 * @param anadirPelAdm       panel de alta de películas del administrador
+	 * @param gestionPelAdm      panel de gestión de películas del administrador
+	 * @param informesAdm        panel de informes del administrador
+	 * @param gestionClientesAdm panel de gestión de clientes del administrador
+	 * @param gestionEmpleados   panel de gestión de empleados del administrador
+	 */
+	
 	public Controlador(VentanaPrincipal ventana, PanelCatalogo catInvitado, PanelCatalogo catCliente,
 			PanelLogin panelLogin, PanelRegistro panelRegistro, PanelCliente panelCliente,
 			PanelMisAlquileres misAlquileres, PanelMiCuenta panelMiCuenta, PanelEmpleado panelEmpleado,
@@ -110,15 +137,23 @@ public class Controlador implements ActionListener {
 		iniciarModoInvitado();
 	}
 
+	/**
+	 * Punto de entrada de todos los eventos de la interfaz gráfica.
+	 * Recibe los eventos de botones y combos, identifica el comando de acción
+	 * y delega en el método privado correspondiente.
+	 *
+	 * @param e evento de acción generado por la interfaz
+	 */
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 
-		// ── JButton ───────────────────────────────────────────────────────────
+		//JButton
 		if (src instanceof JButton) {
 			switch (e.getActionCommand()) {
 
-			// ── VentanaPrincipal ──────────────────────────────────────────
+			//VentanaPrincipal
 			case "ABRIR_LOGIN":
 				panelLogin.limpiar();
 				ventana.cargarPanel(panelLogin);
@@ -131,7 +166,7 @@ public class Controlador implements ActionListener {
 				cerrarSesion();
 				break;
 
-			// ── PanelLogin ────────────────────────────────────────────────
+			//PanelLogin
 			case "LOGIN":
 				procesarLogin();
 				break;
@@ -139,7 +174,7 @@ public class Controlador implements ActionListener {
 				ventana.cargarPanel(catInvitado);
 				break;
 
-			// ── PanelRegistro ─────────────────────────────────────────────
+			//PanelRegistro
 			case "REGISTRAR_CLIENTE":
 				procesarRegistro();
 				break;
@@ -147,7 +182,7 @@ public class Controlador implements ActionListener {
 				ventana.cargarPanel(catInvitado);
 				break;
 
-			// ── PanelCatalogo ─────────────────────────────────────────────
+			//PanelCatalogo
 			case "BUSCAR_PELICULA":
 				buscarPelicula(e);
 				break;
@@ -160,17 +195,17 @@ public class Controlador implements ActionListener {
 				alquilarDesdeClienteCatalogo();
 				break;
 
-			// ── PanelMisAlquileres ────────────────────────────────────────
+			//PanelMisAlquileres
 			case "SOLICITAR_DEVOLUCION":
 				procesarSolicitudDevolucion();
 				break;
 
-			// ── PanelMiCuenta ─────────────────────────────────────────────
+			//PanelMiCuenta 
 			case "MODIFICAR_DATOS_CLIENTE":
 				modificarDatosCliente();
 				break;
 
-			// ── PanelGestionAlquileres ────────────────────────────────────
+			//PanelGestionAlquileres
 			case "ABRIR_FORM_ALQUILER":
 				abrirFormAlquiler();
 				break;
@@ -184,7 +219,7 @@ public class Controlador implements ActionListener {
 				procesarAceptarDevolucion();
 				break;
 
-			// ── PanelAnadirPelicula ───────────────────────────────────────
+			//PanelAnadirPelicula
 			case "GUARDAR_PELICULA":
 				guardarPelicula();
 				break;
@@ -192,7 +227,7 @@ public class Controlador implements ActionListener {
 				getPanelAnadirActivo().limpiar();
 				break;
 
-			// ── PanelGestionPeliculas ─────────────────────────────────────
+			//PanelGestionPeliculas 
 			case "EDITAR_PELICULA":
 				editarPelicula();
 				break;
@@ -200,7 +235,7 @@ public class Controlador implements ActionListener {
 				darDeBajaPelicula();
 				break;
 
-			// ── PanelGestionEmpleados (solo admin) ────────────────────────
+			//PanelGestionEmpleados (solo admin) 
 			case "CREAR_EMPLEADO":
 				crearEmpleado();
 				break;
@@ -214,7 +249,7 @@ public class Controlador implements ActionListener {
 				gestionEmpleados.limpiar();
 				break;
 
-			// ── PanelGestionClientes (empleado y admin) ───────────────────
+			//PanelGestionClientes (empleado y admin)
 			case "EDITAR_CLIENTE":
 				editarCliente();
 				break;
@@ -225,32 +260,32 @@ public class Controlador implements ActionListener {
 				eliminarCliente();
 				break;
 
-			// ── PanelGestionAlquileres — bloquear cliente con alquiler vencido ──
+			//PanelGestionAlquileres — bloquear cliente con alquiler vencido ─
 			case "BLOQUEAR_CLIENTE_ALQUILER":
 				bloquearClienteDesdeAlquiler();
 				break;
 			}
 
-			// ── JComboBox ─────────────────────────────────────────────────────────
+			//JComboBox
 		} else if (src instanceof JComboBox) {
 			switch (e.getActionCommand()) {
 
-			// ── PanelCatalogo ─────────────────────────────────────────────
+			//PanelCatalogo
 			case "FILTRAR_FORMATO_CATALOGO":
 				filtrarFormato(e);
 				break;
 
-			// ── PanelGestionAlquileres ────────────────────────────────────
+			//PanelGestionAlquileres
 			case "FILTRAR_ALQUILERES":
 				filtrarAlquileres();
 				break;
 
-			// ── PanelMisAlquileres ────────────────────────────────────────
+			//PanelMisAlquileres
 			case "FILTRAR_MIS_ALQUILERES":
 				filtrarMisAlquileres();
 				break;
 
-			// ── PanelGestionClientes ──────────────────────────────────────
+			//PanelGestionClientes
 			case "FILTRAR_CLIENTES":
 				filtrarClientes();
 				break;
@@ -258,8 +293,11 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	// ── Helpers ───────────────────────────────────────────────────────────────
-
+	/**
+	 * Devuelve el panel de gestión de alquileres activo según el rol en sesión.
+	 *
+	 * @return panel de gestión de alquileres del administrador o del empleado
+	 */
 	private PanelGestionAlquileres getPanelGestionActivo() {
 		if (esAdmin) {
 			return gestionAlqAdm;
@@ -267,7 +305,12 @@ public class Controlador implements ActionListener {
 			return gestionAlqEmp;
 		}
 	}
-
+	
+	/**
+	 * Devuelve el panel de gestión de películas activo según el rol en sesión.
+	 *
+	 * @return panel de gestión de películas del administrador o del empleado
+	 */
 	private PanelGestionPeliculas getPanelGestionPelActivo() {
 		if (esAdmin) {
 			return gestionPelAdm;
@@ -276,6 +319,11 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Devuelve el panel de añadir película activo según el rol en sesión.
+	 *
+	 * @return panel de alta de películas del administrador o del empleado
+	 */
 	private PanelAnadirPelicula getPanelAnadirActivo() {
 		if (esAdmin) {
 			return anadirPelAdm;
@@ -283,7 +331,12 @@ public class Controlador implements ActionListener {
 			return anadirPelEmp;
 		}
 	}
-
+	
+	/**
+	 * Devuelve el panel de gestión de clientes activo según el rol en sesión.
+	 *
+	 * @return panel de gestión de clientes del administrador o del empleado
+	 */
 	private PanelGestionClientes getPanelGestionClientesActivo() {
 		if (esAdmin) {
 			return gestionClientesAdm;
@@ -292,11 +345,15 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	// ── Modo invitado ─────────────────────────────────────────────────────────
 
-	// ── Helper conteo de copias
-	// ─────────────────────────────────────────────────────
-
+	/**
+	 * Construye una lista paralela con el número de copias disponibles para
+	 * cada película de la lista recibida.
+	 *
+	 * @param peliculas lista de películas a consultar
+	 * @return lista de enteros con el conteo de copias disponibles por película,
+	 *         en el mismo orden que la lista de entrada
+	 */
 	private ArrayList<Integer> obtenerConteosCopias(ArrayList<Pelicula> peliculas) {
 		ArrayList<Integer> conteos = new ArrayList<Integer>();
 		for (Pelicula p : peliculas) {
@@ -305,6 +362,10 @@ public class Controlador implements ActionListener {
 		return conteos;
 	}
 
+	/**
+	 * Resetea la sesión y carga el catálogo en modo invitado. Se ejecuta al
+	 * arrancar la aplicación y al cerrar sesión.
+	 */
 	private void iniciarModoInvitado() {
 		clienteActivo = null;
 		empleadoActivo = null;
@@ -317,14 +378,22 @@ public class Controlador implements ActionListener {
 		ventana.cargarPanel(catInvitado);
 	}
 
-	// ── Catálogos ─────────────────────────────────────────────────────────────
 
+	/**
+	 * Recarga el catálogo del cliente con las copias disponibles actualizadas.
+	 */
 	private void recargarCatalogoCliente() {
 		ArrayList<Pelicula> peliculas = peliculaDAO.listarTodas();
 		ArrayList<Copia> copias = copiaDAO.listarTodasDisponibles();
 		catCliente.cargarCopias(peliculas, copias);
 	}
 
+	/**
+	 * Busca películas por título en el catálogo invitado o cliente según el origen
+	 * del evento, filtrando también las copias disponibles asociadas.
+	 *
+	 * @param e evento de acción que identifica el catálogo origen
+	 */
 	private void buscarPelicula(ActionEvent e) {
 		PanelCatalogo origen;
 		if (e.getSource() == catCliente.getBtnBuscar()) {
@@ -354,6 +423,12 @@ public class Controlador implements ActionListener {
 		origen.cargarCopias(peliculas, copiasFiltradas);
 	}
 
+	/**
+	 * Filtra el catálogo por formato en el panel invitado o cliente según el origen
+	 * del evento. Si el filtro es {@code null} muestra todas las copias disponibles.
+	 *
+	 * @param e evento de acción que identifica el catálogo origen
+	 */
 	private void filtrarFormato(ActionEvent e) {
 		PanelCatalogo origen;
 		if (e.getSource() == catCliente.getCmbFiltroFormato()) {
@@ -373,8 +448,12 @@ public class Controlador implements ActionListener {
 		origen.cargarCopias(peliculas, copias);
 	}
 
-	// ── Alquiler cliente ──────────────────────────────────────────────────────
 
+	/**
+	 * Gestiona el alquiler de una película desde el catálogo del cliente. Si no hay
+	 * sesión activa, ofrece ir al login. Si hay copia disponible, muestra el diálogo
+	 * de confirmación.
+	 */
 	private void alquilarDesdeClienteCatalogo() {
 		if (clienteActivo == null) {
 			int res = JOptionPane.showConfirmDialog(ventana,
@@ -420,6 +499,13 @@ public class Controlador implements ActionListener {
 		mostrarDialogoAlquilerCliente(encontradas.get(0), copias.get(0));
 	}
 
+	/**
+	 * Muestra el diálogo de confirmación de alquiler con los datos de la película,
+	 * el formato, el precio por día, los días y el método de pago.
+	 *
+	 * @param pelicula película seleccionada para alquilar
+	 * @param copia    copia física disponible que se va a alquilar
+	 */
 	private void mostrarDialogoAlquilerCliente(Pelicula pelicula, Copia copia) {
 		JPanel form = new JPanel(new GridLayout(0, 2, 8, 8));
 		form.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -449,8 +535,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	// ── Alquiler empleado/admin ───────────────────────────────────────────────
-
+	/**
+	 * Abre el formulario de nuevo alquiler cargando los combos de clientes y
+	 * películas con los datos actuales de la base de datos.
+	 */
 	private void abrirFormAlquiler() {
 		listaClientesCache = clienteDAO.listarTodos();
 		listaPeliculasCache = peliculaDAO.listarTodas();
@@ -459,6 +547,10 @@ public class Controlador implements ActionListener {
 		getPanelGestionActivo().mostrarFormAlquiler(true);
 	}
 
+	/**
+	 * Confirma el alquiler introducido por el empleado en el formulario, validando
+	 * que haya copias disponibles en el formato seleccionado.
+	 */
 	private void confirmarAlquilerEmpleado() {
 		PanelGestionAlquileres panel = getPanelGestionActivo();
 		int idxCliente = panel.getIndexClienteSeleccionado();
@@ -495,8 +587,20 @@ public class Controlador implements ActionListener {
 		panel.mostrarFormAlquiler(false);
 	}
 
-	// ── Registro de alquiler compartido ──────────────────────────────────────
-
+	/**
+	 * Registra un nuevo alquiler en la base de datos: crea el pago, crea el alquiler
+	 * y actualiza el estado de la copia a {@code alquilada}. Recarga las vistas
+	 * afectadas tras la operación.
+	 *
+	 * @param idCliente   identificador del cliente que realiza el alquiler
+	 * @param copia       copia física que se va a alquilar
+	 * @param idEmpleado  identificador del empleado que registra la operación,
+	 *                    o {@code null} si lo registra el propio cliente
+	 * @param dias        número de días del alquiler
+	 * @param metodoPago  método de pago: {@code efectivo}, {@code tarjeta} o
+	 *                    {@code transferencia}
+	 * @param total       importe total del alquiler en euros
+	 */
 	private void registrarAlquiler(int idCliente, Copia copia, Integer idEmpleado, int dias, String metodoPago,
 			double total) {
 		int idTrans = pagoDAO.registrar(new Pago(0, metodoPago, total));
@@ -515,7 +619,8 @@ public class Controlador implements ActionListener {
 			copiaDAO.actualizarEstado(copia.getIdCopia(), "alquilada");
 			JOptionPane.showMessageDialog(ventana, "¡Alquiler confirmado!\n" + "Devuelve antes del " + devolucion + "\n"
 					+ "Total: " + String.format("%.2f €", total), "Alquiler exitoso", JOptionPane.INFORMATION_MESSAGE);
-
+			
+			// Recargar vistas distintas según quién registró el alquiler
 			if (clienteActivo != null && empleadoActivo == null) {
 				recargarCatalogoCliente();
 				misAlquileres.cargarAlquileres(alquilerDAO.listarPorCliente(clienteActivo.getIdCliente()));
@@ -535,8 +640,11 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	// ── Login y registro ──────────────────────────────────────────────────────
-
+	/**
+	 * Procesa el intento de login del formulario. Distingue entre cliente y empleado
+	 * según el combo de rol, valida las credenciales y carga el panel correspondiente.
+	 * Bloquea el acceso si el cliente tiene estado {@code bloqueado}.
+	 */
 	private void procesarLogin() {
 		String usuario = panelLogin.getUsuario();
 		String contrasenia = panelLogin.getContrasenia();
@@ -545,7 +653,8 @@ public class Controlador implements ActionListener {
 			panelLogin.mostrarError("Rellena todos los campos.");
 			return;
 		}
-
+		
+		// Distinguir entre login de cliente y login de empleado/admin
 		if (panelLogin.esRolEmpleado()) {
 			Empleado emp = empleadoDAO.login(usuario, contrasenia);
 			if (emp != null) {
@@ -577,6 +686,11 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Procesa el registro de un nuevo cliente. Valida los datos del formulario,
+	 * inserta el cliente en la base de datos y redirige al login si tiene éxito.
+	 * Detecta duplicados de email y usuario mediante la excepción del DAO.
+	 */
 	private void procesarRegistro() {
 		if (!panelRegistro.datosValidos()) {
 			return;
@@ -604,8 +718,11 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	// ── Cargar paneles por rol ────────────────────────────────────────────────
-
+	
+	/**
+	 * Carga el panel del cliente: marca alquileres vencidos, recarga el catálogo,
+	 * los alquileres y los datos personales del cliente en sesión.
+	 */
 	private void cargarPanelCliente() {
 		alquilerDAO.marcarVencidos();
 		panelCliente.setBienvenida(clienteActivo);
@@ -620,6 +737,10 @@ public class Controlador implements ActionListener {
 		ventana.cargarPanel(panelCliente);
 	}
 
+	/**
+	 * Carga el panel del empleado: marca alquileres vencidos y recarga alquileres,
+	 * películas, clientes e informes con los datos actuales.
+	 */
 	private void cargarPanelEmpleado() {
 		alquilerDAO.marcarVencidos();
 		panelEmpleado.setBienvenida(empleadoActivo);
@@ -630,6 +751,10 @@ public class Controlador implements ActionListener {
 		ventana.cargarPanel(panelEmpleado);
 	}
 
+	/**
+	 * Carga el panel del administrador: marca alquileres vencidos y recarga
+	 * alquileres, películas, clientes, empleados e informes con los datos actuales.
+	 */
 	private void cargarPanelAdmin() {
 		alquilerDAO.marcarVencidos();
 		panelAdmin.setBienvenida(empleadoActivo);
@@ -641,8 +766,10 @@ public class Controlador implements ActionListener {
 		ventana.cargarPanel(panelAdmin);
 	}
 
-	// ── Devoluciones ──────────────────────────────────────────────────────────
-
+	/**
+	 * Procesa la solicitud de devolución del cliente autenticado. Cambia el estado
+	 * del alquiler a {@code pendiente_devolucion} y actualiza la vista.
+	 */
 	private void procesarSolicitudDevolucion() {
 		int id = misAlquileres.getIdAlquilerSeleccionado();
 		if (id == -1) {
@@ -663,6 +790,11 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Procesa la aceptación de una devolución por parte del empleado. Cambia el
+	 * estado del alquiler a {@code devuelto}, restaura la copia a {@code disponible}
+	 * y recarga las vistas afectadas.
+	 */
 	private void procesarAceptarDevolucion() {
 		PanelGestionAlquileres panel = getPanelGestionActivo();
 		int id = panel.getIdAlquilerSeleccionado();
@@ -691,6 +823,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Filtra la tabla de alquileres del panel activo por el estado seleccionado
+	 * en el combo filtro. Si el filtro es {@code null} muestra todos.
+	 */
 	private void filtrarAlquileres() {
 		PanelGestionAlquileres panel = getPanelGestionActivo();
 		String filtro = panel.getFiltroEstado();
@@ -710,6 +846,10 @@ public class Controlador implements ActionListener {
 		panel.cargarAlquileres(filtrados);
 	}
 
+	/**
+	 * Filtra el historial de alquileres del cliente autenticado por el estado
+	 * seleccionado en el combo filtro. Si el filtro es {@code null} muestra todos.
+	 */
 	private void filtrarMisAlquileres() {
 		String filtro = misAlquileres.getFiltroEstado();
 		ArrayList<Alquiler> todos = alquilerDAO.listarPorCliente(clienteActivo.getIdCliente());
@@ -728,8 +868,12 @@ public class Controlador implements ActionListener {
 		misAlquileres.cargarAlquileres(filtrados);
 	}
 
-	// ── Películas ─────────────────────────────────────────────────────────────
-
+	
+	/**
+	 * Guarda una nueva película con sus copias. Valida los datos del formulario,
+	 * inserta la película en la base de datos, asigna el precio según el formato
+	 * y crea el número de copias indicado.
+	 */
 	private void guardarPelicula() {
 		PanelAnadirPelicula panel = getPanelAnadirActivo();
 		if (!panel.datosValidos()) {
@@ -762,6 +906,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Abre un diálogo para editar los datos de la película seleccionada. Valida
+	 * los campos introducidos y actualiza la película en la base de datos.
+	 */
 	private void editarPelicula() {
 		Pelicula p = getPanelGestionPelActivo().getPeliculaSeleccionada();
 		if (p == null) {
@@ -847,6 +995,11 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Da de baja la película seleccionada cambiando su estado a {@code inactiva}.
+	 * Comprueba primero que no tenga copias actualmente alquiladas antes de
+	 * mostrar el diálogo de confirmación.
+	 */
 	private void darDeBajaPelicula() {
 	    int id = getPanelGestionPelActivo().getIdPeliculaSeleccionada();
 	    if (id == -1) {
@@ -854,7 +1007,8 @@ public class Controlador implements ActionListener {
 	                JOptionPane.WARNING_MESSAGE);
 	        return;
 	    }
-	    // Comprobar primero si tiene copias alquiladas antes de preguntar
+	    
+	    // Verificar que no haya copias alquiladas antes de mostrar el error al usuario
 	    if (copiaDAO.contarAlquiladasPorPelicula(id) > 0) {
 	        JOptionPane.showMessageDialog(ventana,
 	                "No se puede dar de baja. La película tiene copias actualmente alquiladas.", "Error",
@@ -878,8 +1032,11 @@ public class Controlador implements ActionListener {
 	    }
 	}
 
-	// ── Empleados (solo Admin) ────────────────────────────────────────────────
-
+	
+	/**
+	 * Crea un nuevo empleado con los datos del formulario. El administrador activo
+	 * se asigna como jefe del nuevo empleado. Detecta duplicados de email y usuario.
+	 */
 	private void crearEmpleado() {
 		if (!gestionEmpleados.datosValidos()) {
 			return;
@@ -907,6 +1064,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Abre un diálogo para editar los datos del empleado seleccionado. No permite
+	 * modificar la contraseña ni el campo {@code id_jefe}.
+	 */
 	private void editarEmpleado() {
 		Empleado emp = gestionEmpleados.getEmpleadoSeleccionado();
 		if (emp == null) {
@@ -971,6 +1132,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Elimina el empleado seleccionado. No permite eliminar la cuenta del
+	 * administrador activo en sesión.
+	 */
 	private void eliminarEmpleado() {
 		int id = gestionEmpleados.getIdEmpleadoSeleccionado();
 		if (id == -1) {
@@ -996,8 +1161,11 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	// ── Clientes (empleado y admin) ───────────────────────────────────────────
 
+	/**
+	 * Abre un diálogo para editar los datos del cliente seleccionado, incluyendo
+	 * su estado (activo/bloqueado).
+	 */
 	private void editarCliente() {
 		Cliente c = getPanelGestionClientesActivo().getClienteSeleccionado();
 		if (c == null) {
@@ -1072,6 +1240,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Elimina el cliente seleccionado de la base de datos. Muestra error si tiene
+	 * alquileres asociados que impiden la eliminación por integridad referencial.
+	 */
 	private void eliminarCliente() {
 		int id = getPanelGestionClientesActivo().getIdClienteSeleccionado();
 		if (id == -1) {
@@ -1093,6 +1265,12 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Recoge todos los alquileres del sistema, calcula el total de ingresos
+	 * y carga el panel de informes del empleado con los indicadores completos:
+	 * total de alquileres, ingresos totales, alquileres activos y pendientes
+	 * de devolución.
+	 */
 	private void cargarInformesEmpleado() {
 		ArrayList<Alquiler> todos = alquilerDAO.listarTodos();
 		double total = 0;
@@ -1102,6 +1280,12 @@ public class Controlador implements ActionListener {
 		informesEmp.cargarInformes(todos, total);
 	}
 
+	/**
+	 * Recoge todos los alquileres del sistema, calcula el total de ingresos
+	 * y carga el panel de informes del administrador con los indicadores completos:
+	 * total de alquileres, ingresos totales, alquileres activos y pendientes
+	 * de devolución.
+	 */
 	private void cargarInformesAdmin() {
 		ArrayList<Alquiler> todos = alquilerDAO.listarTodos();
 		double total = 0;
@@ -1111,8 +1295,10 @@ public class Controlador implements ActionListener {
 		informesAdm.cargarInformes(todos, total);
 	}
 
-	// ── Contador activos cliente ──────────────────────────────────────────────
-
+	/**
+	 * Cuenta los alquileres en estado {@code activo} del cliente en sesión y
+	 * actualiza el indicador de la cabecera del panel cliente.
+	 */
 	private void actualizarContadorActivosCliente() {
 		ArrayList<Alquiler> alquileres = alquilerDAO.listarPorCliente(clienteActivo.getIdCliente());
 		int activos = 0;
@@ -1124,8 +1310,10 @@ public class Controlador implements ActionListener {
 		panelCliente.actualizarContadorActivos(activos);
 	}
 
-	// ── Mi cuenta ─────────────────────────────────────────────────────────────
-
+	/**
+	 * Abre un diálogo para que el cliente modifique sus datos personales y,
+	 * opcionalmente, su contraseña. Valida los campos y detecta duplicados.
+	 */
 	private void modificarDatosCliente() {
 		JTextField txtNombre = new JTextField(clienteActivo.getNombreCliente());
 		JTextField txtApellido = new JTextField(clienteActivo.getApellidoCliente());
@@ -1249,8 +1437,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	// ── Bloquear / desbloquear cliente ──────────────────────────────────────────
-
+	/**
+	 * Bloquea o desbloquea el cliente seleccionado en el panel de gestión de
+	 * clientes, alternando entre los estados {@code activo} y {@code bloqueado}.
+	 */
 	private void bloquearClienteDesdeGestion() {
 		Cliente cliente = getPanelGestionClientesActivo().getClienteSeleccionado();
 		if (cliente == null) {
@@ -1279,6 +1469,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
+	/**
+	 * Bloquea el cliente asociado al alquiler vencido seleccionado en el panel de
+	 * gestión de alquileres. Comprueba que el cliente no esté ya bloqueado.
+	 */
 	private void bloquearClienteDesdeAlquiler() {
 		PanelGestionAlquileres panel = getPanelGestionActivo();
 		int idAlquiler = panel.getIdAlquilerSeleccionado();
@@ -1326,10 +1520,10 @@ public class Controlador implements ActionListener {
 			}
 		}
 	}
-
-	// ── Cerrar sesión
-	// ─────────────────────────────────────────────────────────────
-
+	
+	/**
+	 * Pide confirmación y cierra la sesión activa volviendo al modo invitado.
+	 */
 	private void cerrarSesion() {
 		int conf = JOptionPane.showConfirmDialog(ventana, "¿Seguro que quieres cerrar sesión?", "Cerrar sesión",
 				JOptionPane.YES_NO_OPTION);
@@ -1338,9 +1532,10 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	// ── Filtrar clientes
-	// ──────────────────────────────────────────────────────────
-
+	/**
+	 * Filtra la tabla de clientes del panel activo por el estado seleccionado
+	 * en el combo filtro. Si el filtro es {@code null} muestra todos.
+	 */
 	private void filtrarClientes() {
 		String filtro = getPanelGestionClientesActivo().getFiltroEstado();
 		ArrayList<Cliente> todos = clienteDAO.listarTodos();
@@ -1359,9 +1554,10 @@ public class Controlador implements ActionListener {
 		getPanelGestionClientesActivo().cargarClientes(filtrados);
 	}
 
-	// ── Buscar película en gestión
-	// ────────────────────────────────────────────────
-
+	/**
+	 * Busca películas por título en el panel de gestión activo. Si el campo de
+	 * búsqueda está vacío, muestra todas las películas activas.
+	 */
 	private void buscarPeliculaGestion() {
 		String termino = getPanelGestionPelActivo().getTxtBuscar().getText().trim();
 		ArrayList<Pelicula> peliculas;

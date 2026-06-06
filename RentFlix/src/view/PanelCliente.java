@@ -33,6 +33,15 @@ public class PanelCliente extends JPanel {
 	private PanelMisAlquileres panelMisAlquileres;
 	private PanelMiCuenta panelMiCuenta;
 
+	/**
+	 * Constructor que recibe los subpaneles ya instanciados y los asigna
+	 * a las pestañas correspondientes.
+	 *
+	 * @param panelCatalogo      panel del catálogo de películas
+	 * @param panelMisAlquileres panel del historial de alquileres del cliente
+	 * @param panelMiCuenta      panel de datos personales del cliente
+	 */
+	
 	public PanelCliente(PanelCatalogo panelCatalogo, PanelMisAlquileres panelMisAlquileres,
 			PanelMiCuenta panelMiCuenta) {
 		this.panelCatalogo = panelCatalogo;
@@ -43,11 +52,21 @@ public class PanelCliente extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildHeader(), BorderLayout.NORTH);
 		add(buildTabs(), BorderLayout.CENTER);
 	}
 
+	/**
+	 * Construye la cabecera con el saludo, el badge de cliente y el contador de alquileres activos.
+	 *
+	 * @return panel de cabecera configurado
+	 */
+	
 	private JPanel buildHeader() {
 		JPanel header = new JPanel(new BorderLayout());
 		header.setBackground(COLOR_DARK);
@@ -82,6 +101,12 @@ public class PanelCliente extends JPanel {
 		return header;
 	}
 
+	/**
+	 * Construye el contenedor de pestañas con los subpaneles del cliente.
+	 *
+	 * @return panel de pestañas configurado
+	 */
+	
 	private JTabbedPane buildTabs() {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -90,8 +115,6 @@ public class PanelCliente extends JPanel {
 		tabbedPane.addTab("👤  Mi cuenta", panelMiCuenta);
 		return tabbedPane;
 	}
-
-	// ── Métodos para el Controlador ───────────────────────────────────────────
 
 	/**
 	 * Actualiza el texto de bienvenida con el nombre completo del cliente.

@@ -213,12 +213,8 @@ public class AlquilerDAO implements IAlquilerDAO {
 
 	/**
 	 * {@inheritDoc}
-	 * <p>
-	 * Realiza primero un SELECT para obtener el {@code id_copia} del alquiler, y
-	 * después ejecuta el UPDATE. Devuelve el {@code id_copia} para que el
-	 * controlador pueda restaurar el estado de la copia a {@code disponible}.
-	 * </p>
 	 */
+	
 	@Override
 	public int aceptarDevolucion(int idAlquiler, String fechaDevolucionReal) {
 		int idCopia = -1;

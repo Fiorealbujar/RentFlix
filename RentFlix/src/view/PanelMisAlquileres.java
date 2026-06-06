@@ -41,6 +41,10 @@ public class PanelMisAlquileres extends JPanel {
 	// Lista paralela para guardar los ids sin mostrarlos en la tabla
 	private ArrayList<Integer> listaIds = new ArrayList<Integer>();
 
+	/**
+	 * Constructor que inicializa el panel y construye sus componentes visuales.
+	 */
+	
 	public PanelMisAlquileres() {
 		setBackground(COLOR_FONDO);
 		setLayout(new BorderLayout());
@@ -48,14 +52,22 @@ public class PanelMisAlquileres extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildPanelSuperior(), BorderLayout.NORTH);
 		add(buildTabla(), BorderLayout.CENTER);
 		add(buildPanelAcciones(), BorderLayout.SOUTH);
 	}
 
-	// ── Superior ─────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel superior con el título, la leyenda de colores y el filtro.
+	 *
+	 * @return panel superior configurado
+	 */
+	
 	private JPanel buildPanelSuperior() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setOpaque(false);
@@ -94,6 +106,14 @@ public class PanelMisAlquileres extends JPanel {
 		return panel;
 	}
 
+	/**
+	 * Construye una etiqueta de leyenda con el color del estado correspondiente.
+	 *
+	 * @param texto texto del estado
+	 * @param color color asociado al estado
+	 * @return etiqueta de leyenda configurada
+	 */
+	
 	private JLabel buildChip(String texto, Color color) {
 		JLabel chip = new JLabel("● " + texto);
 		chip.setFont(new Font("SansSerif", Font.PLAIN, 11));
@@ -101,8 +121,12 @@ public class PanelMisAlquileres extends JPanel {
 		return chip;
 	}
 
-	// ── Tabla ─────────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye la tabla de alquileres con sus columnas y renderers de color por estado.
+	 *
+	 * @return scroll pane con la tabla configurada
+	 */
+	
 	private JScrollPane buildTabla() {
 		// Sin columna ID: el cliente no necesita verlo
 		String[] columnas = { "Película", "F. Alquiler", "F. Devolución prev.", "Estado", "Importe" };
@@ -182,8 +206,12 @@ public class PanelMisAlquileres extends JPanel {
 		return scroll;
 	}
 
-	// ── Acciones ──────────────────────────────────────────────────────────────
-
+	/**
+	 * Construye el panel inferior con el texto informativo y el botón de devolución.
+	 *
+	 * @return panel de acciones configurado
+	 */
+	
 	private JPanel buildPanelAcciones() {
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setOpaque(false);
@@ -208,8 +236,13 @@ public class PanelMisAlquileres extends JPanel {
 		return panel;
 	}
 
-	// ── Métodos para el Controlador ───────────────────────────────────────────
-
+	/**
+	 * Carga la lista de alquileres en la tabla. Los ids se guardan en una lista
+	 * paralela para poder recuperarlos sin mostrarlos en la vista.
+	 *
+	 * @param alquileres lista de alquileres del cliente autenticado
+	 */
+	
 	public void cargarAlquileres(ArrayList<Alquiler> alquileres) {
 		modeloTabla.setRowCount(0);
 		listaIds.clear();
@@ -226,6 +259,11 @@ public class PanelMisAlquileres extends JPanel {
 		actualizarBotonDevolucion();
 	}
 
+	/**
+	 * Habilita el botón "Solicitar devolución" solo si el alquiler seleccionado
+	 * está en estado {@code activo}.
+	 */
+	
 	public void actualizarBotonDevolucion() {
 		int fila = tblAlquileres.getSelectedRow();
 		if (fila >= 0) {
@@ -236,7 +274,13 @@ public class PanelMisAlquileres extends JPanel {
 		}
 	}
 
-	// Recupera el id real desde la lista paralela
+	/**
+	 * Devuelve el id real del alquiler seleccionado, obtenido de la lista paralela
+	 * de ids (no visible en la tabla).
+	 *
+	 * @return id del alquiler, o {@code -1} si no hay selección
+	 */
+	
 	public int getIdAlquilerSeleccionado() {
 		int fila = tblAlquileres.getSelectedRow();
 		if (fila < 0) {
@@ -245,6 +289,13 @@ public class PanelMisAlquileres extends JPanel {
 		return listaIds.get(fila);
 	}
 
+	/**
+	 * Devuelve el estado seleccionado en el combo filtro, o {@code null} si se
+	 * seleccionó "Todos".
+	 *
+	 * @return estado del filtro, o {@code null}
+	 */
+	
 	public String getFiltroEstado() {
 		String sel = (String) cmbFiltroEstado.getSelectedItem();
 		if ("Todos".equals(sel)) {
@@ -253,6 +304,12 @@ public class PanelMisAlquileres extends JPanel {
 		return sel;
 	}
 
+	/**
+	 * Registra el controlador como listener del botón, el combo filtro y la tabla.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
+	
 	public void setControlador(Controlador controlador) {
 		btnSolicitarDevolucion.addActionListener(controlador);
 		cmbFiltroEstado.addActionListener(controlador);

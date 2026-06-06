@@ -33,6 +33,18 @@ public class PanelAdmin extends JPanel {
 	private PanelGestionEmpleados panelGestionEmpleados;
 	private PanelGestionClientes panelGestionClientes;
 
+	/**
+	 * Constructor que recibe los subpaneles ya instanciados y los asigna
+	 * a las pestañas correspondientes.
+	 *
+	 * @param panelGestionAlquileres panel de gestión de alquileres
+	 * @param panelAnadirPelicula    panel de alta de películas
+	 * @param panelGestionPeliculas  panel de gestión de películas
+	 * @param panelInformes          panel de informes de ventas
+	 * @param panelGestionEmpleados  panel de gestión de empleados
+	 * @param panelGestionClientes   panel de gestión de clientes
+	 */
+	
 	public PanelAdmin(PanelGestionAlquileres panelGestionAlquileres, PanelAnadirPelicula panelAnadirPelicula,
 			PanelGestionPeliculas panelGestionPeliculas, PanelInformes panelInformes,
 			PanelGestionEmpleados panelGestionEmpleados, PanelGestionClientes panelGestionClientes) {
@@ -48,11 +60,21 @@ public class PanelAdmin extends JPanel {
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y añade los componentes principales del panel.
+	 */
+	
 	private void initComponents() {
 		add(buildHeader(), BorderLayout.NORTH);
 		add(buildTabs(), BorderLayout.CENTER);
 	}
 
+	/**
+	 * Construye la cabecera con el saludo de bienvenida y el badge de administrador.
+	 *
+	 * @return panel de cabecera configurado
+	 */
+	
 	private JPanel buildHeader() {
 		JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
 		header.setBackground(COLOR_DARK);
@@ -73,6 +95,12 @@ public class PanelAdmin extends JPanel {
 		return header;
 	}
 
+	/**
+	 * Construye el contenedor de pestañas con todos los subpaneles del administrador.
+	 *
+	 * @return panel de pestañas configurado
+	 */
+	
 	private JTabbedPane buildTabs() {
 		tabbedPane = new JTabbedPane();
 		tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 13));
@@ -85,6 +113,12 @@ public class PanelAdmin extends JPanel {
 		return tabbedPane;
 	}
 
+	/**
+	 * Actualiza el texto de bienvenida con el nombre completo del administrador.
+	 *
+	 * @param emp empleado administrador en sesión
+	 */
+	
 	public void setBienvenida(Empleado emp) {
 		lblBienvenida.setText("👑 Hola, " + emp.getNombreCompleto());
 	}

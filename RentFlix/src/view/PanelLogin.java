@@ -28,12 +28,20 @@ public class PanelLogin extends JPanel {
 	private JButton btnCancelar;
 	private JLabel lblError;
 
+	/**
+	 * Constructor que inicializa el panel y construye el formulario de login.
+	 */
+	
 	public PanelLogin() {
 		setBackground(COLOR_FONDO);
 		setLayout(new GridBagLayout());
 		initComponents();
 	}
 
+	/**
+	 * Inicializa y construye la tarjeta central con el formulario de login.
+	 */
+	
 	private void initComponents() {
 		JPanel tarjeta = new JPanel();
 		tarjeta.setLayout(new BoxLayout(tarjeta, BoxLayout.Y_AXIS));
@@ -100,6 +108,13 @@ public class PanelLogin extends JPanel {
 		add(tarjeta);
 	}
 
+	/**
+	 * Construye un campo de texto con placeholder para el formulario.
+	 *
+	 * @param placeholder texto de ayuda que se muestra cuando el campo está vacío
+	 * @return campo de texto configurado
+	 */
+	
 	private JTextField buildCampo(String placeholder) {
 		JTextField campo = new JTextField();
 		campo.putClientProperty("JTextField.placeholderText", placeholder);
@@ -109,6 +124,13 @@ public class PanelLogin extends JPanel {
 		return campo;
 	}
 
+	/**
+	 * Construye una etiqueta con el estilo del formulario.
+	 *
+	 * @param texto texto de la etiqueta
+	 * @return etiqueta configurada
+	 */
+	
 	private JLabel buildLabel(String texto) {
 		JLabel lbl = new JLabel(texto);
 		lbl.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -118,6 +140,15 @@ public class PanelLogin extends JPanel {
 		return lbl;
 	}
 
+	/**
+	 * Construye un botón con el estilo estándar del formulario de login.
+	 *
+	 * @param texto  texto del botón
+	 * @param fondo  color de fondo
+	 * @param letra  color del texto
+	 * @return botón configurado
+	 */
+	
 	private JButton buildBoton(String texto, Color fondo, Color letra) {
 		JButton btn = new JButton(texto);
 		btn.setFont(new Font("SansSerif", Font.BOLD, 14));
@@ -131,10 +162,20 @@ public class PanelLogin extends JPanel {
 		return btn;
 	}
 
+	/**
+	 * Muestra un mensaje de error bajo el formulario.
+	 *
+	 * @param mensaje texto del error a mostrar
+	 */
+	
 	public void mostrarError(String mensaje) {
 		lblError.setText(mensaje);
 	}
 
+	/**
+	 * Limpia los campos de usuario y contraseña y resetea el combo de rol.
+	 */
+	
 	public void limpiar() {
 		txtUsuario.setText("");
 		txtContrasenia.setText("");
@@ -142,18 +183,42 @@ public class PanelLogin extends JPanel {
 		cmbRol.setSelectedIndex(0);
 	}
 
+	/**
+	 * Indica si el tipo de usuario seleccionado en el combo es empleado o administrador.
+	 *
+	 * @return {@code true} si se seleccionó "Empleado / Administrador"
+	 */
+	
 	public boolean esRolEmpleado() {
 		return cmbRol.getSelectedIndex() == 1;
 	}
 
+	/**
+	 * Devuelve el nombre de usuario introducido.
+	 *
+	 * @return nombre de usuario
+	 */
+	
 	public String getUsuario() {
 		return txtUsuario.getText().trim();
 	}
 
+	/**
+	 * Devuelve la contraseña introducida.
+	 *
+	 * @return contraseña en texto plano
+	 */
+	
 	public String getContrasenia() {
 		return new String(txtContrasenia.getPassword());
 	}
 
+	/**
+	 * Registra el controlador como listener de los botones del formulario.
+	 *
+	 * @param controlador controlador principal de la aplicación
+	 */
+	
 	public void setControlador(Controlador controlador) {
 		btnEntrar.addActionListener(controlador);
 		btnCancelar.addActionListener(controlador);

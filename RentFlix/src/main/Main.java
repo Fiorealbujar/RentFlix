@@ -38,7 +38,9 @@ public class Main {
 		UIManager.put("OptionPane.noButtonText", "No");
 		UIManager.put("OptionPane.okButtonText", "Aceptar");
 		UIManager.put("OptionPane.cancelButtonText", "Cancelar");
-
+		
+		// Crear la interfaz en el hilo de eventos de Swing para evitar problemas
+		// de concurrencia en los componentes gráficos
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -47,14 +49,14 @@ public class Main {
 				PanelLogin panelLogin = new PanelLogin();
 				PanelRegistro panelRegistro = new PanelRegistro();
 
-				// ── Cliente ──────────────────────────────────────────────────
+				//Cliente
 				PanelCatalogo catInvitado = new PanelCatalogo(false);
 				PanelCatalogo catCliente = new PanelCatalogo(false);
 				PanelMisAlquileres misAlquileres = new PanelMisAlquileres();
 				PanelMiCuenta panelMiCuenta = new PanelMiCuenta();
 				PanelCliente panelCliente = new PanelCliente(catCliente, misAlquileres, panelMiCuenta);
 
-				// ── Empleado ─────────────────────────────────────────────────
+				//Empleado
 				PanelGestionAlquileres gestionAlqEmp = new PanelGestionAlquileres();
 				PanelAnadirPelicula anadirPelEmp = new PanelAnadirPelicula();
 				PanelGestionPeliculas gestionPelEmp = new PanelGestionPeliculas();
@@ -63,7 +65,7 @@ public class Main {
 				PanelEmpleado panelEmpleado = new PanelEmpleado(gestionAlqEmp, anadirPelEmp, gestionPelEmp, informesEmp,
 						gestionClientesEmp);
 
-				// ── Admin ────────────────────────────────────────────────────
+				//Admin
 				PanelGestionAlquileres gestionAlqAdm = new PanelGestionAlquileres();
 				PanelAnadirPelicula anadirPelAdm = new PanelAnadirPelicula();
 				PanelGestionPeliculas gestionPelAdm = new PanelGestionPeliculas();
@@ -73,13 +75,13 @@ public class Main {
 				PanelAdmin panelAdmin = new PanelAdmin(gestionAlqAdm, anadirPelAdm, gestionPelAdm, informesAdm,
 						gestionEmpleados, gestionClientesAdm);
 
-				// ── Controlador ──────────────────────────────────────────────
+				//Controlador
 				Controlador controlador = new Controlador(ventana, catInvitado, catCliente, panelLogin, panelRegistro,
 						panelCliente, misAlquileres, panelMiCuenta, panelEmpleado, gestionAlqEmp, anadirPelEmp,
 						gestionPelEmp, informesEmp, gestionClientesEmp, panelAdmin, gestionAlqAdm, anadirPelAdm,
 						gestionPelAdm, informesAdm, gestionClientesAdm, gestionEmpleados);
 
-				// ── Inyectar controlador ─────────────────────────────────────
+				//Inyectar controlador
 				ventana.setControlador(controlador);
 				catInvitado.setControlador(controlador);
 				catCliente.setControlador(controlador);
