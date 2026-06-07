@@ -40,6 +40,12 @@ import java.util.ArrayList;
  * Todos los tests que dependen del estado de la BD buscan dinámicamente los
  * registros necesarios, sin depender de ids fijos.
  * </p>
+ * <p>
+ * <strong>Nota de uso:</strong> algunos tests insertan registros en la base de
+ * datos de producción. Si se detectan datos acumulados tras varias ejecuciones,
+ * se recomienda restaurar la BD desde el script SQL inicial antes de volver a
+ * ejecutar la suite completa.
+ * </p>
  *
  * @author Fiorella Ruth Albújar Albino
  * @version 1.0
